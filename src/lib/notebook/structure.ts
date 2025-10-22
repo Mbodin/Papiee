@@ -1,3 +1,5 @@
+import type { Widget } from './widgets/types';
+
 export type NotebookNode<U, T> = { type: U; children: T[] };
 
 export interface RootWidgetMap {}
@@ -11,10 +13,16 @@ export function register<
 	REGISTRY[value] = constructor();
 }
 
-export function getWidgets(): RootWidgetMap[keyof RootWidgetMap][] {
-	return Object.values(REGISTRY) as RootWidgetMap[keyof RootWidgetMap][];
+export function getWidgets(): Widget[] {
+	return Object.values(REGISTRY).map((v) => v as unknown as Widget);
 }
 
 export function getWidget<T extends keyof RootWidgetMap>(value: T) {
 	return REGISTRY[value];
 }
+
+export function getWidget_unsafe(value: string) {
+	return REGISTRY[value as keyof RootWidgetMap]!;
+}
+
+export type NotebookState = ReturnType<RootWidgetMap[keyof RootWidgetMap]['initial']>[];
