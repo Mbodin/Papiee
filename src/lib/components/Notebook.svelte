@@ -41,26 +41,7 @@
 	<div class="relative h-full w-40 py-10">
 		{#if anchor}
 			<div class="absolute flex w-full flex-row-reverse px-5" style={`top: ${anchor.offsetTop}px`}>
-				<NotebookAddMenu
-					addMarkdownNode={() => {
-						const new_node = MARKDOWN_WIDGET.initial();
-						new_node.compiled = false;
-						let unfocused = notebook_state.map((v) => MARKDOWN_WIDGET.moveTo(v, undefined));
-
-						notebook_state = [
-							...unfocused.slice(0, anchored_i + 1),
-							new_node,
-							...unfocused.slice(anchored_i + 1)
-						];
-
-						const i = anchored_i + 1;
-
-						setTimeout(() => {
-							const begin = MARKDOWN_WIDGET.getBegin(new_node);
-							notebook_state[i] = MARKDOWN_WIDGET.moveTo(new_node, begin);
-						});
-					}}
-				/>
+				<NotebookAddMenu bind:notebook_state {anchored_i} />
 			</div>
 		{/if}
 	</div>

@@ -4,9 +4,11 @@ export type Widget<
 	Position = unknown,
 	Type extends string = string,
 	Value extends WidgetValue<Position> = WidgetValue<Position, Type>,
-	ToKeepWhenTrimmed extends keyof Value = keyof Value
+	ToKeepWhenTrimmed extends keyof Value = never
 > = {
-	name: Type;
+	name: string;
+	type: Type;
+	icon?: Component;
 
 	trim(value: Value): Pick<Value, ToKeepWhenTrimmed>;
 	untrim(trimmed: Pick<Value, ToKeepWhenTrimmed>): Value;
@@ -16,7 +18,7 @@ export type Widget<
 
 export type WidgetValue<Position = unknown, Type extends string = string> = {
 	type: Type;
-	position?: Position;
+	position?: Position | undefined;
 };
 
 export type PositionHelper<Value extends WidgetValue, Position> = {

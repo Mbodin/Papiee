@@ -1,4 +1,4 @@
-import type { Widget } from './widgets/types';
+import type { Widget, WidgetValue } from './widgets/types';
 
 export type NotebookNode<U, T> = { type: U; children: T[] };
 
@@ -22,7 +22,7 @@ export function getWidget<T extends keyof RootWidgetMap>(value: T) {
 }
 
 export function getWidget_unsafe(value: string) {
-	return REGISTRY[value as keyof RootWidgetMap]!;
+	return REGISTRY[value as keyof RootWidgetMap]! as unknown as Widget;
 }
 
-export type NotebookState = ReturnType<RootWidgetMap[keyof RootWidgetMap]['initial']>[];
+export type NotebookState = WidgetValue[];

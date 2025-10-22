@@ -1,6 +1,7 @@
 import MarkdownWidgetC from '$lib/components/widgets/MarkdownWidget.svelte';
 import { register } from '$lib/notebook/structure';
 import type { Widget, WidgetValue } from '$lib/notebook/widgets/types';
+import { FileTextIcon } from '@lucide/svelte';
 
 export type MarkdownWidget = Widget<number, 'markdown', MarkdownWidgetValue, 'value' | 'compiled'>;
 export type MarkdownWidgetValue = WidgetValue<number> & { value: string; compiled: boolean };
@@ -12,14 +13,17 @@ declare module '$lib/notebook/structure' {
 }
 
 export const MARKDOWN_WIDGET: MarkdownWidget = {
-	name: 'markdown',
+	type: 'markdown',
+	name: 'Markdown',
+	icon: FileTextIcon,
+
 	component: MarkdownWidgetC,
 	initial() {
 		return {
 			type: 'markdown',
 			value: '',
 			position: undefined,
-			compiled: true
+			compiled: false
 		};
 	},
 	trim(value) {
