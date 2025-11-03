@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { MathLiveNodeView } from '$lib/prosemirror-papiee-cnt/mathlive_inputview';
-	import SCHEMA from '$lib/prosemirror-papiee-cnt/schema';
+	import { MathLiveNodeView } from '$lib/prosemirror-papiee-cnl/mathlive_inputview';
+	import SCHEMA from '$lib/prosemirror-papiee-cnl/schema';
 	import { EditorState } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
 	import type { Node } from 'prosemirror-model';
-	import { MATHLIVE_PLUGINS } from '$lib/prosemirror-papiee-cnt/plugins';
+	import { MATHLIVE_PLUGINS } from '$lib/prosemirror-papiee-cnl/plugins';
 	import {
 		comparePosition,
 		RichEditInputPositionHelper,

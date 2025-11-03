@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { getWidget, getWidget_unsafe, type NotebookState } from '$lib/notebook/structure';
+	import { getWidget_unsafe, type NotebookState } from '$lib/notebook/structure';
 	import { MARKDOWN_WIDGET } from '$lib/notebook/widgets/markdown/structure';
-	import { Plus } from '@lucide/svelte';
+	import * as _ from '$lib/notebook/widgets/proof/structure';
 	import NotebookAddMenu from './NotebookAddMenu.svelte';
 
 	let notebook_state: NotebookState = $state([MARKDOWN_WIDGET.initial()]);

@@ -1,4 +1,4 @@
-import SCHEMA from '$lib/prosemirror-papiee-cnt/schema';
+import SCHEMA from '$lib/prosemirror-papiee-cnl/schema';
 import { keymap } from 'prosemirror-keymap';
 import { Plugin, Selection, TextSelection } from 'prosemirror-state';
 import * as mathlive from 'mathlive';

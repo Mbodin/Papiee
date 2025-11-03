@@ -38,6 +38,9 @@ export const PROOF_WIDGET: ProofWidget = {
 			value: trimmed.value
 		};
 	},
+	get(value) {
+		return value.position;
+	},
 	getBegin() {
 		return 0;
 	},

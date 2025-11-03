@@ -10,7 +10,7 @@ export function register<
 	T extends RootWidgetMap[keyof RootWidgetMap],
 	U extends T['name'] & keyof RootWidgetMap
 >(value: U, constructor: () => T) {
-	REGISTRY[value] = constructor();
+	(REGISTRY as any)[value] = constructor();
 }
 
 export function getWidgets(): Widget[] {

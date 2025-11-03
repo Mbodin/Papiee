@@ -12,7 +12,7 @@
 	const popover = usePopover({
 		id: id,
 		closeOnInteractOutside: true,
-		positioning: { placement: 'right' }
+		positioning: { placement: 'right-start' }
 	});
 
 	function addNode(widget: Widget) {
@@ -42,7 +42,7 @@
 		<Popover.Positioner>
 			<Popover.Content>
 				<div
-					class="max-w-md space-y-2 card border border-surface-500/30 bg-tertiary-200-800/30 p-2 shadow-xl backdrop-blur-sm"
+					class="flex max-w-md flex-col space-y-2 card border border-surface-500/30 bg-tertiary-200-800/30 p-2 shadow-xl backdrop-blur-sm"
 				>
 					{#each getWidgets() as widget}
 						{@const Component = widget.icon}
