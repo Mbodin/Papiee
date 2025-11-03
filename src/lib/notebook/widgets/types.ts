@@ -21,9 +21,13 @@ export type WidgetValue<Position = unknown, Type extends string = string> = {
 	position?: Position | undefined;
 };
 
-export type PositionHelper<Value extends WidgetValue, Position> = {
+export type PositionHelper<Value extends any, Position> = {
 	isLast(value: Value): boolean;
 	isFirst(value: Value): boolean;
+
+	// Should get the current position stored in the value
+	// Maybe undefined if element is not focused
+	get(value: Value): Position | undefined;
 	getBegin(value: Value): Position;
 	getEnd(value: Value): Position;
 

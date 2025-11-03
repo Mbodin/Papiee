@@ -79,7 +79,7 @@
 			]}
 		/>
 	{/if}
-	<div class="absolute top-2 right-2 btn-icon preset-filled-secondary-500 text-primary-100-900">
+	<div class="absolute top-0 right-2 btn-icon preset-filled-secondary-500 text-primary-100-900">
 		<button onclick={() => onNodeValueUpdate(value, { ...value, compiled: !value.compiled })}
 			>{#if value.compiled}
 				<PickaxeIcon />

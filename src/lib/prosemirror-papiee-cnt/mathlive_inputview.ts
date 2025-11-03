@@ -1,7 +1,7 @@
 import type { Node as P_Node } from 'prosemirror-model';
 import * as mathlive from 'mathlive';
 import type { Decoration, DecorationSource, EditorView, NodeView } from 'prosemirror-view';
-import { Selection } from 'prosemirror-state';
+import { Selection, TextSelection } from 'prosemirror-state';
 import 'mathlive/fonts.css';
 
 export class MathLiveNodeView implements NodeView {
@@ -47,10 +47,11 @@ export class MathLiveNodeView implements NodeView {
 				);
 				this.mathfield.value = value.replace('\\$', '');
 				this.view.dispatch(tr);
-			} else {
-				const tr = this.view.state.tr.setNodeMarkup(pos, undefined, { latex: value });
-				this.view.dispatch(tr);
+				return;
 			}
+			const tr = this.view.state.tr.setNodeMarkup(pos, undefined, { latex: value });
+			const $pos = this.view.state.doc.resolve(pos);
+			this.view.dispatch(tr);
 		});
 
 		this.mathfield.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -90,11 +91,21 @@ export class MathLiveNodeView implements NodeView {
 			const nodeSize = this.node.nodeSize;
 			const sel = this.view.state.selection;
 
-			// If selection isn’t already inside this node, move it here
-			if (sel.from < pos || sel.to > pos + nodeSize) {
-				const $pos = this.view.state.doc.resolve(pos);
-				this.view.dispatch(this.view.state.tr.setSelection(Selection.near($pos, 1)));
-			}
+			const doc = this.view.state.doc;
+			this.view.dispatch(
+				this.view.state.tr.setSelection(new TextSelection(doc.resolve(pos), doc.resolve(pos + 1)))
+			);
+		});
+		this.mathfield.addEventListener('selection-change', (e) => {
+			// Keep the repeating behaviour because it set the position to the right value
+			// if ('explicitOriginalTarget' in e && e.explicitOriginalTarget === this.mathfield) return;
+			e.stopPropagation();
+			// When MathLive focuses, select the node in PM if needed
+			const pos = this.getPos()!;
+			const doc = this.view.state.doc;
+			this.view.dispatch(
+				this.view.state.tr.setSelection(new TextSelection(doc.resolve(pos), doc.resolve(pos + 1)))
+			);
 		});
 
 		// Handle arrow keys at edges

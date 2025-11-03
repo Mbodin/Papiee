@@ -5,8 +5,21 @@
 	import { EditorView } from 'prosemirror-view';
 	import type { Node } from 'prosemirror-model';
 	import { MATHLIVE_PLUGINS } from '$lib/prosemirror-papiee-cnt/plugins';
+	import {
+		comparePosition,
+		RichEditInputPositionHelper,
+		type RichInputPosition
+	} from '$lib/RichEditInput';
 
-	let { value = $bindable('') }: { value?: string } = $props();
+	let {
+		value = $bindable(''),
+		position = $bindable(),
+		onKeyDown
+	}: {
+		value?: string;
+		position?: RichInputPosition | undefined;
+		onKeyDown?: (e: KeyboardEvent) => void;
+	} = $props();
 
 	let editor_state: EditorState;
 	let view: EditorView;
@@ -23,9 +36,14 @@
 		view = new EditorView(diva, {
 			state: editor_state,
 
+			handleKeyDown(_view, event) {
+				if (onKeyDown) onKeyDown(event);
+			},
 			dispatchTransaction(tr) {
 				const newState = view.state.apply(tr);
 				view.updateState(newState);
+				const _p = RichEditInputPositionHelper.get(view);
+				if (comparePosition(_p, position) !== 0) position = RichEditInputPositionHelper.get(view);
 				value = unparse(newState.doc);
 			},
 
@@ -44,6 +62,12 @@
 				const tr = view.state.tr.replaceWith(0, view.state.doc.content.size, newDoc.content);
 				view.dispatch(tr);
 			}
+		}
+	});
+
+	$effect(() => {
+		if (view && comparePosition(position, RichEditInputPositionHelper.get(view)) !== 0) {
+			RichEditInputPositionHelper.moveTo(view, position);
 		}
 	});
 

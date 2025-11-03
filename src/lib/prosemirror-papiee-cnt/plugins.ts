@@ -1,6 +1,6 @@
 import SCHEMA from '$lib/prosemirror-papiee-cnt/schema';
 import { keymap } from 'prosemirror-keymap';
-import { Plugin, TextSelection } from 'prosemirror-state';
+import { Plugin, Selection, TextSelection } from 'prosemirror-state';
 import * as mathlive from 'mathlive';
 
 export const MATHLIVE_ARROWKEY_KEYMAP_PLUGIN = keymap({
@@ -20,8 +20,8 @@ export const MATHLIVE_ARROWKEY_KEYMAP_PLUGIN = keymap({
 		return false;
 	},
 
-	ArrowLeft: (state, _dispatch, view) => {
-		const { $from: from } = state.selection;
+	ArrowLeft: (state, dispatch, view) => {
+		const { $from: from, $to: to } = state.selection;
 
 		// If previous node is math node and selection at start of text
 		if (from.nodeBefore?.type.name === 'math' && from.textOffset === 0) {
@@ -60,7 +60,7 @@ export const MATHLIVE_SELECTION_PLUGIN = new Plugin({
 
 export const MATHLIVE_MATHMODE = keymap({
 	$: (state, dispatch, view) => {
-		const mathNode = SCHEMA.nodes.math.create({ latex: '' });
+		const mathNode = SCHEMA.nodes.math.createAndFill({ latex: '' })!;
 		const { from, to } = state.selection;
 		const tr = state.tr.replaceRangeWith(from, to, mathNode);
 

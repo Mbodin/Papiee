@@ -1,47 +1,42 @@
-import MarkdownWidgetC from '$lib/components/widgets/MarkdownWidget.svelte';
 import { register } from '$lib/notebook/structure';
 import type { Widget, WidgetValue } from '$lib/notebook/widgets/types';
-import { FileTextIcon } from '@lucide/svelte';
+import { NotebookPenIcon } from '@lucide/svelte';
+import type { ProofDocumentValue } from './values';
+import ProofDocument from '$lib/components/widgets/proof/ProofDocument.svelte';
 
-export type MarkdownWidget = Widget<number, 'markdown', MarkdownWidgetValue, 'value' | 'compiled'>;
-export type MarkdownWidgetValue = WidgetValue<number> & { value: string; compiled: boolean };
+export type ProofWidget = Widget<number, 'proof', ProofWidgetValue, 'value'>;
+export type ProofWidgetValue = WidgetValue<number> & { value: ProofDocumentValue };
 
 declare module '$lib/notebook/structure' {
 	interface RootWidgetMap {
-		markdown: MarkdownWidget;
+		proof: ProofWidget;
 	}
 }
 
-export const MARKDOWN_WIDGET: MarkdownWidget = {
-	type: 'markdown',
-	name: 'Markdown',
-	icon: FileTextIcon,
+export const PROOF_WIDGET: ProofWidget = {
+	type: 'proof',
+	name: 'Proof',
+	icon: NotebookPenIcon,
 
-	component: MarkdownWidgetC,
+	component: ProofDocument,
 	initial() {
 		return {
-			type: 'markdown',
+			type: 'proof',
 			value: '',
-			position: undefined,
-			compiled: false
+			position: undefined
 		};
 	},
 	trim(value) {
 		return {
-			value: value.value,
-			compiled: value.compiled
+			value: value.value
 		};
 	},
 	untrim(trimmed) {
 		return {
 			type: 'markdown',
 			position: 0,
-			value: trimmed.value,
-			compiled: trimmed.compiled
+			value: trimmed.value
 		};
-	},
-	get(v) {
-		return v.position;
 	},
 	getBegin() {
 		return 0;
@@ -66,4 +61,4 @@ export const MARKDOWN_WIDGET: MarkdownWidget = {
 	}
 };
 
-register('markdown', () => MARKDOWN_WIDGET);
+register('proof', () => PROOF_WIDGET);
