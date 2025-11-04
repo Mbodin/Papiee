@@ -1,14 +1,16 @@
 <script lang="ts" module>
-	import Doc from './Doc.svelte';
 	export const DocNodeView = (factory: NodeViewFactory) =>
 		factory({
 			component: Doc,
 			as: 'div',
 			contentAs: 'p'
 		});
+	export const plugins: Plugin[] = [];
 </script>
 
 <script lang="ts">
+	import type { Plugin } from 'prosemirror-state';
+	import Doc from './Doc.svelte';
 	import { useNodeViewContext, type NodeViewFactory } from '@prosemirror-adapter/svelte';
 
 	const contentRef = useNodeViewContext('contentRef');
