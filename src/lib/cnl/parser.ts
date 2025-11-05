@@ -17,10 +17,7 @@ export class ParseError extends Error {}
  * \t\t2.2 Paragraph
  */
 export function parse(value: string): Node {
-	const lines = value
-		.split(/\r?\n/)
-		.map((l) => l.replace(/\r$/, ''))
-		.filter((l) => l.trim() !== '');
+	const lines = value.split('\n');
 
 	let index = 0;
 	const paragraphs: Node[] = [];
@@ -83,7 +80,10 @@ function parseParagraph(
 
 	// Build ProseMirror nodes
 	const textNode = parseText(paragraphLines.join(' '));
-	const lineNode = schema.nodes.line.create(null, textNode);
+	const lineNode = schema.nodes.line.create(
+		undefined,
+		textNode.length === 0 ? undefined : textNode
+	);
 
 	const childrenNode =
 		paragraphChildren.length === 0
