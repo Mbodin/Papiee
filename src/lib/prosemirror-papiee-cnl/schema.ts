@@ -1,5 +1,5 @@
 import * as mathlive from 'mathlive';
-import { Schema, type NodeSpec } from 'prosemirror-model';
+import { Schema, type MarkSpec, type NodeSpec } from 'prosemirror-model';
 
 export const nodes = {
 	doc: { content: 'content' },
@@ -66,4 +66,8 @@ export const nodes = {
 	}
 } satisfies { [key: string]: NodeSpec };
 
-export const schema = new Schema({ nodes });
+export const marks = {
+	selected: {}
+} satisfies { [key: string]: MarkSpec };
+
+export const schema = new Schema({ nodes, marks });

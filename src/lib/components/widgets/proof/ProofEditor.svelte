@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { MATHLIVE_PLUGINS } from '$lib/prosemirror-papiee-cnl/plugins';
 	import { schema } from '$lib/prosemirror-papiee-cnl/schema';
-	import { useNodeViewFactory } from '@prosemirror-adapter/svelte';
+	import { useMarkViewFactory, useNodeViewFactory } from '@prosemirror-adapter/svelte';
 	import { EditorState, Plugin } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
 	import { ParagraphNodeView, plugins as paragraph_plugins } from './views/Paragraph.svelte';
@@ -12,11 +12,13 @@
 	import { unparse } from '$lib/cnl/textual';
 	import '$lib/resolvedpos';
 	import { MathLiveNodeView } from '$lib/prosemirror-papiee-cnl/mathlive_inputview';
+	import { MarkSelectedView, plugins as mark_selected_plugins } from './marks/MarkSelected.svelte';
 
 	let { node = $bindable(), onView }: { node?: Node; onView?: (view: EditorView) => void } =
 		$props();
 
 	const nodeViewFactory = useNodeViewFactory();
+	const markViewFactor = useMarkViewFactory();
 
 	const editor = (element: HTMLElement) => {
 		const editor_state = EditorState.create({
@@ -36,6 +38,7 @@
 				doc_plugins,
 				line_plugins,
 				content_plugins,
+				mark_selected_plugins,
 				// Prevent selection from spanning multiple elements
 				new Plugin({
 					filterTransaction(tr, state) {
@@ -63,6 +66,9 @@
 				math: (node, view, getPos, decorations, innerDectorations) => {
 					return new MathLiveNodeView(node, view, getPos, decorations, innerDectorations);
 				}
+			},
+			markViews: {
+				selected: MarkSelectedView(markViewFactor)
 			},
 			attributes(state) {
 				return { spellcheck: 'false' };
