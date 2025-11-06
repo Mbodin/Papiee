@@ -1,6 +1,7 @@
 import type { CompiledRules, ParserRule } from 'nearley';
 import { getTactics, type CnlTactic } from './cnl_tactic';
 import { filterToName } from './cnl_tactic_to_grammar';
+import { Lexer } from './lexer';
 
 function rename_string(v: string, src: string, target: string) {
 	return v === src ? target : v;
@@ -34,6 +35,7 @@ export default function tactic_grammar(tactics?: CnlTactic[], state?: string[]):
 
 	return {
 		ParserStart: 'main',
+		Lexer: new Lexer(),
 		ParserRules: sources
 			.flatMap((v) => v.ParserRules)
 			.concat({

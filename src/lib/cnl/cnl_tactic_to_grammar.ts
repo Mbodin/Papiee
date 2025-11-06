@@ -38,8 +38,8 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 	const reference_value_type: Map<string, 'unique' | 'list'> = new Map();
 	const regitered_tokens: ({ literal: string } | { token: string })[] = [];
 
-	const _space_0_id = generate();
-	const _space_1_id = generate();
+	const _space_0_id = generate() + '#SPACE_0';
+	const _space_1_id = generate() + '#SPACE_1';
 	const SPACE_0: ParserRule[] = [
 		{ name: _space_0_id, symbols: [_space_1_id, _space_0_id] },
 		{ name: _space_0_id, symbols: [] }
@@ -54,7 +54,9 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 			name: _everything,
 			symbols: [
 				{
-					test: (v: any) => v !== '$'
+					test: (v: any) => {
+						return typeof v === 'string' && v !== '$';
+					}
 				} as Symbol,
 				_everything
 			],
@@ -64,9 +66,15 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 		},
 		{
 			name: _everything,
-			symbols: [],
+			symbols: [
+				{
+					test: (v: any) => {
+						return v !== '$' || (typeof v === 'object' && v.type === 'stop_everything');
+					}
+				} as Symbol
+			],
 			postprocess(d, loc, reject) {
-				return '';
+				return d[0];
 			}
 		}
 	];
