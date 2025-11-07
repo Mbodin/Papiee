@@ -384,7 +384,7 @@
 		Transaction,
 		type Command
 	} from 'prosemirror-state';
-	import { nodes, schema } from '$lib/prosemirror-papiee-cnl/schema';
+	import { nodes, schema } from '$lib/components/widgets/proof/schema';
 	import { keymap } from 'prosemirror-keymap';
 	import Paragraph from './Paragraph.svelte';
 	import { type ResolvedPos } from 'prosemirror-model';

@@ -18,7 +18,6 @@
 				newState.doc.descendants((node, offset, index) => {
 					if (node.type.name !== schema.nodes.line.name) return true;
 					const content = node.textContent;
-
 					const result = parse_cnl(content);
 					tr = tr.addMark(
 						offset,
@@ -37,8 +36,8 @@
 <script lang="ts">
 	import { useMarkViewContext } from '@prosemirror-adapter/svelte';
 	import { unparse } from '$lib/cnl/textual';
-	import { schema } from '$lib/prosemirror-papiee-cnl/schema';
-	import { parse_cnl, parse_cnl_chained } from '$lib/cnl/parser';
+	import { schema } from '$lib/components/widgets/proof/schema';
+	import { parse_cnl } from '$lib/cnl/parser';
 	import { get } from 'svelte/store';
 	import type { CnlTactic } from '$lib/cnl/cnl_tactic';
 
@@ -59,6 +58,10 @@
 	.mark-tactic {
 		position: relative;
 		display: inline-block;
+	}
+
+	:global(.mark-tactic .mark-tactic::before) {
+		display: none;
 	}
 
 	.mark-error::before {

@@ -21,9 +21,8 @@
 </script>
 
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { useMarkViewContext } from '@prosemirror-adapter/svelte';
-	import { marks, schema } from '$lib/prosemirror-papiee-cnl/schema';
+	import { schema } from '$lib/components/widgets/proof/schema';
 
 	const contentRef = useMarkViewContext('contentRef');
 </script>
@@ -45,6 +44,10 @@
 		pointer-events: none;
 		border-style: solid;
 		z-index: 1; /* sits behind the text */
+	}
+
+	:global(.mark-selected .mark-selected::before) {
+		display: none;
 	}
 
 	:global(.mark-selected .mark-tactic::before) {

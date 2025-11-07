@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { MATHLIVE_PLUGINS } from '$lib/prosemirror-papiee-cnl/plugins';
-	import { schema } from '$lib/prosemirror-papiee-cnl/schema';
 	import { useMarkViewFactory, useNodeViewFactory } from '@prosemirror-adapter/svelte';
 	import { EditorState, Plugin } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
@@ -11,9 +9,9 @@
 	import { ContentNodeView, plugins as content_plugins } from './views/Content.svelte';
 	import { unparse } from '$lib/cnl/textual';
 	import '$lib/resolvedpos';
-	import { MathLiveNodeView } from '$lib/prosemirror-papiee-cnl/mathlive_inputview';
 	import { MarkSelectedView, plugins as mark_selected_plugins } from './marks/MarkSelected.svelte';
 	import { plugins as mark_tactic_plugins, MarkTacticView } from './marks/MarkTactic.svelte';
+	import { schema } from '$lib/components/widgets/proof/schema';
 
 	import '$lib/cnl/tactics';
 
@@ -27,7 +25,6 @@
 		const editor_state = EditorState.create({
 			schema,
 			plugins: [
-				MATHLIVE_PLUGINS,
 				new Plugin({
 					view(view) {
 						return {
@@ -65,10 +62,7 @@
 				paragraph: ParagraphNodeView(nodeViewFactory),
 				doc: DocNodeView(nodeViewFactory),
 				line: LineNodeView(nodeViewFactory),
-				content: ContentNodeView(nodeViewFactory),
-				math: (node, view, getPos, decorations, innerDectorations) => {
-					return new MathLiveNodeView(node, view, getPos, decorations, innerDectorations);
-				}
+				content: ContentNodeView(nodeViewFactory)
 			},
 			markViews: {
 				selected: MarkSelectedView(markViewFactor),
@@ -114,61 +108,7 @@
 		background: Highlight;
 	}
 
-	:global(.math-selected) {
-		background: var(--selection-bg);
-		color: black;
-		border-radius: 2px;
-	}
-
 	:global(.ProseMirror:focus) {
 		outline: none;
-	}
-
-	:global(.math-node) {
-		display: inline-block;
-		font-family: inherit; /* match surrounding text */
-		font-size: 1em;
-		padding: 0 0;
-		margin: 0;
-		border: none;
-		outline: none;
-	}
-
-	:global(.math-node math-field::part(container)) {
-		padding-left: 0px;
-		padding-right: 0px;
-	}
-
-	:global(.math-node math-field::part(content)) {
-		padding-left: 0px;
-		padding-right: 0px;
-	}
-
-	:global(.math-node math-field) {
-		color: inherit;
-	}
-
-	:global(.math-node math-field::part(virtual-keyboard-toggle)) {
-		display: none;
-	}
-
-	:global(math-field::part(menu-toggle)) {
-		display: none;
-		background-color: red;
-	}
-
-	:global(.math-node math-field) {
-		transition: background-color 10s;
-		background-color: transparent;
-		outline: none;
-	}
-
-	:global(.math-mode math-field) {
-		--text-highlight-background-color: transparent;
-		--math-highlight-background-color: transparent;
-		--contains-highlight-background-color: transparent;
-		--smart-fence-opacity: 1;
-		--smart-fence-color: inherit;
-		background-color: transparent;
 	}
 </style>

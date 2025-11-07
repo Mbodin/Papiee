@@ -1,5 +1,5 @@
 import { ParseError } from '$lib/parsing';
-import { schema } from '$lib/prosemirror-papiee-cnl/schema';
+import { schema } from '$lib/components/widgets/proof/schema';
 import type { Node } from 'prosemirror-model';
 
 /**
@@ -103,17 +103,18 @@ function parseParagraph(
  * @returns A list of node with math and text node inside
  */
 function parseText(value: string): Node[] {
-	const nodes = [];
-	const regex = /\$(.*?)\$|([^$]+)/gs;
-	let match;
-	while ((match = regex.exec(value))) {
-		if (match[1]) {
-			nodes.push(schema.node('math', { latex: match[1] }));
-		} else if (match[2]) {
-			nodes.push(schema.text(match[2]));
-		}
-	}
-	return nodes;
+	return [schema.text(value)];
+	// const nodes = [];
+	// const regex = /\$(.*?)\$|([^$]+)/gs;
+	// let match;
+	// while ((match = regex.exec(value))) {
+	// 	if (match[1]) {
+	// 		nodes.push(schema.text(match[1]));
+	// 	} else if (match[2]) {
+	// 		nodes.push(schema.text(match[2]));
+	// 	}
+	// }
+	// return nodes;
 }
 
 /** Counts the number of leading tab characters in a string. */
