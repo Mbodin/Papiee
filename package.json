@@ -55,6 +55,10 @@
 		"prosemirror-state": "^1.4.3",
 		"prosemirror-transform": "^1.10.4",
 		"prosemirror-view": "^1.41.3",
-		"svelte-codemirror-editor": "^2.1.0"
+		"svelte-codemirror-editor": "^2.1.0",
+		"unzipper": "^0.12.3",
+		"vscode-jsonrpc": "^8.2.1",
+		"vscode-languageserver-protocol": "^3.17.5",
+		"vscode-languageserver-types": "^3.17.5"
 	}
 }
