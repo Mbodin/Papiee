@@ -59,7 +59,11 @@ export function parse_cnl(value: string, state?: string[]): CNLParseResult | und
 	return max;
 }
 
-export function parse_cnl_chained(value: string, state: string[] = []): CNLParseResultChained {
+export function parse_cnl_chained(
+	value: string,
+	state: string[] = [],
+	ignore_structre: boolean = false
+): CNLParseResultChained {
 	let _state = [...state];
 	let _offset = 0;
 
@@ -73,7 +77,7 @@ export function parse_cnl_chained(value: string, state: string[] = []): CNLParse
 		ends.push(_offset);
 		_state = result.state;
 		parsed.push(result.result);
-	} while (result && !result.result.tactic.spec.footer.structure);
+	} while (result && (ignore_structre || !result.result.tactic.spec.footer.structure));
 
 	return {
 		result: parsed,

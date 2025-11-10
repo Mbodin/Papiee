@@ -27,6 +27,15 @@ export type CnlTactic<T = any> = {
 	transformer: Transformer<T>;
 };
 
+/**
+ * A fallback tactic is defined using empty content, it's a tactic supposed to be called when no other way is available
+ * @param tactic
+ * @returns true if the content is empty, false otherwise
+ */
+export function isFallbackTactic(tactic: CnlTactic<unknown>): boolean {
+	return tactic.spec.content.length === 0;
+}
+
 export function resolve_state_actions(state: string[], actions: StateAction[]) {
 	const _state = [...state];
 

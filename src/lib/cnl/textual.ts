@@ -103,7 +103,7 @@ function parseParagraph(
  * @returns A list of node with math and text node inside
  */
 function parseText(value: string): Node[] {
-	return [schema.text(value)];
+	return value.length === 0 ? [] : [schema.text(value)];
 	// const nodes = [];
 	// const regex = /\$(.*?)\$|([^$]+)/gs;
 	// let match;

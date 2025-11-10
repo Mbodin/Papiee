@@ -176,37 +176,26 @@
 				let tr = newState.tr;
 				const head = tr.selection.$head;
 
-				let completion_begin = -1,
-					completion_end = -1;
-				let completion = undefined as CompletionState | undefined;
-				tr.doc.nodesBetween(head.before(), head.after(), (n, pos) => {
-					const completion_mark = n.marks.find((v) => v.type.name === schema.marks.selected.name);
-					if (!completion_mark) return true;
-					completion = completion_mark.attrs.completion as CompletionState | undefined;
-					completion_begin = pos;
-					completion_end = pos + n.nodeSize;
-				});
+				const index = head.index();
+				if (head.node().childCount <= index) return;
+				const text = head.node().child(index);
+				const main = getMainChunk(getChunks(text));
+				if (!main) return;
+				const { from, to } = main.range;
 
-				if (completion) return undefined;
-				tr = newState.tr.removeMark(0, newState.doc.content.size, schema.marks.selected);
+				const existing_selection = text.marks.find(
+					(v) => v.type.name === schema.marks.selected.name
+				)?.attrs;
 
-				let begin = -1,
-					end = -1;
-				tr.doc.nodesBetween(head.before(), head.after(), (n, pos) => {
-					if (n.marks.length === 0) return true;
-					if (!(head.pos >= pos && head.pos <= pos + n.nodeSize)) return true;
-					if (n.marks.find((v) => v.type.name !== schema.marks.tactic.name)) return true;
-					begin = pos;
-					end = pos + n.nodeSize;
-				});
+				if (existing_selection) return;
 
-				tr = tr.addMark(
-					begin,
-					end,
+				tr = tr.removeMark(0, tr.doc.content.size, schema.marks.selected).addMark(
+					from,
+					to,
 					schema.marks.selected.create({
 						completion: {
-							from: begin,
-							to: end,
+							from,
+							to,
 							selector: '.completer_position',
 							value: ['Test', 'Test', 'Test', 'Test', 'Test', 'Test', 'Test', 'Test'],
 							selected: undefined,
@@ -225,6 +214,7 @@
 	import { schema } from '$lib/components/widgets/proof/schema';
 	import type { CompletionState } from '../ProofAutoCompletion.svelte';
 	import { keymap } from 'prosemirror-keymap';
+	import { getChunks, getMainChunk, type ProofChunk } from '$lib/notebook/widgets/proof/chunk';
 
 	let id = $props.id();
 
@@ -252,7 +242,7 @@
 		display: none;
 	}
 
-	:global(.mark-selected .mark-tactic::before) {
+	:global(.mark-selected .mark-chunks::before) {
 		content: '';
 		position: absolute;
 		inset: -5px;

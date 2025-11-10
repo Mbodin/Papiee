@@ -54,17 +54,9 @@ export const marks = {
 			}
 		}
 	},
-	tactic: {
+	chunks: {
 		attrs: {
-			tactic: {
-				default: undefined as ParseResult | undefined
-			},
-			error: {
-				default: false
-			},
-			last: {
-				default: false
-			}
+			value: {}
 		}
 	}
 } satisfies { [key: string]: MarkSpec };

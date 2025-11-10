@@ -1,5 +1,6 @@
 import type { ParseResult } from '$lib/cnl/cnl_grammar';
 import { Schema, type MarkSpec, type NodeSpec } from 'prosemirror-model';
+import type { ProofChunk } from './chunk';
 
 export const nodes = {
 	doc: { content: 'content' },
@@ -47,13 +48,10 @@ export const nodes = {
 
 export const marks = {
 	selected: {},
-	tactic: {
+	chunks: {
 		attrs: {
-			tactic: {
-				default: undefined as ParseResult | undefined
-			},
-			error: {
-				default: false
+			value: {
+				default: undefined as undefined | ProofChunk[]
 			}
 		}
 	}

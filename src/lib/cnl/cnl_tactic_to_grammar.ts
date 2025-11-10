@@ -142,7 +142,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 	const main_rule: ParserRule[] = [
 		{
 			name: filterToName(spec.header.state),
-			symbols: compiled_content.map((v) => v[0]),
+			symbols: [_space_0_id, ...compiled_content.map((v) => v[0]), _space_0_id],
 			postprocess(v) {
 				const references = v
 					.flat(Infinity)

@@ -10,7 +10,7 @@
 	import { unparse } from '$lib/cnl/textual';
 	import '$lib/resolvedpos';
 	import { MarkSelectedView, plugins as mark_selected_plugins } from './marks/MarkSelected.svelte';
-	import { plugins as mark_tactic_plugins, MarkTacticView } from './marks/MarkTactic.svelte';
+	import { plugins as mark_chunks_plugins, MarkChunksView } from './marks/MarkChunks.svelte';
 	import { schema } from '$lib/components/widgets/proof/schema';
 
 	import '$lib/cnl/tactics';
@@ -31,7 +31,7 @@
 			schema,
 			plugins: [
 				mark_selected_plugins,
-				mark_tactic_plugins,
+				mark_chunks_plugins,
 				new Plugin({
 					view(view) {
 						return {
@@ -84,7 +84,7 @@
 			},
 			markViews: {
 				selected: MarkSelectedView(markViewFactor),
-				tactic: MarkTacticView(markViewFactor)
+				chunks: MarkChunksView(markViewFactor)
 			},
 
 			attributes(state) {
