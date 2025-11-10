@@ -9,5 +9,5 @@ const INTROS = createTacticFromTextual<{ name: string }>(
 const ASSUME = createTacticFromTextual<{ prop: string }>(
 	undefined,
 	'{|Assume that $|prop|$.|}',
-	({ value }) => `intros ${value.prop}.`
+	({ value }) => `assume ${value.prop}.`
 );

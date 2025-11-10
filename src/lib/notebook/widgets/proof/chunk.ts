@@ -31,6 +31,7 @@ export type CommentChunk = {
 export type TacticChunk = {
 	type: 'tactic';
 	range: { from: number; to: number };
+	code: string;
 } & ParseResult;
 
 export function getLineEndStructure(
@@ -153,7 +154,8 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 					type: 'tactic',
 					range: { from: after_content_pos, to: after_content_pos },
 					tactic: v.tactic,
-					value: v.value
+					value: v.value,
+					code: v.tactic.transformer({ value: v.value as any })
 				}));
 			}
 		}
@@ -179,7 +181,8 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 				({
 					...v,
 					type: 'tactic',
-					range: { from: pos + (i == 0 ? 0 : ends[i - 1]), to: pos + ends[i] }
+					range: { from: pos + (i == 0 ? 0 : ends[i - 1]), to: pos + ends[i] },
+					code: v.tactic.transformer({ value: v.value as any })
 				}) satisfies TacticChunk
 		);
 
@@ -229,6 +232,7 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 			chunks1 = result.map((v) => ({
 				type: 'tactic',
 				range: { from: result_chunked.pos, to: result_chunked.pos },
+				code: v.tactic.transformer({ value: v.value as any }),
 				tactic: v.tactic,
 				value: v.value
 			}));
@@ -297,7 +301,16 @@ export function command_parsechunk(state: EditorState, dispatch?: (tr: Transacti
 }
 
 export function getChunks(node: Node): ProofChunk[] {
-	return node.marks
-		.filter((v) => v.type.name === schema.marks.chunks.name)
-		.flatMap((v) => v.attrs.value as ProofChunk[]);
+	let chunks: ProofChunk[] = [];
+
+	node.descendants((child) => {
+		console.log(child.marks);
+		chunks = chunks.concat(
+			child.marks
+				.filter((v) => v.type.name === schema.marks.chunks.name)
+				.flatMap((v) => v.attrs.value as ProofChunk[])
+		);
+	});
+
+	return chunks;
 }

@@ -16,6 +16,7 @@
 	import '$lib/cnl/tactics';
 	import type { CompletionState } from './ProofAutoCompletion.svelte';
 	import ProofAutoCompletion from './ProofAutoCompletion.svelte';
+	import { getChunks, parsechunks } from '$lib/notebook/widgets/proof/chunk';
 
 	let { node = $bindable(), onView }: { node?: Node; onView?: (view: EditorView) => void } =
 		$props();
@@ -88,6 +89,17 @@
 			attributes(state) {
 				return { spellcheck: 'false' };
 			},
+
+			dispatchTransaction(tr) {
+				const newState = view!.state.apply(tr);
+
+				code = parsechunks(newState.doc)
+					.chunks.filter((v) => v.type === 'tactic')
+					.map((v) => v.code)
+					.join('');
+
+				view!.updateState(newState);
+			},
 			// As long a copy/paste is broken prevent it
 			transformCopied(slice, view) {
 				return Slice.empty;
@@ -106,6 +118,7 @@
 	};
 
 	let completion: CompletionState | undefined = $state();
+	let code: string = $state('');
 </script>
 
 {#if view}
