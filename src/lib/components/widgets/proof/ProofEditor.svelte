@@ -16,7 +16,6 @@
 	import '$lib/cnl/tactics';
 	import type { CompletionState } from './ProofAutoCompletion.svelte';
 	import ProofAutoCompletion from './ProofAutoCompletion.svelte';
-	import { setContext } from 'svelte';
 
 	let { node = $bindable(), onView }: { node?: Node; onView?: (view: EditorView) => void } =
 		$props();
@@ -49,7 +48,6 @@
 				new Plugin({
 					filterTransaction(tr, state) {
 						const { $anchor: anchor, $from: from, $to: to, $head: head } = tr.selection;
-
 						const begin = anchor.$start();
 						const end = anchor.$end();
 

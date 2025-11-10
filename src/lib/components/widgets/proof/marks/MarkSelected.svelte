@@ -13,9 +13,7 @@
 				ArrowDown: (state, dispatch) => {
 					let tr = state.tr;
 					const head = tr.selection.$head;
-
 					let completion = undefined as CompletionState | undefined;
-
 					let begin = -1,
 						end = -1;
 					tr.doc.nodesBetween(head.before(), head.after(), (n, pos) => {
@@ -25,9 +23,7 @@
 						begin = pos;
 						end = pos + n.nodeSize;
 					});
-
 					if (completion && completion.hidden) return false;
-
 					if (dispatch) {
 						if (completion) {
 							completion = {
@@ -50,16 +46,12 @@
 						dispatch(tr);
 						return true;
 					}
-
 					return false;
 				},
-
 				ArrowUp: (state, dispatch) => {
 					let tr = state.tr;
 					const head = tr.selection.$head;
-
 					let completion = undefined as CompletionState | undefined;
-
 					let begin = -1,
 						end = -1;
 					tr.doc.nodesBetween(head.before(), head.after(), (n, pos) => {
@@ -69,9 +61,7 @@
 						begin = pos;
 						end = pos + n.nodeSize;
 					});
-
 					if (completion && completion.hidden) return false;
-
 					if (dispatch) {
 						if (completion) {
 							completion = {
@@ -94,16 +84,12 @@
 						dispatch(tr);
 						return true;
 					}
-
 					return false;
 				},
-
 				Escape: (state, dispatch) => {
 					let tr = state.tr;
 					const head = tr.selection.$head;
-
 					let completion = undefined as CompletionState | undefined;
-
 					let begin = -1,
 						end = -1;
 					tr.doc.nodesBetween(head.before(), head.after(), (n, pos) => {
@@ -113,9 +99,7 @@
 						begin = pos;
 						end = pos + n.nodeSize;
 					});
-
 					if (completion && completion.hidden) return false;
-
 					if (dispatch) {
 						if (completion) {
 							completion = {
@@ -129,16 +113,12 @@
 						dispatch(tr);
 						return true;
 					}
-
 					return false;
 				},
-
 				Enter: (state, dispatch) => {
 					let tr = state.tr;
 					const head = tr.selection.$head;
-
 					let completion = undefined as CompletionState | undefined;
-
 					let begin = -1,
 						end = -1;
 					tr.doc.nodesBetween(head.before(), head.after(), (n, pos) => {
@@ -148,15 +128,11 @@
 						begin = pos;
 						end = pos + n.nodeSize;
 					});
-
 					if (!completion || completion.hidden) return false;
-
 					if (dispatch) {
 						const replaceWith =
 							completion.selected != null ? completion.value[completion.selected] : undefined;
-
 						if (!replaceWith) return false;
-
 						tr = tr
 							.removeMark(begin, end, schema.marks.selected)
 							.replaceWith(completion.from, completion.to, schema.text(replaceWith));
@@ -165,7 +141,6 @@
 						dispatch(tr);
 						return true;
 					}
-
 					return false;
 				}
 			}),
@@ -175,20 +150,15 @@
 			appendTransaction(transactions, oldState, newState) {
 				let tr = newState.tr;
 				const head = tr.selection.$head;
-
-				const index = head.index();
-				if (head.node().childCount <= index) return;
+				const index = Math.min(head.index(), head.node().childCount - 1);
 				const text = head.node().child(index);
 				const main = getMainChunk(getChunks(text));
 				if (!main) return;
 				const { from, to } = main.range;
-
 				const existing_selection = text.marks.find(
 					(v) => v.type.name === schema.marks.selected.name
 				)?.attrs;
-
 				if (existing_selection) return;
-
 				tr = tr.removeMark(0, tr.doc.content.size, schema.marks.selected).addMark(
 					from,
 					to,
@@ -199,7 +169,7 @@
 							selector: '.completer_position',
 							value: ['Test', 'Test', 'Test', 'Test', 'Test', 'Test', 'Test', 'Test'],
 							selected: undefined,
-							hidden: false
+							hidden: true
 						} satisfies CompletionState | undefined
 					})
 				);
@@ -234,34 +204,22 @@
 
 	.completer_position {
 		position: absolute;
+		width: 0;
+		height: 0;
 		left: 0;
 		bottom: 0;
 	}
 
-	:global(.mark-selected .mark-selected::before) {
-		display: none;
-	}
-
-	:global(.mark-selected .mark-chunks::before) {
+	:global(.mark-selected .selected-frame::before) {
 		content: '';
 		position: absolute;
-		inset: -5px;
+		inset: -5px !important;
 		border-radius: 4px !important;
-		border: 2px rgba(0, 0, 255, 0.4) !important;
+		border-width: 2px !important;
 		pointer-events: none !important;
 		border-style: solid !important;
-		z-index: 1; /* sits behind the text */
-	}
-
-	:global(.mark-selected .mark-error::before) {
-		content: '';
-		position: absolute;
-		inset: -5px;
-		background-color: transparent !important;
-		border-radius: 4px !important;
-		border: 2px rgba(0, 0, 255, 0.4) !important;
-		pointer-events: none !important;
-		border-style: solid !important;
+		border-color: var(--selected-border) !important;
+		background-color: var(--selected-background) !important;
 		z-index: 1; /* sits behind the text */
 	}
 </style>

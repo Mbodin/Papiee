@@ -244,7 +244,9 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 
 export function command_parsechunk(state: EditorState, dispatch?: (tr: Transaction) => void) {
 	let tr = state.tr;
-	tr = tr.removeMark(0, tr.doc.content.size, schema.marks.chunk);
+	tr = tr
+		.removeMark(0, tr.doc.content.size, schema.marks.chunk)
+		.removeStoredMark(schema.marks.chunks);
 
 	let chunks = parsechunks(state.doc);
 
@@ -283,6 +285,13 @@ export function command_parsechunk(state: EditorState, dispatch?: (tr: Transacti
 
 		tr = tr.addMark(from, to, schema.marks.chunks.create({ value: existing.concat(chunk) }));
 	});
+	const head = tr.selection.$head;
+	const index = Math.min(head.index(), head.node().childCount - 1);
+	const text = head.node().child(index);
+	const main = getMainChunk(getChunks(text));
+	if (main) {
+		tr = tr.addStoredMark(schema.marks.chunks.create({ value: [main] }));
+	}
 
 	if (dispatch) dispatch(tr);
 }

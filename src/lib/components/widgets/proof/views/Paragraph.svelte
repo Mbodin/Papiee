@@ -84,6 +84,7 @@
 					tr = tr.insert(after_pos.pos, paragraph_pos.node().child(1).children);
 				}
 				tr = tr.setSelection(Selection.near(tr.doc.resolve(preceding_line_pos.pos)));
+				tr.doc.check();
 				dispatch(tr);
 
 				return true;
