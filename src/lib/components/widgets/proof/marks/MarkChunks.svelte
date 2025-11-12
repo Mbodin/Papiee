@@ -56,13 +56,17 @@
 		--selected-border: pink;
 		--selected-background: rgba(255, 192, 203, 0.2);
 		--unselected-border: red;
-		--unselected-background: transactions;
+		--unselected-background: transparent;
 	}
 	:global(.mark-chunks[data-type='comment']) {
 		--selected-border: gray;
 		--selected-background: rgba(128, 128, 128, 0.2);
 		--unselected-border: gray;
-		--unselected-background: gray;
+		--unselected-background: rgba(128, 128, 128, 0.2);
+	}
+
+	:global(.mark-chunks[data-type='comment']::before) {
+		border-style: dashed;
 	}
 
 	:global(.mark-chunks::before) {

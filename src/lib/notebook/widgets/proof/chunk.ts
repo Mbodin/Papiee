@@ -200,7 +200,9 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 		}
 
 		chunks = chunks.map((v) =>
-			v.type === 'tactic' && v.tactic.name === 'COMMENT' ? { ...v, type: 'comment' } : v
+			v.type === 'tactic' && v.tactic.name?.toLocaleLowerCase() === 'comment'
+				? { ...v, type: 'comment' }
+				: v
 		);
 
 		const line_stop = getLineEndStructure_chunkIndex(chunks);

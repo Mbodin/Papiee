@@ -11,3 +11,9 @@ const ASSUME = createTacticFromTextual<{ prop: string }>(
 	'{|Assume that $|prop|$.|}',
 	({ value }) => `assume ${value.prop}.`
 );
+
+const COMMENT = createTacticFromTextual<{ comment: string }>(
+	'Comment',
+	'{*|(|comment|)|}',
+	({ value }) => `(*${value.comment}.*)`
+);
