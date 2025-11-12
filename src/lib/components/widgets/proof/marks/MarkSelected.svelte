@@ -219,6 +219,5 @@
 		border-style: solid !important;
 		border-color: var(--selected-border) !important;
 		background-color: var(--selected-background) !important;
-		z-index: 1; /* sits behind the text */
 	}
 </style>

@@ -75,6 +75,5 @@
 		border-style: solid;
 		border-color: var(--unselected-border);
 		background-color: var(--unselected-background);
-		z-index: 1; /* sits behind the text */
 	}
 </style>
