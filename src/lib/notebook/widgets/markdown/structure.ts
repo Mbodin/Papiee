@@ -3,7 +3,12 @@ import { register } from '$lib/notebook/structure';
 import type { Widget, WidgetValue } from '$lib/notebook/widgets/types';
 import { FileTextIcon } from '@lucide/svelte';
 
-export type MarkdownWidget = Widget<number, 'markdown', MarkdownWidgetValue, 'value' | 'compiled'>;
+export type MarkdownWidget = Widget<
+	number,
+	'markdown',
+	MarkdownWidgetValue,
+	Omit<MarkdownWidgetValue, 'position' | 'type'>
+>;
 export type MarkdownWidgetValue = WidgetValue<number> & { value: string; compiled: boolean };
 
 declare module '$lib/notebook/structure' {
@@ -28,6 +33,7 @@ export const MARKDOWN_WIDGET: MarkdownWidget = {
 	},
 	trim(value) {
 		return {
+			type: 'markdown',
 			value: value.value,
 			compiled: value.compiled
 		};

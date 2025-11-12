@@ -1,37 +1,17 @@
 <script lang="ts">
 	import { getWidget_unsafe, type NotebookState } from '$lib/notebook/structure';
-	import { MARKDOWN_WIDGET } from '$lib/notebook/widgets/markdown/structure';
-	import { PROOF_WIDGET } from '$lib/notebook/widgets/proof/structure';
 	import NotebookAddMenu from './NotebookAddMenu.svelte';
 	import RocqProvider from './RocqProvider.svelte';
+	import { array_position } from '$lib/notebook/position';
+
+	import '$lib/notebook/widgets/widgets';
 
 	let { notebook_state = $bindable([]) }: { notebook_state?: NotebookState } = $props();
 
 	let anchor: HTMLElement | undefined = $state();
 	let anchored_i: number = $state(-1);
 
-	let global_position: {
-		value: { index: number; position: NotebookState[number]['position'] } | undefined;
-	} = {
-		get value() {
-			const i0 = notebook_state.findIndex((v) => v.position != null);
-			const i1 = notebook_state.findLastIndex((v) => v.position != null);
-			if (i0 !== i1 || i0 === -1) return undefined;
-			const i = i0;
-
-			return {
-				index: i,
-				position: notebook_state[i].position
-			};
-		},
-
-		set value(v) {
-			const { index, position } = v || { index: -1, position: undefined };
-			notebook_state = notebook_state.map((v, i) =>
-				i === index ? { ...v, position } : { ...v, position: undefined }
-			);
-		}
-	};
+	let global_position = $derived(array_position(notebook_state, (v) => (notebook_state = v)));
 
 	function setAnchorNode(node: HTMLElement | undefined, i?: number) {
 		anchor = node;

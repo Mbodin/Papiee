@@ -1,41 +1,43 @@
+import RocqWidgetC from '$lib/components/widgets/RocqWidget.svelte';
 import { register } from '$lib/notebook/structure';
 import type { Widget, WidgetValue } from '$lib/notebook/widgets/types';
-import ProofWidgetC from '$lib/components/widgets/proof/ProofWidget.svelte';
 
-export type ProofWidget = Widget<number, 'proof', ProofWidgetValue, { value: string }>;
-export type ProofWidgetValue = WidgetValue<number> & { value: string };
+export type RocqWidget = Widget<number, 'rocq', RocqWidgetValue, { value: string }>;
+export type RocqWidgetValue = WidgetValue<number> & { value: string };
 
 declare module '$lib/notebook/structure' {
 	interface RootWidgetMap {
-		proof: ProofWidget;
+		rocq: RocqWidget;
 	}
 }
 
-export const PROOF_WIDGET: ProofWidget = {
-	type: 'proof',
+export const ROCQ_WIDGET: RocqWidget = {
+	type: 'rocq',
 
-	component: ProofWidgetC,
+	component: RocqWidgetC,
 	initial() {
 		return {
-			type: 'proof',
-			value: '',
-			position: undefined
+			type: 'rocq',
+			value: '(*Coq file*)',
+			position: undefined,
+			compiled: false
 		};
 	},
 	trim(value) {
 		return {
+			type: 'rocq',
 			value: value.value
 		};
 	},
 	untrim(trimmed) {
 		return {
-			type: 'proof',
-			value: trimmed.value,
-			position: 0
+			type: 'rocq',
+			position: 0,
+			value: trimmed.value
 		};
 	},
-	get(value) {
-		return value.position;
+	get(v) {
+		return v.position;
 	},
 	getBegin() {
 		return 0;
@@ -60,4 +62,4 @@ export const PROOF_WIDGET: ProofWidget = {
 	}
 };
 
-register('proof', () => PROOF_WIDGET);
+register('rocq', () => ROCQ_WIDGET);

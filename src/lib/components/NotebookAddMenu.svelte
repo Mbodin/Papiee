@@ -3,6 +3,7 @@
 	import type { Widget } from '$lib/notebook/widgets/types';
 	import { PlusIcon } from '@lucide/svelte';
 	import { Popover, Portal, usePopover } from '@skeletonlabs/skeleton-svelte';
+	import { type Component } from 'svelte';
 
 	let {
 		notebook_state = $bindable(),
@@ -44,7 +45,7 @@
 				<div
 					class="flex max-w-md flex-col space-y-2 card border border-surface-500/30 bg-tertiary-200-800/30 p-2 shadow-xl backdrop-blur-sm"
 				>
-					{#each getWidgets() as widget}
+					{#each getWidgets(true) as (Widget & { name: string; icon?: Component })[] as widget}
 						{@const Component = widget.icon}
 						<button
 							onclick={() => {

@@ -4,14 +4,18 @@ export type Widget<
 	Position = unknown,
 	Type extends string = string,
 	Value extends WidgetValue<Position> = WidgetValue<Position, Type>,
-	ToKeepWhenTrimmed extends keyof Value = never
-> = {
-	name: string;
+	TrimmedValue = never
+> = (
+	| {
+			name: string;
+			icon?: Component;
+	  }
+	| {}
+) & {
 	type: Type;
-	icon?: Component;
 
-	trim(value: Value): Pick<Value, ToKeepWhenTrimmed>;
-	untrim(trimmed: Pick<Value, ToKeepWhenTrimmed>): Value;
+	trim(value: Value): TrimmedValue;
+	untrim(trimmed: TrimmedValue): Value;
 	initial(): Value;
 	component: Component<WidgetProps<Value>>;
 } & PositionHelper<Value, Position>;
@@ -20,6 +24,8 @@ export type WidgetValue<Position = unknown, Type extends string = string> = {
 	type: Type;
 	position?: Position | undefined;
 };
+
+export type TrimmedWidgetValue<T> = T extends { trim: (...args: any) => infer O } ? O : never;
 
 export type PositionHelper<Value extends any, Position> = {
 	isLast(value: Value): boolean;
