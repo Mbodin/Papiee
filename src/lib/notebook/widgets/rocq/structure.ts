@@ -18,7 +18,7 @@ export const ROCQ_WIDGET: RocqWidget = {
 	initial() {
 		return {
 			type: 'rocq',
-			value: '(*Coq file*)',
+			value: '(*Rocq file*)',
 			position: undefined,
 			compiled: false
 		};

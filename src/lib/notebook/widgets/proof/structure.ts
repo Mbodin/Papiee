@@ -1,6 +1,6 @@
 import { register } from '$lib/notebook/structure';
 import type { Widget, WidgetValue } from '$lib/notebook/widgets/types';
-import ProofWidgetC from '$lib/components/widgets/proof/ProofWidget.svelte';
+import ProofWidgetC from '$lib/components/widgets/ProofWidget.svelte';
 
 export type ProofWidget = Widget<number, 'proof', ProofWidgetValue, { value: string }>;
 export type ProofWidgetValue = WidgetValue<number> & { value: string };

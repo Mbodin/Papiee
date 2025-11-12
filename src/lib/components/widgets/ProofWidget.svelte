@@ -4,7 +4,7 @@
 	import type { WidgetProps } from '$lib/notebook/widgets/types';
 	import type { ProofWidgetValue } from '$lib/notebook/widgets/proof/structure';
 	import { parse, unparse } from '$lib/cnl/textual';
-	import ProofEditor from './ProofEditor.svelte';
+	import ProofEditor from './proof/ProofEditor.svelte';
 	import type { EditorView } from 'prosemirror-view';
 
 	let { value, onNodeValueUpdate, setAnchorNode }: WidgetProps<ProofWidgetValue> = $props();
@@ -28,4 +28,6 @@
 	}
 </script>
 
-<ProofEditor bind:node={cnl_value.value} {onView} />
+<div class="border-l-2 p-2">
+	<ProofEditor bind:node={cnl_value.value} {onView} />
+</div>

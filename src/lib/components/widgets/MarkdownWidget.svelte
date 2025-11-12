@@ -52,32 +52,49 @@
 			{@html compiled}
 		</div>
 	{:else}
-		<CodeMirror
-			onready={(v) => {
-				view = v;
-				if (position != null) {
-					view.focus();
-					view.dispatch({ selection: { anchor: position, head: position } });
-				}
-			}}
-			bind:value={() => text, (v) => onNodeValueUpdate(value, { ...value, value: v })}
-			lang={markdown()}
-			extensions={[
-				EditorView.updateListener.of((state) => {
-					if (state.focusChanged)
-						if (view?.hasFocus) {
-							onNodeValueUpdate(value, { ...value, position: state.state.selection.main.head });
-						} else {
-							onNodeValueUpdate(value, { ...value, position: undefined });
-						}
-					else if (state.selectionSet) {
-						if (view && state.state.selection.main.head !== value.position) {
-							onNodeValueUpdate(value, { ...value, position: state.state.selection.main.head });
-						}
+		<div class="flex w-full flex-col items-start gap-1">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 208 128" class="h-4"
+				><rect
+					width="198"
+					height="118"
+					x="5"
+					y="5"
+					ry="10"
+					stroke="#000"
+					stroke-width="10"
+					fill="none"
+				/><path
+					d="M30 98V30h20l20 25 20-25h20v68H90V59L70 84 50 59v39zm125 0l-30-33h20V30h20v35h20z"
+				/></svg
+			>
+			<CodeMirror
+				class="w-full"
+				onready={(v) => {
+					view = v;
+					if (position != null) {
+						view.focus();
+						view.dispatch({ selection: { anchor: position, head: position } });
 					}
-				})
-			]}
-		/>
+				}}
+				bind:value={() => text, (v) => onNodeValueUpdate(value, { ...value, value: v })}
+				lang={markdown()}
+				extensions={[
+					EditorView.updateListener.of((state) => {
+						if (state.focusChanged)
+							if (view?.hasFocus) {
+								onNodeValueUpdate(value, { ...value, position: state.state.selection.main.head });
+							} else {
+								onNodeValueUpdate(value, { ...value, position: undefined });
+							}
+						else if (state.selectionSet) {
+							if (view && state.state.selection.main.head !== value.position) {
+								onNodeValueUpdate(value, { ...value, position: state.state.selection.main.head });
+							}
+						}
+					})
+				]}
+			/>
+		</div>
 	{/if}
 	<div class="absolute top-0 right-2 btn-icon preset-filled-secondary-500 text-primary-100-900">
 		<button onclick={() => onNodeValueUpdate(value, { ...value, compiled: !value.compiled })}

@@ -31,7 +31,7 @@ export async function initialize(
 	let initializeParameters: proto.InitializeParams = {
 		...params,
 		processId: null,
-		rootUri: null,
+		rootUri: 'exercise',
 		workspaceFolders: null,
 		initializationOptions: { eager_diagnostics: false, messages_follow_goal: true },
 		capabilities: {
@@ -47,7 +47,7 @@ export async function initialize(
 
 	await Promise.all(
 		Object.keys(rocqDumpFile.files).map(async ([path, value]) => {
-			let uri = 'file:///test/' + path;
+			let uri = 'file:///exercise/' + path;
 			let languageId = 'rocq';
 			let version = 1;
 			let text = value;
@@ -65,18 +65,22 @@ export async function initialize(
 		})
 	);
 
+	await connection.sendNotification('coq/workspace_update').then(console.log).catch(console.error);
+	await connection.sendNotification('').then(console.log).catch(console.error);
 	{
-		let uri = 'file:///test/_CoqProject';
+		const path = 'main.v';
+		const value = 'Require Import Test.\nPrint Lemma.';
+		let uri = 'file:///exercise/' + path;
 		let languageId = 'rocq';
 		let version = 1;
-		let text = `-Q . Exercise\n` + Object.keys(rocqDumpFile.files).join('\n');
-		console.log(text);
+		let text = value;
 		let textDocument = types.TextDocumentItem.create(uri, languageId, version, text);
 		let openParams: proto.DidOpenTextDocumentParams = { textDocument };
 		await connection
 			.sendNotification(proto.DidOpenTextDocumentNotification.type, openParams)
 			.then(console.log)
 			.catch(console.error);
+
 		await connection
 			.sendRequest('proof/goals', {
 				textDocument: { uri, version } satisfies proto.VersionedTextDocumentIdentifier,
