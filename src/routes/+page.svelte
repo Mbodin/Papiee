@@ -9,21 +9,16 @@
 	import { EditorState } from 'prosemirror-state';
 	const { Grammar, Parser } = nearley;
 
-	// onMount(() => {
-	// 	createTacticFromTextual(undefined, '{|Case disjunction.|>+case_disjunction}', () => '');
-	// 	createTacticFromTextual(undefined, '{case_disjunction||<-}', () => '');
-	// 	createTacticFromTextual(undefined, '{case_disjunction|End|<-}', () => '');
-	// 	createTacticFromTextual(undefined, '{case_disjunction|Case |a|.|#}', () => '');
-	// 	createTacticFromTextual(undefined, '{|Test|}', () => '');
-	// 	let document = `Case disjunction. Test Test`;
+	onMount(() => {
+		let document = `Let $c$.`;
 
-	// 	const node = parse(document);
-	// 	const state = new EditorState();
-	// 	state.doc = node;
-	// 	command_parsechunk(state, (o) => {
-	// 		console.log(o.doc);
-	// 	});
-	// });
+		const node = parse(document);
+		const state = new EditorState();
+		state.doc = node;
+		command_parsechunk(state, (o) => {
+			console.log(o.doc);
+		});
+	});
 </script>
 
 <h1>Welcome to SvelteKit</h1>

@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	import { Plugin, Selection, Transaction } from 'prosemirror-state';
+	import { Plugin, Transaction } from 'prosemirror-state';
 	import MarkChunks from './MarkChunks.svelte';
 	import type { MarkViewFactory } from '@prosemirror-adapter/svelte';
 
@@ -11,7 +11,7 @@
 		new Plugin({
 			appendTransaction(_transactions, oldState, newState) {
 				if (unparse(oldState.doc) === unparse(newState.doc)) return;
-				let tr: Transaction | undefined = undefined;
+				let tr: Transaction | undefined = undefined as Transaction | undefined;
 				command_parsechunk(newState, (_tr) => (tr = _tr));
 				return tr;
 			}
@@ -23,23 +23,25 @@
 	import { useMarkViewContext } from '@prosemirror-adapter/svelte';
 	import { unparse } from '$lib/cnl/textual';
 	import { command_parsechunk, type ProofChunk } from '$lib/notebook/widgets/proof/chunk';
-	import { derived, get } from 'svelte/store';
+	import type { Mark } from 'prosemirror-model';
 
 	let id = $props.id();
 
 	const contentRef = useMarkViewContext('contentRef');
 	const _mark = useMarkViewContext('mark');
 
-	const mark = $derived(get(_mark));
-	const chunks = $derived(mark.attrs.value as ProofChunk[]);
+	let mark = $state(undefined as Mark | undefined);
+	_mark.update((value) => (mark = value));
 
-	const chunk = $derived(chunks.find((v) => v.range.from !== v.range.to)!);
+	const chunks = $derived((mark?.attrs.value || []) as ProofChunk[]);
+
+	const chunk = $derived(chunks?.find((v) => v.range.from !== v.range.to));
 </script>
 
-<span class="mark-chunks selected-frame" data-type={chunk.type} use:contentRef></span>
+<span class="mark-chunks selected-frame" data-type={chunk?.type} use:contentRef></span>
 
 <style>
-	.mark-chunks {
+	:global(.mark-chunks) {
 		position: relative;
 		display: inline-block;
 		margin-left: 20px;

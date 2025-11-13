@@ -1,6 +1,5 @@
-import type { ParseResult } from '$lib/cnl/cnl_grammar';
+import type { CompletionState } from '$lib/components/widgets/proof/ProofAutoCompletion.svelte';
 import { Schema, type MarkSpec, type NodeSpec } from 'prosemirror-model';
-import type { ProofChunk } from './chunk';
 
 export const nodes = {
 	doc: { content: 'content' },
@@ -47,12 +46,16 @@ export const nodes = {
 } satisfies { [key: string]: NodeSpec };
 
 export const marks = {
-	selected: {},
+	selected: {
+		attrs: {
+			completion: {
+				default: undefined as CompletionState | undefined
+			}
+		}
+	},
 	chunks: {
 		attrs: {
-			value: {
-				default: undefined as undefined | ProofChunk[]
-			}
+			value: {}
 		}
 	}
 } satisfies { [key: string]: MarkSpec };

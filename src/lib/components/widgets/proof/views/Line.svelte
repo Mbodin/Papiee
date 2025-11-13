@@ -22,4 +22,8 @@
 		text-wrap-mode: wrap;
 		max-width: 90%;
 	}
+
+	:global(.line *) {
+		white-space: pre;
+	}
 </style>

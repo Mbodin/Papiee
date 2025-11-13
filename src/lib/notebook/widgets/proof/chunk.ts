@@ -1,4 +1,4 @@
-import type { Node } from 'prosemirror-model';
+import type { Node, ResolvedPos } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import { schema } from './schema';
 import { parse_cnl_chained } from '$lib/cnl/parser';
@@ -7,6 +7,7 @@ import type { StructureSpecification } from '$lib/cnl/cnl_tactic_specifier';
 import { isFallbackTactic, resolve_state_actions } from '$lib/cnl/cnl_tactic';
 
 import '$lib/resolvedpos';
+import '$lib/cnl/tactics';
 
 export type ProofChunk = ErrorChunk | CommentChunk | TacticChunk;
 
@@ -174,7 +175,11 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 	): { state: string[]; chunks: ProofChunk[]; pos: number } {
 		if (node.childCount === 0) return { state, chunks: [], pos };
 
-		const { ends, result } = parse_cnl_chained(node.textContent, state, true);
+		const { ends, result } = parse_cnl_chained(
+			node.textContent.replaceAll(/\u00A0/g, ' '),
+			state,
+			true
+		);
 
 		let chunks: ProofChunk[] = result.map(
 			(v, i) =>
@@ -250,9 +255,7 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 
 export function command_parsechunk(state: EditorState, dispatch?: (tr: Transaction) => void) {
 	let tr = state.tr;
-	tr = tr
-		.removeMark(0, tr.doc.content.size, schema.marks.chunk)
-		.removeStoredMark(schema.marks.chunks);
+	tr = tr.removeMark(0, tr.doc.content.size, schema.marks.chunk);
 
 	let chunks = parsechunks(state.doc);
 
@@ -291,13 +294,6 @@ export function command_parsechunk(state: EditorState, dispatch?: (tr: Transacti
 
 		tr = tr.addMark(from, to, schema.marks.chunks.create({ value: existing.concat(chunk) }));
 	});
-	const head = tr.selection.$head;
-	const index = Math.min(head.index(), head.node().childCount - 1);
-	const text = head.node().child(index);
-	const main = getMainChunk(getChunks(text));
-	if (main) {
-		tr = tr.addStoredMark(schema.marks.chunks.create({ value: [main] }));
-	}
 
 	if (dispatch) dispatch(tr);
 }
@@ -305,14 +301,24 @@ export function command_parsechunk(state: EditorState, dispatch?: (tr: Transacti
 export function getChunks(node: Node): ProofChunk[] {
 	let chunks: ProofChunk[] = [];
 
-	node.descendants((child) => {
-		console.log(child.marks);
+	function visit(node: Node) {
 		chunks = chunks.concat(
-			child.marks
+			node.marks
 				.filter((v) => v.type.name === schema.marks.chunks.name)
 				.flatMap((v) => v.attrs.value as ProofChunk[])
 		);
-	});
+	}
+
+	visit(node);
+	node.descendants(visit);
 
 	return chunks;
+}
+
+export function getChunk(pos: ResolvedPos): ProofChunk | undefined {
+	const index = Math.min(pos.index(), pos.node().childCount - 1);
+	if (index === -1) return undefined;
+	const text = pos.node().child(index);
+	const main = getMainChunk(getChunks(text));
+	return main;
 }

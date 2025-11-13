@@ -14,90 +14,24 @@
 		return i;
 	}
 
-	// Common logic is extracted for Backspace and Delete
-	const DeleteBack: (
-		state: EditorState,
-		dispatch: ((tr: Transaction) => void) | undefined,
-		view: EditorView | undefined
-	) => boolean = (state, dispatch, view) => {
-		const head = state.selection.$head;
-		if (head.start() !== head.pos) return false; // Skipping backspace in line
-
-		const paragraph_pos = head.$start(direct_parent_depth(head, 'paragraph'));
-
-		let preceding_line_pos = paragraph_pos.$decrement();
-		while (preceding_line_pos.pos > 0 && preceding_line_pos.node().type.name !== 'line')
-			preceding_line_pos = preceding_line_pos.$decrement();
-
-		if (preceding_line_pos.pos === 0) return false;
-
-		const preceding_paragraph_pos = preceding_line_pos.$start(
-			direct_parent_depth(preceding_line_pos, 'paragraph')
-		);
-		const parent_paragraph_pos = preceding_line_pos.$start(
-			direct_parent_depth(preceding_line_pos, 'paragraph', 1)
-		);
-
-		// TODO going to parent
-		if (preceding_paragraph_pos.pos === parent_paragraph_pos.pos) {
-			if (dispatch) {
-				let tr = state.tr;
-				let preserve_content_node =
-					paragraph_pos.node().childCount === 2 ||
-					(parent_paragraph_pos.node().maybeChild(1)?.childCount || 0) > 1;
-				tr = tr.delete(
-					paragraph_pos.before() - (preserve_content_node ? 0 : 1),
-					paragraph_pos.after() + (preserve_content_node ? 0 : 1)
-				);
-				tr = tr.insert(preceding_line_pos.end(), paragraph_pos.node().child(0).children);
-				const after_pos = tr.doc.resolve(
-					preceding_line_pos.end() + paragraph_pos.node().child(0).nodeSize
-				);
-				if (paragraph_pos.node().maybeChild(1)) {
-					if ((parent_paragraph_pos.node().maybeChild(1)?.childCount || 0) > 1) {
-						tr = tr.insert(after_pos.pos, paragraph_pos.node().child(1).children);
-					} else {
-						// We need to remove the empty line that was created when content node was preserved but empty
-						tr = tr.replaceWith(
-							after_pos.start(),
-							after_pos.end(),
-							paragraph_pos.node().child(1).children
-						);
-					}
-				}
-				tr.doc.check();
-				tr = tr.setSelection(Selection.near(tr.doc.resolve(preceding_line_pos.pos)));
-
-				dispatch(tr);
-
-				return true;
-			}
-		} else {
-			if (dispatch) {
-				let tr = state.tr;
-				tr = tr.delete(paragraph_pos.before(), paragraph_pos.after());
-				tr = tr.insert(preceding_line_pos.end(), paragraph_pos.node().child(0).children);
-				const after_pos = tr.doc.resolve(
-					preceding_line_pos.end() + paragraph_pos.node().child(0).nodeSize
-				);
-				if (paragraph_pos.node().childCount === 2) {
-					tr = tr.insert(after_pos.pos, paragraph_pos.node().child(1).children);
-				}
-				tr = tr.setSelection(Selection.near(tr.doc.resolve(preceding_line_pos.pos)));
-				tr.doc.check();
-				dispatch(tr);
-
-				return true;
-			}
-		}
-
-		return false;
-	};
-
 	const keymap_definition: { [key in string]: Command } = {
 		Backspace: (state, dispatch) => {
 			const head = state.selection.$head;
-			if (head.start() !== head.pos) return false; // Skipping backspace in line
+			if (head.start() !== head.pos) {
+				const length = head.end() - head.start();
+				if (length === 1) {
+					let tr = state.tr;
+					tr = tr.delete(head.before(), head.after());
+					tr = tr.setSelection(Selection.near(tr.doc.resolve(head.after())));
+					if (dispatch) dispatch(tr);
+				} else {
+					let tr = state.tr;
+					tr = tr.delete(head.pos - 1, head.pos);
+					tr = tr.setSelection(Selection.near(tr.doc.resolve(head.pos - 1)));
+					if (dispatch) dispatch(tr);
+				}
+				return true;
+			}
 
 			const paragraph_pos = head.$start(direct_parent_depth(head, 'paragraph'));
 
@@ -114,7 +48,6 @@
 				direct_parent_depth(preceding_line_pos, 'paragraph', 1)
 			);
 
-			// TODO going to parent
 			if (preceding_paragraph_pos.pos === parent_paragraph_pos.pos) {
 				if (dispatch) {
 					let tr = state.tr;
@@ -160,6 +93,7 @@
 						tr = tr.insert(after_pos.pos, paragraph_pos.node().child(1).children);
 					}
 					tr = tr.setSelection(Selection.near(tr.doc.resolve(preceding_line_pos.pos)));
+					tr.doc.check();
 					dispatch(tr);
 
 					return true;
@@ -377,30 +311,21 @@
 
 <script lang="ts">
 	import { useNodeViewContext, type NodeViewFactory } from '@prosemirror-adapter/svelte';
-	import {
-		EditorState,
-		Plugin,
-		PluginKey,
-		Selection,
-		Transaction,
-		type Command
-	} from 'prosemirror-state';
-	import { nodes, schema } from '$lib/components/widgets/proof/schema';
+	import { Plugin, PluginKey, Selection, type Command } from 'prosemirror-state';
+	import { nodes, schema } from '$lib/notebook/widgets/proof/schema';
 	import { keymap } from 'prosemirror-keymap';
 	import Paragraph from './Paragraph.svelte';
 	import { type ResolvedPos } from 'prosemirror-model';
-	import type { EditorView } from 'prosemirror-view';
-	import { get } from 'svelte/store';
 
 	const contentRef = useNodeViewContext('contentRef');
 	const node = useNodeViewContext('node');
-
-	let hasChildren = $derived(get(node).childCount === 2);
-
+	let hasChildren = $state(false);
 	let collapsed = $state(false);
+
+	node.subscribe((value) => (hasChildren = value.childCount === 2));
 </script>
 
-<div class="paragraph" class:hide_content={collapsed}>
+<div class="paragraph whitespace-nowrap" class:hide_content={collapsed}>
 	{#if hasChildren}
 		<div class="relative select-none" contenteditable="false">
 			<button

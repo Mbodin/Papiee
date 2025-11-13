@@ -9,14 +9,15 @@
 <script lang="ts">
 	import { useNodeViewContext, type NodeViewFactory } from '@prosemirror-adapter/svelte';
 	import type { Plugin } from 'prosemirror-state';
-	import { get } from 'svelte/store';
 	import Content from './Content.svelte';
 
 	const contentRef = useNodeViewContext('contentRef');
 	const view = useNodeViewContext('view');
 	const node = useNodeViewContext('node');
 
-	let isRoot = $derived(get(node) === view.state.doc.child(0));
+	let isRoot = $derived(false);
+
+	node.subscribe((value) => (isRoot = value === view.state.doc.child(0)));
 </script>
 
 <div class="paragraph-content">

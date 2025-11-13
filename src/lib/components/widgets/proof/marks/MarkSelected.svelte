@@ -151,6 +151,7 @@
 				let tr = newState.tr;
 				const head = tr.selection.$head;
 				const index = Math.min(head.index(), head.node().childCount - 1);
+				if (index === -1) return undefined;
 				const text = head.node().child(index);
 				const main = getMainChunk(getChunks(text));
 				if (!main) return;
@@ -181,10 +182,10 @@
 
 <script lang="ts">
 	import { useMarkViewContext } from '@prosemirror-adapter/svelte';
-	import { schema } from '$lib/components/widgets/proof/schema';
+	import { schema } from '$lib/notebook/widgets/proof/schema';
 	import type { CompletionState } from '../ProofAutoCompletion.svelte';
 	import { keymap } from 'prosemirror-keymap';
-	import { getChunks, getMainChunk, type ProofChunk } from '$lib/notebook/widgets/proof/chunk';
+	import { getChunks, getMainChunk } from '$lib/notebook/widgets/proof/chunk';
 
 	let id = $props.id();
 
@@ -207,6 +208,10 @@
 		height: 0;
 		left: 0;
 		bottom: 0;
+	}
+
+	:global(.completer_position br) {
+		display: none;
 	}
 
 	:global(.mark-selected .selected-frame::before) {

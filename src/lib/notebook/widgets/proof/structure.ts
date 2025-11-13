@@ -14,11 +14,12 @@ declare module '$lib/notebook/structure' {
 export const PROOF_WIDGET: ProofWidget = {
 	type: 'proof',
 
+	name: 'Proof',
 	component: ProofWidgetC,
 	initial() {
 		return {
 			type: 'proof',
-			value: '',
+			value: 'Let $x$.',
 			position: undefined
 		};
 	},

@@ -1,5 +1,5 @@
 import { ParseError } from '$lib/parsing';
-import { schema } from '$lib/components/widgets/proof/schema';
+import { schema } from '$lib/notebook/widgets/proof/schema';
 import type { Node } from 'prosemirror-model';
 
 /**
@@ -103,18 +103,7 @@ function parseParagraph(
  * @returns A list of node with math and text node inside
  */
 function parseText(value: string): Node[] {
-	return value.length === 0 ? [] : [schema.text(value)];
-	// const nodes = [];
-	// const regex = /\$(.*?)\$|([^$]+)/gs;
-	// let match;
-	// while ((match = regex.exec(value))) {
-	// 	if (match[1]) {
-	// 		nodes.push(schema.text(match[1]));
-	// 	} else if (match[2]) {
-	// 		nodes.push(schema.text(match[2]));
-	// 	}
-	// }
-	// return nodes;
+	return value.length === 0 ? [] : [schema.text(value.replaceAll(/\u00A0/g, ' '))];
 }
 
 /** Counts the number of leading tab characters in a string. */
@@ -144,5 +133,5 @@ export function unparse(value: Node) {
 		const str_content = content ? ('\n' + content_visitor(content)).replaceAll('\n', '\n\t') : '';
 		return str_line + str_content;
 	}
-	return content_visitor(value.child(0));
+	return content_visitor(value.child(0)).replaceAll(/\u00A0/g, ' ');
 }

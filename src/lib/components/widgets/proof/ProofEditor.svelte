@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { useMarkViewFactory, useNodeViewFactory } from '@prosemirror-adapter/svelte';
-	import { EditorState, Plugin } from 'prosemirror-state';
+	import { EditorState, Plugin, Transaction } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
 	import { ParagraphNodeView, plugins as paragraph_plugins } from './views/Paragraph.svelte';
 	import { Slice, type Node } from 'prosemirror-model';
@@ -11,12 +11,18 @@
 	import '$lib/resolvedpos';
 	import { MarkSelectedView, plugins as mark_selected_plugins } from './marks/MarkSelected.svelte';
 	import { plugins as mark_chunks_plugins, MarkChunksView } from './marks/MarkChunks.svelte';
-	import { schema } from '$lib/components/widgets/proof/schema';
+	import { schema } from '$lib/notebook/widgets/proof/schema';
 
 	import '$lib/cnl/tactics';
 	import type { CompletionState } from './ProofAutoCompletion.svelte';
 	import ProofAutoCompletion from './ProofAutoCompletion.svelte';
-	import { getChunks, parsechunks } from '$lib/notebook/widgets/proof/chunk';
+	import {
+		command_parsechunk,
+		getChunks,
+		parsechunks,
+		type ProofChunk
+	} from '$lib/notebook/widgets/proof/chunk';
+	import ProofStateDisplay from './ProofStateDisplay.svelte';
 
 	let { node = $bindable(), onView }: { node?: Node; onView?: (view: EditorView) => void } =
 		$props();
@@ -25,13 +31,13 @@
 	const markViewFactor = useMarkViewFactory();
 
 	let view: EditorView | undefined = $state();
+	let selected: number | -1 = $state(-1);
+	let chunks: ProofChunk[] = $state([]);
 
 	const editor = (element: HTMLElement) => {
 		const editor_state = EditorState.create({
 			schema,
 			plugins: [
-				mark_selected_plugins,
-				mark_chunks_plugins,
 				new Plugin({
 					view(view) {
 						return {
@@ -47,16 +53,6 @@
 				content_plugins,
 				// Prevent selection from spanning multiple elements
 				new Plugin({
-					filterTransaction(tr, state) {
-						const { $anchor: anchor, $from: from, $to: to, $head: head } = tr.selection;
-						const begin = anchor.$start();
-						const end = anchor.$end();
-
-						const sel_start = begin.max(from);
-						const sel_end = end.min(to);
-
-						return sel_start.pos === from.pos && sel_end.pos === to.pos;
-					},
 					view(view) {
 						return {
 							update(view, prevState) {
@@ -70,7 +66,9 @@
 							}
 						};
 					}
-				})
+				}),
+				mark_selected_plugins,
+				mark_chunks_plugins
 			].flat()
 		});
 		view = new EditorView(element, {
@@ -91,12 +89,19 @@
 			},
 
 			dispatchTransaction(tr) {
-				const newState = view!.state.apply(tr);
+				const _newState = view!.state.apply(tr);
+				let tr2: Transaction | undefined = undefined as Transaction | undefined;
+				command_parsechunk(_newState, (_tr) => (tr2 = _tr));
+				const newState = tr2 ? _newState.apply(tr2) : _newState;
 
+				chunks = parsechunks(newState.doc).chunks;
 				code = parsechunks(newState.doc)
 					.chunks.filter((v) => v.type === 'tactic')
 					.map((v) => v.code)
 					.join('');
+				let limit = chunks.findIndex((v) => v.range.from > tr.selection.head);
+				if (limit === -1) limit = chunks.length;
+				selected = limit - 1;
 
 				view!.updateState(newState);
 			},
@@ -123,6 +128,7 @@
 
 {#if view}
 	<ProofAutoCompletion {view} {completion} />
+	<ProofStateDisplay {chunks} position={selected} />
 {/if}
 <div class="ProseMirror" use:editor></div>
 

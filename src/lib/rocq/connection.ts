@@ -28,12 +28,14 @@ export async function initialize(
 	connection: proto.MessageConnection,
 	params: Partial<proto.InitializeParams> = {}
 ) {
+	connection.onNotification(proto.LogMessageNotification.type, console.log);
 	let initializeParameters: proto.InitializeParams = {
 		...params,
 		processId: null,
-		rootUri: 'exercise',
+		rootUri: 'file:///exercise/',
 		workspaceFolders: null,
-		initializationOptions: { eager_diagnostics: false, messages_follow_goal: true },
+		initializationOptions: { eager_diagnostics: true, messages_follow_goal: true },
+		trace: 'verbose',
 		capabilities: {
 			textDocument: {
 				publishDiagnostics: {
@@ -43,14 +45,16 @@ export async function initialize(
 		}
 	};
 
+	await connection.sendNotification(proto.SetTraceNotification.type, { value: 'verbose' });
+
 	await connection.sendRequest(proto.InitializeRequest.type, initializeParameters);
 
 	await Promise.all(
-		Object.keys(rocqDumpFile.files).map(async ([path, value]) => {
+		Object.keys(rocqDumpFile.files).map(async (path) => {
 			let uri = 'file:///exercise/' + path;
 			let languageId = 'rocq';
 			let version = 1;
-			let text = value;
+			let text = (rocqDumpFile as any).files[path];
 			let textDocument = types.TextDocumentItem.create(uri, languageId, version, text);
 			let openParams: proto.DidOpenTextDocumentParams = { textDocument };
 			await connection
@@ -59,14 +63,14 @@ export async function initialize(
 				.catch(console.error);
 
 			await connection
-				.sendNotification('coq/saveVo', openParams)
+				.sendNotification('coq/workspace_update')
 				.then(console.log)
 				.catch(console.error);
+			await connection.sendRequest('coq/saveVo', openParams).then(console.log).catch(console.error);
 		})
 	);
 
 	await connection.sendNotification('coq/workspace_update').then(console.log).catch(console.error);
-	await connection.sendNotification('').then(console.log).catch(console.error);
 	{
 		const path = 'main.v';
 		const value = 'Require Import Test.\nPrint Lemma.';
