@@ -104,7 +104,13 @@
 		},
 		Delete: (state, dispatch) => {
 			const head = state.selection.$head;
-			if (head.end() !== head.pos) return false; // Skipping delete in line
+			if (head.end() !== head.pos)
+				return keymap_definition.Backspace(
+					state.applyTransaction(
+						state.tr.setSelection(Selection.near(state.doc.resolve(head.pos + 1)))
+					).state,
+					dispatch
+				);
 
 			const paragraph_pos = head.$start(direct_parent_depth(head, 'paragraph'));
 
