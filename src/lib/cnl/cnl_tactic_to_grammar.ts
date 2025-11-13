@@ -48,7 +48,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 				{
 					test: (v: any) => {
 						if (typeof v === 'object' && 'value' in v) v = v.value;
-						return typeof v === 'string' && v !== '$';
+						return typeof v === 'string';
 					}
 				} as Symbol,
 				_everything
@@ -66,7 +66,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 				{
 					test: (v: any) => {
 						if (typeof v === 'object' && 'value' in v) v = v.value;
-						return v !== '$' || (typeof v === 'object' && v.type === 'stop_everything');
+						return typeof v === 'string' || (typeof v === 'object' && v.type === 'stop_everything');
 					}
 				} as Symbol
 			],

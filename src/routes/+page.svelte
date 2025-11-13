@@ -10,7 +10,7 @@
 	const { Grammar, Parser } = nearley;
 
 	onMount(() => {
-		let document = `Let $c$.`;
+		let document = `(azazzz            $zzzzzz)`;
 
 		const node = parse(document);
 		const state = new EditorState();
