@@ -64,7 +64,7 @@
 	bind:clientHeight={height}
 	{@attach RootAttachment}
 	class:dragging
-	class="dragging absolute min-h-0 min-w-0"
+	class="dragging absolute min-h-0 min-w-0 select-none"
 	onmousedown={startDrag}
 	style={`top: ${inbounds_position.y}px; left: ${inbounds_position.x}px;`}
 >
@@ -74,5 +74,6 @@
 <style>
 	:global(* .dragging) {
 		user-select: none;
+		cursor: grab;
 	}
 </style>
