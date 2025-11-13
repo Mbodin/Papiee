@@ -102,6 +102,9 @@
 
 			return false;
 		},
+		'Ctrl-Backspace': (state, dispatch) => keymap_definition.Backspace(state, dispatch),
+		'Shift-Backspace': (state, dispatch) => keymap_definition.Backspace(state, dispatch),
+		'Ctrl-Shift-Backspace': (state, dispatch) => keymap_definition.Backspace(state, dispatch),
 		Delete: (state, dispatch) => {
 			const head = state.selection.$head;
 			if (head.end() !== head.pos)
@@ -128,6 +131,9 @@
 				dispatch
 			);
 		},
+		'Ctrl-Delete': (state, dispatch) => keymap_definition.Delete(state, dispatch),
+		'Shift-Delete': (state, dispatch) => keymap_definition.Delete(state, dispatch),
+		'Ctrl-Shift-Delete': (state, dispatch) => keymap_definition.Delete(state, dispatch),
 		Enter: (state, dispatch) => {
 			const head = state.selection.$head;
 
