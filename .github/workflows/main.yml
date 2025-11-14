@@ -17,6 +17,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24.x'
-      - run: wget https://cloud.univ-grenoble-alpes.fr/s/LXLSziFQMYJj9b3 -O ./static/worker_artifact.zip
+      - run: cd static
+      - run: curl -H "Accept: application/vnd.github+json" -H "Authorization: token ${{ secrets.TOKEN }}" -L -o worker_artifact.zip "https://api.github.com/repos/ejgallego/rocq-lsp/actions/artifacts/4518852242/zip"
+      - run: cd ../
       - run: npm ci
       - run: npm run build
