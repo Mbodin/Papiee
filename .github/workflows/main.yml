@@ -17,5 +17,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24.x'
+      - run: wget https://cloud.univ-grenoble-alpes.fr/s/LXLSziFQMYJj9b3 -O ./static/worker_artifact.zip
       - run: npm ci
       - run: npm run build
