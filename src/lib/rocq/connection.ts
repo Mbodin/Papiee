@@ -11,7 +11,7 @@ type RocqDumpFile = {
 };
 
 export async function create(): Promise<proto.MessageConnection> {
-	let wuri = '/wasm-bin/wacoq_worker.js';
+	let wuri = 'wasm-bin/wacoq_worker.js';
 
 	let worker = new Worker(wuri);
 	worker.postMessage('');

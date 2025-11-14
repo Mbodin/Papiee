@@ -13,9 +13,7 @@
 
 	onMount(() => {
 		setTimeout(async () => {
-			const WPATH = origin;
-
-			worker.connection = await create(WPATH).then(
+			worker.connection = await create().then(
 				async (c) => await initialize(c, initialization_params)
 			);
 		});
