@@ -8,6 +8,7 @@
 	import type { GoalAnswer } from '$lib/rocq/type';
 	import type { Attachment } from 'svelte/attachments';
 	import Draggable from '$lib/components/Draggable.svelte';
+	import { type SyntaxError } from '$lib/notebook/widgets/proof/errors';
 
 	let { chunks, position, hide }: { chunks: ProofChunk[]; position: number; hide?: boolean } =
 		$props();
@@ -19,6 +20,8 @@
 			.map((v) => v.code)
 			.join('')
 	);
+
+	let selected_chunk = $derived(chunks[position]);
 
 	const rocq_position: Position = $derived.by(() => {
 		const before = chunks
@@ -80,16 +83,27 @@
 			<div class="min-w-20 rounded-t-md border-surface-600-400 bg-surface-600-400">
 				<h4 class="mx-auto my-0 w-fit">Goal</h4>
 			</div>
-			<div class="bg-white p-2">
-				<ul>
-					{#each hyps as h}
-						<li>
-							{h.names.join(',')} : {h.ty}
-						</li>
-					{/each}
-				</ul>
+			<div class="rounded-b-md bg-white p-2">
+				{#if selected_chunk.type === 'error'}
+					<div class="rounded-md bg-red-500 p-2">
+						{#if 'fatal' in selected_chunk}
+							Fatal Error
+						{:else}
+							{@const reason = (selected_chunk as SyntaxError).reason}
+							{reason}
+						{/if}
+					</div>
+				{:else}
+					<ul>
+						{#each hyps as h}
+							<li>
+								{h.names.join(',')} : {h.ty}
+							</li>
+						{/each}
+					</ul>
 
-				<h4>{goal?.ty}</h4>
+					<h4>{goal?.ty}</h4>
+				{/if}
 			</div>
 		</div>
 	{/if}

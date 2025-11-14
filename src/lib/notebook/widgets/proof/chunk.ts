@@ -8,21 +8,24 @@ import { isFallbackTactic, resolve_state_actions } from '$lib/cnl/cnl_tactic';
 
 import '$lib/resolvedpos';
 import '$lib/cnl/tactics';
+import {
+	CHILD_WITHOUT_PARAGRAPH_BEGIN,
+	error,
+	FATAL_ERROR,
+	PARAGRAPH_ALREADY_ENDED,
+	TACTIC_AFTER_LINE_END,
+	type ErrorChunk,
+	type ErrorGenerator
+} from './errors';
 
 export type ProofChunk = ErrorChunk | CommentChunk | TacticChunk;
+export type Range = { from: number; to: number };
 
-export type ErrorChunk = ErrorChunk_all | ErrorChunk_fatal;
+export function collapsed_range(value: number): Range {
+	return { from: value, to: value };
+}
 
-export type ErrorChunk_all = {
-	type: 'error';
-	range: { from: number; to: number };
-};
-
-export type ErrorChunk_fatal = {
-	type: 'error';
-	range: { from: number; to: number };
-	fatal: true;
-};
+export type ChunkGenerator<T = ProofChunk> = (range: Range) => T;
 
 export type CommentChunk = {
 	type: 'comment';
@@ -62,14 +65,14 @@ export function getMainChunk(chunks: ProofChunk[]): ProofChunk | undefined {
 	return chunks.find((v) => v.range.to !== v.range.from);
 }
 
-export function turnToErroChunks(chunks: ProofChunk[], offset: number = 0): ProofChunk[] {
+export function turnToErroChunks(
+	chunks: ProofChunk[],
+	offset: number = 0,
+	generator: ErrorGenerator
+): ProofChunk[] {
 	return [
 		...chunks.slice(0, offset),
-		...chunks
-			.slice(offset)
-			.map((v) =>
-				v.type !== 'comment' ? ({ type: 'error', range: v.range } satisfies ProofChunk) : v
-			)
+		...chunks.slice(offset).map((v) => (v.type !== 'comment' ? generator(v.range) : v))
 	];
 }
 
@@ -121,7 +124,9 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 			let result = visitParagraph(after_content_state, node, after_content_pos + 1);
 			after_content_pos = result.pos;
 			if (paragraph_stop) {
-				chunks1 = chunks1.concat(turnToErroChunks(result.chunks));
+				chunks1 = chunks1.concat(
+					turnToErroChunks(result.chunks, undefined, PARAGRAPH_ALREADY_ENDED)
+				);
 			} else {
 				chunks1 = chunks1.concat(result.chunks);
 				after_content_state = result.state;
@@ -138,7 +143,7 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 		if (required_structure !== 'begin_of_paragraph' && content) {
 			// Restore line state
 			after_content_state = after_line_state;
-			chunks1 = turnToErroChunks(chunks1);
+			chunks1 = turnToErroChunks(chunks1, undefined, CHILD_WITHOUT_PARAGRAPH_BEGIN);
 		}
 
 		// If content was expected but none was provided, try to find a fallback tactic
@@ -147,9 +152,7 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 
 			if (result.length === 0) {
 				// Emit a fatal error as no fallback was found
-				chunks1 = [
-					{ type: 'error', fatal: true, range: { from: after_content_pos, to: after_content_pos } }
-				];
+				chunks1 = [FATAL_ERROR(collapsed_range(after_content_pos))];
 			} else {
 				after_content_state = state;
 				chunks1 = result.map((v) => ({
@@ -216,7 +219,7 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 
 		// If there are tactics after a tactic which was marked as line end, then those tactics are error
 		if (line_stop !== -1 && tactic_after_stop) {
-			chunks = turnToErroChunks(chunks, line_stop + 1);
+			chunks = turnToErroChunks(chunks, line_stop + 1, TACTIC_AFTER_LINE_END);
 		}
 
 		chunks = chunks.filter((v) => v.type === 'tactic' || v.range.from !== v.range.to);
@@ -232,9 +235,7 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 
 		if (result.length === 0) {
 			// Emit a fatal error as no fallback was found
-			chunks1 = [
-				{ type: 'error', fatal: true, range: { from: result_chunked.pos, to: result_chunked.pos } }
-			];
+			chunks1 = [FATAL_ERROR(collapsed_range(result_chunked.pos))];
 		} else {
 			result_chunked.state = state;
 			chunks1 = result.map((v) => ({
