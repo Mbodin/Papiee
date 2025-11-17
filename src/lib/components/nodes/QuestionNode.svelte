@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { QuestionWidgetValue } from '$lib/notebook/widgets/question/structure';
-	import type { WidgetProps } from '$lib/notebook/widgets/types';
-	import MarkdownWidget from './MarkdownWidget.svelte';
-	import ProofWidget from './ProofWidget.svelte';
-	import RocqWidget from './RocqWidget.svelte';
+	import type { QuestionNodeValue } from '$lib/notebook/nodes/question/structure';
+	import type { NotebookNodeProps } from '$lib/notebook/nodes/types';
+	import MarkdownNode from './MarkdownNode.svelte';
+	import ProofNode from './ProofNode.svelte';
+	import RocqNode from './RocqNode.svelte';
 
 	let {
 		value,
@@ -13,7 +13,7 @@
 		mode,
 		root,
 		position
-	}: WidgetProps<QuestionWidgetValue> = $props();
+	}: NotebookNodeProps<QuestionNodeValue> = $props();
 
 	function setAnchorNode() {
 		_setAnchorNode(div);
@@ -23,7 +23,7 @@
 </script>
 
 <div bind:this={div} class="flex flex-col gap-5">
-	<MarkdownWidget
+	<MarkdownNode
 		{setAnchorNode}
 		{isAnchored}
 		{mode}
@@ -46,7 +46,7 @@
 		position={[...position, 0]}
 	/>
 
-	<RocqWidget
+	<RocqNode
 		{setAnchorNode}
 		{isAnchored}
 		{mode}
@@ -69,7 +69,7 @@
 		position={[...position, 1]}
 	/>
 
-	<ProofWidget
+	<ProofNode
 		{setAnchorNode}
 		{isAnchored}
 		{mode}

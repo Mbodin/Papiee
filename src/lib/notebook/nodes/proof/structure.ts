@@ -1,21 +1,21 @@
 import { register } from '$lib/notebook/structure';
-import type { Widget, WidgetValue } from '$lib/notebook/widgets/types';
-import ProofWidgetC from '$lib/components/widgets/ProofWidget.svelte';
+import type { NotebookNode, NotebookNodeValue } from '$lib/notebook/nodes/types';
+import ProofNodeC from '$lib/components/nodes/ProofNode.svelte';
 
-export type ProofWidget = Widget<number, 'proof', [], ProofWidgetValue, { value: string }>;
-export type ProofWidgetValue = WidgetValue<number, 'proof', []> & { value: string };
+export type ProofNode = NotebookNode<number, 'proof', [], ProofNodeValue, { value: string }>;
+export type ProofNodeValue = NotebookNodeValue<number, 'proof', []> & { value: string };
 
 declare module '$lib/notebook/structure' {
-	interface RootWidgetMap {
-		proof: ProofWidget;
+	interface RootNodeMap {
+		proof: ProofNode;
 	}
 }
 
-export const PROOF_WIDGET: ProofWidget = {
+export const PROOF_NODE: ProofNode = {
 	type: 'proof',
 
 	name: 'Proof',
-	component: ProofWidgetC,
+	component: ProofNodeC,
 	initial() {
 		return {
 			type: 'proof',
@@ -63,4 +63,4 @@ export const PROOF_WIDGET: ProofWidget = {
 	}
 };
 
-register('proof', () => PROOF_WIDGET);
+register('proof', () => PROOF_NODE);

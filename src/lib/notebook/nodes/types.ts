@@ -1,11 +1,11 @@
 import type { NotebookState } from '$lib/notebook/structure';
 import type { Component } from 'svelte';
 
-export type Widget<
+export type NotebookNode<
 	Position = any,
 	Type extends string = string,
 	children_keys extends string[] = string[],
-	Value extends WidgetValue<Position, Type, children_keys> = WidgetValue<
+	Value extends NotebookNodeValue<Position, Type, children_keys> = NotebookNodeValue<
 		Position,
 		Type,
 		children_keys
@@ -23,10 +23,10 @@ export type Widget<
 	trim(value: Value): TrimmedValue;
 	untrim(trimmed: TrimmedValue): Value;
 	initial(): Value;
-	component: Component<WidgetProps<Value>>;
+	component: Component<NotebookNodeProps<Value>>;
 } & PositionHelper<Value, Position>;
 
-export type WidgetValue<
+export type NotebookNodeValue<
 	Position = any,
 	Type extends string = string,
 	children_keys extends string[] | [] = string[] | []
@@ -34,11 +34,11 @@ export type WidgetValue<
 	type: Type;
 	position?: Position | undefined;
 	children: {
-		[key in children_keys[number]]: ReturnType<Widget['initial']>;
+		[key in children_keys[number]]: ReturnType<NotebookNode['initial']>;
 	};
 };
 
-export type TrimmedWidgetValue<T> = T extends { trim: (...args: any) => infer O } ? O : never;
+export type TrimmedNotebookNodeValue<T> = T extends { trim: (...args: any) => infer O } ? O : never;
 
 export type PositionHelper<Value extends any, Position> = {
 	isLast(value: Value): boolean;
@@ -55,7 +55,7 @@ export type PositionHelper<Value extends any, Position> = {
 	moveTo(value: Value, position?: Position): Value;
 };
 
-export type WidgetProps<Value extends WidgetValue> = {
+export type NotebookNodeProps<Value extends NotebookNodeValue> = {
 	/**
 	 * The current value of the widget
 	 *
@@ -76,13 +76,13 @@ export type WidgetProps<Value extends WidgetValue> = {
 	 */
 	onNodeValueUpdate: (old_value: Value, new_value: Value) => void;
 	/**
-	 * Enable widgets to behave differently if they are the currently anchored widget
+	 * Enable notebook nodes to behave differently if they are the currently anchored widget
 	 * @returns
 	 */
 	isAnchored: () => boolean;
 
 	/**
-	 * Enable widgets views to render differently if the document is being viewed by a teacher or a student
+	 * Enable notebook nodes views to render differently if the document is being viewed by a teacher or a student
 	 */
 	mode: 'teacher' | 'student';
 

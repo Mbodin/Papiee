@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { getWidget_unsafe, type NotebookState } from '$lib/notebook/structure';
+	import { getNotebookNode_unsafe, type NotebookState } from '$lib/notebook/structure';
 	import NotebookAddMenu from './NotebookAddMenu.svelte';
 	import RocqProvider from '../rocq/RocqProvider.svelte';
 	import { array_position } from '$lib/notebook/position';
 
-	import '$lib/notebook/widgets/widgets';
+	import '$lib/notebook/nodes/nodes';
 	import NotebookUpload from './NotebookUpload.svelte';
 	import NotebookDownload from './NotebookDownload.svelte';
 
 	let {
-		notebook_state = $bindable({ title: '', widgets: [] }),
+		notebook_state = $bindable({ title: '', children: [] }),
 		mode
 	}: { notebook_state?: NotebookState; mode: 'teacher' | 'student' } = $props();
 
@@ -20,8 +20,8 @@
 
 	let global_position = $derived(
 		array_position(
-			notebook_state.widgets,
-			(v) => (notebook_state = { ...notebook_state, widgets: v })
+			notebook_state.children,
+			(v) => (notebook_state = { ...notebook_state, children: v })
 		)
 	);
 
@@ -55,15 +55,15 @@
 				{/if}
 			</div>
 			<div class="flex h-full w-full flex-col gap-5 py-10">
-				{#each notebook_state.widgets as node, i}
-					{@const Component = getWidget_unsafe(node.type).component}
+				{#each notebook_state.children as node, i}
+					{@const Component = getNotebookNode_unsafe(node.type).component}
 					{@const thisAnchoredNode = (node: HTMLElement | undefined) => setAnchorNode(node, i)}
 					{@const position = global_position.value?.index === i ? node.position : undefined}
 					<Component
 						value={{ ...node, position }}
 						setAnchorNode={thisAnchoredNode}
 						onNodeValueUpdate={(_, new_v) => {
-							notebook_state.widgets[i] = new_v;
+							notebook_state.children[i] = new_v;
 						}}
 						isAnchored={() => anchored_i === i}
 						{mode}

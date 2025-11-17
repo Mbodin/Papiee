@@ -22,7 +22,7 @@
 <script lang="ts">
 	import { useMarkViewContext } from '@prosemirror-adapter/svelte';
 	import { unparse } from '$lib/cnl/textual';
-	import { command_parsechunk, type ProofChunk } from '$lib/notebook/widgets/proof/chunk';
+	import { command_parsechunk, type ProofChunk } from '$lib/notebook/nodes/proof/chunk';
 	import type { Mark } from 'prosemirror-model';
 
 	let id = $props.id();

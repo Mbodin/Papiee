@@ -182,10 +182,10 @@
 
 <script lang="ts">
 	import { useMarkViewContext } from '@prosemirror-adapter/svelte';
-	import { schema } from '$lib/notebook/widgets/proof/schema';
+	import { schema } from '$lib/notebook/nodes/proof/schema';
 	import type { CompletionState } from '../ProofAutoCompletion.svelte';
 	import { keymap } from 'prosemirror-keymap';
-	import { getChunks, getMainChunk } from '$lib/notebook/widgets/proof/chunk';
+	import { getChunks, getMainChunk } from '$lib/notebook/nodes/proof/chunk';
 
 	let id = $props.id();
 

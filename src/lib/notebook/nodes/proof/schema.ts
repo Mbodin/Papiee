@@ -1,4 +1,4 @@
-import type { CompletionState } from '$lib/components/widgets/proof/ProofAutoCompletion.svelte';
+import type { CompletionState } from '$lib/components/nodes/proof/ProofAutoCompletion.svelte';
 import { Schema, type MarkSpec, type NodeSpec } from 'prosemirror-model';
 
 export const nodes = {

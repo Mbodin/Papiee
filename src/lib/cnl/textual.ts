@@ -1,5 +1,5 @@
 import { ParseError } from '$lib/parsing';
-import { schema } from '$lib/notebook/widgets/proof/schema';
+import { schema } from '$lib/notebook/nodes/proof/schema';
 import type { Node } from 'prosemirror-model';
 
 /**

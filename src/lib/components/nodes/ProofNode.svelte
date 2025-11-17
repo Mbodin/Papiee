@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { useProsemirrorAdapterProvider } from '@prosemirror-adapter/svelte';
 
-	import type { WidgetProps } from '$lib/notebook/widgets/types';
-	import type { ProofWidgetValue } from '$lib/notebook/widgets/proof/structure';
+	import type { NotebookNodeProps } from '$lib/notebook/nodes/types';
+	import type { ProofNodeValue } from '$lib/notebook/nodes/proof/structure';
 	import { parse, unparse } from '$lib/cnl/textual';
 	import ProofEditor from './proof/ProofEditor.svelte';
 	import type { EditorView } from 'prosemirror-view';
 
-	let { value, onNodeValueUpdate, setAnchorNode, isAnchored }: WidgetProps<ProofWidgetValue> =
+	let { value, onNodeValueUpdate, setAnchorNode, isAnchored }: NotebookNodeProps<ProofNodeValue> =
 		$props();
 
 	useProsemirrorAdapterProvider();

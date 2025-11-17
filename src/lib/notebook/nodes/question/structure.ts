@@ -1,21 +1,21 @@
-import QuestionWidgetC from '$lib/components/widgets/QuestionWidget.svelte';
+import QuestionNodeC from '$lib/components/nodes/QuestionNode.svelte';
 import { register } from '$lib/notebook/structure';
-import type { TrimmedWidgetValue, Widget, WidgetValue } from '$lib/notebook/widgets/types';
+import type {
+	TrimmedNotebookNodeValue,
+	NotebookNode,
+	NotebookNodeValue
+} from '$lib/notebook/nodes/types';
 import { FileQuestionMark } from '@lucide/svelte';
-import {
-	MARKDOWN_WIDGET,
-	type MarkdownWidget,
-	type MarkdownWidgetValue
-} from '../markdown/structure';
-import { ROCQ_WIDGET, type RocqWidget, type RocqWidgetValue } from '../rocq/structure';
-import { PROOF_WIDGET, type ProofWidget, type ProofWidgetValue } from '../proof/structure';
+import { MARKDOWN_NODE, type MarkdownNode, type MarkdownNodeValue } from '../markdown/structure';
+import { ROCQ_NODE, type RocqNode, type RocqNodeValue } from '../rocq/structure';
+import { PROOF_NODE, type ProofNode, type ProofNodeValue } from '../proof/structure';
 
-export type QuestionWidget = Widget<
+export type QuestionNode = NotebookNode<
 	QuestionPosition,
 	string,
 	['markdown_header', 'rocq_header', 'cnl_proof'],
-	QuestionWidgetValue,
-	TrimmedQuestionWidgetValue
+	QuestionNodeValue,
+	TrimmedQuestionNodeValue
 >;
 
 export type QuestionPosition =
@@ -25,25 +25,25 @@ export type QuestionPosition =
 	  }
 	| undefined;
 
-export type QuestionWidgetValue = WidgetValue<
+export type QuestionNodeValue = NotebookNodeValue<
 	QuestionPosition,
 	'question',
 	['markdown_header', 'rocq_header', 'cnl_proof']
 > & {
-	_markdown_header: Omit<MarkdownWidgetValue, 'position' | 'type'>;
-	_rocq_header: Omit<RocqWidgetValue, 'position' | 'type'>;
-	_cnl_proof: Omit<ProofWidgetValue, 'position' | 'type'>;
+	_markdown_header: Omit<MarkdownNodeValue, 'position' | 'type'>;
+	_rocq_header: Omit<RocqNodeValue, 'position' | 'type'>;
+	_cnl_proof: Omit<ProofNodeValue, 'position' | 'type'>;
 };
 
-export type TrimmedQuestionWidgetValue = {
-	_markdown_header: Omit<TrimmedWidgetValue<MarkdownWidget>, 'type'>;
-	_rocq_header: Omit<TrimmedWidgetValue<RocqWidget>, 'type'>;
-	_cnl_proof: Omit<TrimmedWidgetValue<ProofWidget>, 'type'>;
+export type TrimmedQuestionNodeValue = {
+	_markdown_header: Omit<TrimmedNotebookNodeValue<MarkdownNode>, 'type'>;
+	_rocq_header: Omit<TrimmedNotebookNodeValue<RocqNode>, 'type'>;
+	_cnl_proof: Omit<TrimmedNotebookNodeValue<ProofNode>, 'type'>;
 };
 
 declare module '$lib/notebook/structure' {
-	interface RootWidgetMap {
-		question: QuestionWidget;
+	interface RootNodeMap {
+		question: QuestionNode;
 	}
 }
 
@@ -75,35 +75,35 @@ function unstrip_child<K extends string, T extends { position?: unknown; type: u
 	return object as { [key in K]: T };
 }
 
-export const QUESTION_WIDGET: QuestionWidget = {
+export const QUESTION_NODE: QuestionNode = {
 	type: 'question',
 	name: 'Question',
 	icon: FileQuestionMark,
 
-	component: QuestionWidgetC,
+	component: QuestionNodeC,
 	initial() {
-		const value: QuestionWidgetValue = {
+		const value: QuestionNodeValue = {
 			type: 'question',
-			_markdown_header: strip_child(MARKDOWN_WIDGET.initial()),
-			_rocq_header: strip_child(ROCQ_WIDGET.initial()),
-			_cnl_proof: strip_child(PROOF_WIDGET.initial()),
+			_markdown_header: strip_child(MARKDOWN_NODE.initial()),
+			_rocq_header: strip_child(ROCQ_NODE.initial()),
+			_cnl_proof: strip_child(PROOF_NODE.initial()),
 			children: {
 				...unstrip_child(
 					'cnl_proof',
 					'proof',
-					(): QuestionWidgetValue['_cnl_proof'] => value._cnl_proof,
+					(): QuestionNodeValue['_cnl_proof'] => value._cnl_proof,
 					(v) => (value._cnl_proof = v)
 				),
 				...unstrip_child(
 					'markdown_header',
 					'markdown',
-					(): QuestionWidgetValue['_markdown_header'] => value._markdown_header,
+					(): QuestionNodeValue['_markdown_header'] => value._markdown_header,
 					(v) => (value._markdown_header = v)
 				),
 				...unstrip_child(
 					'rocq_header',
 					'rocq',
-					(): QuestionWidgetValue['_rocq_header'] => value._rocq_header,
+					(): QuestionNodeValue['_rocq_header'] => value._rocq_header,
 					(v) => (value._rocq_header = v)
 				)
 			},
@@ -120,31 +120,31 @@ export const QUESTION_WIDGET: QuestionWidget = {
 		};
 	},
 	untrim(trimmed) {
-		const value: QuestionWidgetValue = {
+		const value: QuestionNodeValue = {
 			type: 'question',
 			children: {
 				...unstrip_child(
 					'cnl_proof',
 					'proof',
-					(): QuestionWidgetValue['_cnl_proof'] => value._cnl_proof,
+					(): QuestionNodeValue['_cnl_proof'] => value._cnl_proof,
 					(v) => (value._cnl_proof = v)
 				),
 				...unstrip_child(
 					'markdown_header',
 					'markdown',
-					(): QuestionWidgetValue['_markdown_header'] => value._markdown_header,
+					(): QuestionNodeValue['_markdown_header'] => value._markdown_header,
 					(v) => (value._markdown_header = v)
 				),
 				...unstrip_child(
 					'rocq_header',
 					'rocq',
-					(): QuestionWidgetValue['_rocq_header'] => value._rocq_header,
+					(): QuestionNodeValue['_rocq_header'] => value._rocq_header,
 					(v) => (value._rocq_header = v)
 				)
 			},
-			_cnl_proof: PROOF_WIDGET.untrim(trimmed._cnl_proof),
-			_markdown_header: MARKDOWN_WIDGET.untrim(trimmed._markdown_header),
-			_rocq_header: ROCQ_WIDGET.untrim(trimmed._rocq_header),
+			_cnl_proof: PROOF_NODE.untrim(trimmed._cnl_proof),
+			_markdown_header: MARKDOWN_NODE.untrim(trimmed._markdown_header),
+			_rocq_header: ROCQ_NODE.untrim(trimmed._rocq_header),
 			position: undefined
 		};
 
@@ -190,4 +190,4 @@ export const QUESTION_WIDGET: QuestionWidget = {
 	}
 };
 
-register('question', () => QUESTION_WIDGET);
+register('question', () => QUESTION_NODE);

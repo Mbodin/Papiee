@@ -1,20 +1,20 @@
-import RocqWidgetC from '$lib/components/widgets/RocqWidget.svelte';
+import RocqNodeC from '$lib/components/nodes/RocqNode.svelte';
 import { register } from '$lib/notebook/structure';
-import type { Widget, WidgetValue } from '$lib/notebook/widgets/types';
+import type { NotebookNode, NotebookNodeValue } from '$lib/notebook/nodes/types';
 
-export type RocqWidget = Widget<number, 'rocq', [], RocqWidgetValue, { value: string }>;
-export type RocqWidgetValue = WidgetValue<number, 'rocq', []> & { value: string };
+export type RocqNode = NotebookNode<number, 'rocq', [], RocqNodeValue, { value: string }>;
+export type RocqNodeValue = NotebookNodeValue<number, 'rocq', []> & { value: string };
 
 declare module '$lib/notebook/structure' {
-	interface RootWidgetMap {
-		rocq: RocqWidget;
+	interface RootNodeMap {
+		rocq: RocqNode;
 	}
 }
 
-export const ROCQ_WIDGET: RocqWidget = {
+export const ROCQ_NODE: RocqNode = {
 	type: 'rocq',
 
-	component: RocqWidgetC,
+	component: RocqNodeC,
 	initial() {
 		return {
 			type: 'rocq',
@@ -64,4 +64,4 @@ export const ROCQ_WIDGET: RocqWidget = {
 	}
 };
 
-register('rocq', () => ROCQ_WIDGET);
+register('rocq', () => ROCQ_NODE);

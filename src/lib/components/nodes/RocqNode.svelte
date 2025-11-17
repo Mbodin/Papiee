@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { rocq } from '$lib/notebook/widgets/rocq/language-coq';
-	import type { RocqWidgetValue } from '$lib/notebook/widgets/rocq/structure';
-	import type { WidgetProps } from '$lib/notebook/widgets/types';
+	import { rocq } from '$lib/notebook/nodes/rocq/language-coq';
+	import type { RocqNodeValue } from '$lib/notebook/nodes/rocq/structure';
+	import type { NotebookNodeProps } from '$lib/notebook/nodes/types';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { basicDark } from '@fsegurai/codemirror-theme-basic-dark';
 
-	let { value, onNodeValueUpdate, setAnchorNode, mode }: WidgetProps<RocqWidgetValue> = $props();
+	let { value, onNodeValueUpdate, setAnchorNode, mode }: NotebookNodeProps<RocqNodeValue> =
+		$props();
 
 	let div: HTMLDivElement | undefined = $state();
 </script>

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import Notebook from '$lib/components/Notebook.svelte';
 	import type { NotebookState } from '$lib/notebook/structure';
-	import { PROOF_WIDGET } from '$lib/notebook/widgets/proof/structure';
-	import { QUESTION_WIDGET } from '$lib/notebook/widgets/question/structure';
+	import { PROOF_NODE } from '$lib/notebook/nodes/proof/structure';
+	import { QUESTION_NODE } from '$lib/notebook/nodes/question/structure';
 
-	let notebook_state: NotebookState = $state({ widgets: [PROOF_WIDGET.initial()], title: '' });
+	let notebook_state: NotebookState = $state({ children: [PROOF_NODE.initial()], title: '' });
 
 	let teacher_viewing = $state(true);
 </script>

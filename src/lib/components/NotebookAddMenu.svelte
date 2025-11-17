@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getWidgets, type NotebookState } from '$lib/notebook/structure';
-	import type { Widget } from '$lib/notebook/widgets/types';
+	import { getNotebookNodes, type NotebookState } from '$lib/notebook/structure';
+	import type { NotebookNode } from '$lib/notebook/nodes/types';
 	import { PlusIcon } from '@lucide/svelte';
 	import { Popover, Portal, usePopover } from '@skeletonlabs/skeleton-svelte';
 	import { type Component } from 'svelte';
@@ -16,11 +16,11 @@
 		positioning: { placement: 'right-start' }
 	});
 
-	function addNode(widget: Widget) {
-		const new_node = widget.initial();
-		let unfocused = notebook_state.widgets.map((v) => widget.moveTo(v, undefined));
+	function addNode(node: NotebookNode) {
+		const new_node = node.initial();
+		let unfocused = notebook_state.children.map((v) => node.moveTo(v, undefined));
 
-		notebook_state.widgets = [
+		notebook_state.children = [
 			...unfocused.slice(0, anchored_i + 1),
 			new_node,
 			...unfocused.slice(anchored_i + 1)
@@ -29,8 +29,8 @@
 		const i = anchored_i + 1;
 
 		setTimeout(() => {
-			const begin = widget.getBegin(new_node);
-			notebook_state.widgets[i] = widget.moveTo(new_node, begin);
+			const begin = node.getBegin(new_node);
+			notebook_state.children[i] = node.moveTo(new_node, begin);
 		}, 20);
 	}
 </script>
@@ -45,16 +45,16 @@
 				<div
 					class="flex max-w-md flex-col space-y-2 card border border-surface-500/30 bg-tertiary-200-800/30 p-2 shadow-xl backdrop-blur-sm"
 				>
-					{#each getWidgets(true) as (Widget & { name: string; icon?: Component })[] as widget}
-						{@const Component = widget.icon}
+					{#each getNotebookNodes(true) as (NotebookNode & { name: string; icon?: Component })[] as node}
+						{@const Component = node.icon}
 						<button
 							onclick={() => {
 								popover().setOpen(false);
-								addNode(widget);
+								addNode(node);
 							}}
 						>
 							<div class="btn flex flex-row items-center gap-2 bg-secondary-300-700">
-								<h4>{widget.name}</h4>
+								<h4>{node.name}</h4>
 								{#if Component}
 									<Component />
 								{/if}

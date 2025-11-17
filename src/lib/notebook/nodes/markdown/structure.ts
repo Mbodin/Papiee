@@ -1,32 +1,32 @@
-import MarkdownWidgetC from '$lib/components/widgets/MarkdownWidget.svelte';
+import MarkdownNodeC from '$lib/components/nodes/MarkdownNode.svelte';
 import { register } from '$lib/notebook/structure';
-import type { Widget, WidgetValue } from '$lib/notebook/widgets/types';
+import type { NotebookNode, NotebookNodeValue } from '$lib/notebook/nodes/types';
 import { FileTextIcon } from '@lucide/svelte';
 
-export type MarkdownWidget = Widget<
+export type MarkdownNode = NotebookNode<
 	number,
 	'markdown',
 	[],
-	MarkdownWidgetValue,
-	Omit<MarkdownWidgetValue, 'position' | 'type' | 'children'>
+	MarkdownNodeValue,
+	Omit<MarkdownNodeValue, 'position' | 'type' | 'children'>
 >;
-export type MarkdownWidgetValue = WidgetValue<number, 'markdown', []> & {
+export type MarkdownNodeValue = NotebookNodeValue<number, 'markdown', []> & {
 	value: string;
 	compiled: boolean;
 };
 
 declare module '$lib/notebook/structure' {
-	interface RootWidgetMap {
-		markdown: MarkdownWidget;
+	interface RootNodeMap {
+		markdown: MarkdownNode;
 	}
 }
 
-export const MARKDOWN_WIDGET: MarkdownWidget = {
+export const MARKDOWN_NODE: MarkdownNode = {
 	type: 'markdown',
 	name: 'Markdown',
 	icon: FileTextIcon,
 
-	component: MarkdownWidgetC,
+	component: MarkdownNodeC,
 	initial() {
 		return {
 			type: 'markdown',
@@ -78,4 +78,4 @@ export const MARKDOWN_WIDGET: MarkdownWidget = {
 	}
 };
 
-register('markdown', () => MARKDOWN_WIDGET);
+register('markdown', () => MARKDOWN_NODE);

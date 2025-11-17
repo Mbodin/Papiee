@@ -324,7 +324,7 @@
 <script lang="ts">
 	import { useNodeViewContext, type NodeViewFactory } from '@prosemirror-adapter/svelte';
 	import { Plugin, PluginKey, Selection, type Command } from 'prosemirror-state';
-	import { nodes, schema } from '$lib/notebook/widgets/proof/schema';
+	import { nodes, schema } from '$lib/notebook/nodes/proof/schema';
 	import { keymap } from 'prosemirror-keymap';
 	import Paragraph from './Paragraph.svelte';
 	import { type ResolvedPos } from 'prosemirror-model';

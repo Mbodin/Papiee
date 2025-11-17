@@ -3,12 +3,12 @@
 	import { markdown } from '@codemirror/lang-markdown';
 
 	import MarkdownIt from 'markdown-it';
-	import type { WidgetProps } from '$lib/notebook/widgets/types';
-	import type { MarkdownWidgetValue } from '$lib/notebook/widgets/markdown/structure';
+	import type { NotebookNodeProps } from '$lib/notebook/nodes/types';
+	import type { MarkdownNodeValue } from '$lib/notebook/nodes/markdown/structure';
 	import { BrickWallIcon, PickaxeIcon } from '@lucide/svelte';
 	import { EditorView } from 'codemirror';
 
-	let { value, onNodeValueUpdate, setAnchorNode, mode }: WidgetProps<MarkdownWidgetValue> =
+	let { value, onNodeValueUpdate, setAnchorNode, mode }: NotebookNodeProps<MarkdownNodeValue> =
 		$props();
 
 	let compiled = $derived.by(() => {

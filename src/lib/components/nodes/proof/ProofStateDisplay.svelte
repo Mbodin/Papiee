@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ProofChunk } from '$lib/notebook/widgets/proof/chunk';
+	import type { ProofChunk } from '$lib/notebook/nodes/proof/chunk';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
 	import { getContext, untrack } from 'svelte';
 	import type { Position } from 'vscode-languageserver-types';
@@ -8,7 +8,7 @@
 	import type { GoalAnswer } from '$lib/rocq/type';
 	import type { Attachment } from 'svelte/attachments';
 	import Draggable from '$lib/components/Draggable.svelte';
-	import { type SyntaxError } from '$lib/notebook/widgets/proof/errors';
+	import { type SyntaxError } from '$lib/notebook/nodes/proof/errors';
 
 	let { chunks, position, hide }: { chunks: ProofChunk[]; position: number; hide?: boolean } =
 		$props();

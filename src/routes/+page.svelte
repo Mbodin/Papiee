@@ -5,7 +5,7 @@
 
 	import { createTacticFromTextual } from '$lib/cnl/cnl_tactic';
 	import { parse } from '$lib/cnl/textual';
-	import { command_parsechunk } from '$lib/notebook/widgets/proof/chunk';
+	import { command_parsechunk } from '$lib/notebook/nodes/proof/chunk';
 	import { EditorState } from 'prosemirror-state';
 	const { Grammar, Parser } = nearley;
 

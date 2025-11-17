@@ -11,7 +11,7 @@
 	import '$lib/resolvedpos';
 	import { MarkSelectedView, plugins as mark_selected_plugins } from './marks/MarkSelected.svelte';
 	import { plugins as mark_chunks_plugins, MarkChunksView } from './marks/MarkChunks.svelte';
-	import { schema } from '$lib/notebook/widgets/proof/schema';
+	import { schema } from '$lib/notebook/nodes/proof/schema';
 
 	import '$lib/cnl/tactics';
 	import type { CompletionState } from './ProofAutoCompletion.svelte';
@@ -21,7 +21,7 @@
 		getChunks,
 		parsechunks,
 		type ProofChunk
-	} from '$lib/notebook/widgets/proof/chunk';
+	} from '$lib/notebook/nodes/proof/chunk';
 	import ProofStateDisplay from './ProofStateDisplay.svelte';
 
 	let {
