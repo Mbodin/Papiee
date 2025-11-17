@@ -2,8 +2,8 @@ import { register } from '$lib/notebook/structure';
 import type { Widget, WidgetValue } from '$lib/notebook/widgets/types';
 import ProofWidgetC from '$lib/components/widgets/ProofWidget.svelte';
 
-export type ProofWidget = Widget<number, 'proof', ProofWidgetValue, { value: string }>;
-export type ProofWidgetValue = WidgetValue<number> & { value: string };
+export type ProofWidget = Widget<number, 'proof', [], ProofWidgetValue, { value: string }>;
+export type ProofWidgetValue = WidgetValue<number, 'proof', []> & { value: string };
 
 declare module '$lib/notebook/structure' {
 	interface RootWidgetMap {
@@ -20,6 +20,7 @@ export const PROOF_WIDGET: ProofWidget = {
 		return {
 			type: 'proof',
 			value: 'Let $x$.',
+			children: {},
 			position: undefined
 		};
 	},
@@ -32,6 +33,7 @@ export const PROOF_WIDGET: ProofWidget = {
 		return {
 			type: 'proof',
 			value: trimmed.value,
+			children: {},
 			position: 0
 		};
 	},

@@ -6,10 +6,14 @@ import { FileTextIcon } from '@lucide/svelte';
 export type MarkdownWidget = Widget<
 	number,
 	'markdown',
+	[],
 	MarkdownWidgetValue,
-	Omit<MarkdownWidgetValue, 'position' | 'type'>
+	Omit<MarkdownWidgetValue, 'position' | 'type' | 'children'>
 >;
-export type MarkdownWidgetValue = WidgetValue<number> & { value: string; compiled: boolean };
+export type MarkdownWidgetValue = WidgetValue<number, 'markdown', []> & {
+	value: string;
+	compiled: boolean;
+};
 
 declare module '$lib/notebook/structure' {
 	interface RootWidgetMap {
@@ -28,6 +32,7 @@ export const MARKDOWN_WIDGET: MarkdownWidget = {
 			type: 'markdown',
 			value: '',
 			position: undefined,
+			children: {},
 			compiled: false
 		};
 	},
@@ -43,6 +48,7 @@ export const MARKDOWN_WIDGET: MarkdownWidget = {
 			type: 'markdown',
 			position: 0,
 			value: trimmed.value,
+			children: {},
 			compiled: trimmed.compiled
 		};
 	},

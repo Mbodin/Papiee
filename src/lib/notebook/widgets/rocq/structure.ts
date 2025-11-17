@@ -2,8 +2,8 @@ import RocqWidgetC from '$lib/components/widgets/RocqWidget.svelte';
 import { register } from '$lib/notebook/structure';
 import type { Widget, WidgetValue } from '$lib/notebook/widgets/types';
 
-export type RocqWidget = Widget<number, 'rocq', RocqWidgetValue, { value: string }>;
-export type RocqWidgetValue = WidgetValue<number> & { value: string };
+export type RocqWidget = Widget<number, 'rocq', [], RocqWidgetValue, { value: string }>;
+export type RocqWidgetValue = WidgetValue<number, 'rocq', []> & { value: string };
 
 declare module '$lib/notebook/structure' {
 	interface RootWidgetMap {
@@ -20,6 +20,7 @@ export const ROCQ_WIDGET: RocqWidget = {
 			type: 'rocq',
 			value: '(*Rocq file*)',
 			position: undefined,
+			children: {},
 			compiled: false
 		};
 	},
@@ -33,7 +34,8 @@ export const ROCQ_WIDGET: RocqWidget = {
 		return {
 			type: 'rocq',
 			position: 0,
-			value: trimmed.value
+			value: trimmed.value,
+			children: {}
 		};
 	},
 	get(v) {

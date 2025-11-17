@@ -1,9 +1,15 @@
+import type { NotebookState } from '$lib/notebook/structure';
 import type { Component } from 'svelte';
 
 export type Widget<
-	Position = unknown,
+	Position = any,
 	Type extends string = string,
-	Value extends WidgetValue<Position> = WidgetValue<Position, Type>,
+	children_keys extends string[] = string[],
+	Value extends WidgetValue<Position, Type, children_keys> = WidgetValue<
+		Position,
+		Type,
+		children_keys
+	>,
 	TrimmedValue = never
 > = (
 	| {
@@ -20,9 +26,16 @@ export type Widget<
 	component: Component<WidgetProps<Value>>;
 } & PositionHelper<Value, Position>;
 
-export type WidgetValue<Position = unknown, Type extends string = string> = {
+export type WidgetValue<
+	Position = any,
+	Type extends string = string,
+	children_keys extends string[] | [] = string[] | []
+> = {
 	type: Type;
 	position?: Position | undefined;
+	children: {
+		[key in children_keys[number]]: ReturnType<Widget['initial']>;
+	};
 };
 
 export type TrimmedWidgetValue<T> = T extends { trim: (...args: any) => infer O } ? O : never;
@@ -42,7 +55,7 @@ export type PositionHelper<Value extends any, Position> = {
 	moveTo(value: Value, position?: Position): Value;
 };
 
-export type WidgetProps<Value extends WidgetValue = WidgetValue> = {
+export type WidgetProps<Value extends WidgetValue> = {
 	/**
 	 * The current value of the widget
 	 *
@@ -72,4 +85,28 @@ export type WidgetProps<Value extends WidgetValue = WidgetValue> = {
 	 * Enable widgets views to render differently if the document is being viewed by a teacher or a student
 	 */
 	mode: 'teacher' | 'student';
+
+	/**
+	 * Uniquely identify a widget node through the iterative parent index
+	 *
+	 * Example :
+	 * 	Parent :
+	 * 		ChildA
+	 * 		ChildB
+	 *  Parent :
+	 * 		ChildC
+	 *
+	 * [0, 1] refers to ChildA
+	 * [1, 1] refers to ChildC
+	 *
+	 * [0] is valid and refers to Parent node
+	 *
+	 * [] refers to the root
+	 */
+	position: number[];
+
+	/**
+	 * Enable access to the root node
+	 */
+	root: NotebookState;
 };

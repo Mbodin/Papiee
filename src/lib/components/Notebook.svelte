@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getWidget_unsafe, type NotebookState } from '$lib/notebook/structure';
 	import NotebookAddMenu from './NotebookAddMenu.svelte';
-	import RocqProvider from './RocqProvider.svelte';
+	import RocqProvider from '../rocq/RocqProvider.svelte';
 	import { array_position } from '$lib/notebook/position';
 
 	import '$lib/notebook/widgets/widgets';
@@ -67,6 +67,8 @@
 						}}
 						isAnchored={() => anchored_i === i}
 						{mode}
+						position={[i]}
+						root={notebook_state}
 					/>
 				{/each}
 			</div>

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /************************************************************************/
 /*  v      *    CodeMirror Mode for the Rocq Proof Assistant            */
 /* <O___,, *      Copyright 2016-2025 jsRocq contributors               */

@@ -18,7 +18,12 @@
 		},
 		set value(v) {
 			if (unparse(v) === value.value) return;
-			onNodeValueUpdate(value, { type: 'proof', position: value.position, value: unparse(v) });
+			onNodeValueUpdate(value, {
+				type: 'proof',
+				position: value.position,
+				value: unparse(v),
+				children: {}
+			});
 		}
 	};
 

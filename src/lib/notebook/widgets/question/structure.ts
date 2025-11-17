@@ -12,7 +12,8 @@ import { PROOF_WIDGET, type ProofWidget, type ProofWidgetValue } from '../proof/
 
 export type QuestionWidget = Widget<
 	QuestionPosition,
-	'question',
+	string,
+	['markdown_header', 'rocq_header', 'cnl_proof'],
 	QuestionWidgetValue,
 	TrimmedQuestionWidgetValue
 >;
@@ -24,22 +25,54 @@ export type QuestionPosition =
 	  }
 	| undefined;
 
-export type QuestionWidgetValue = WidgetValue<QuestionPosition> & {
-	markdown_header: Omit<MarkdownWidgetValue, 'position' | 'type'>;
-	rocq_header: Omit<RocqWidgetValue, 'position' | 'type'>;
-	cnl_proof: Omit<ProofWidgetValue, 'position' | 'type'>;
+export type QuestionWidgetValue = WidgetValue<
+	QuestionPosition,
+	'question',
+	['markdown_header', 'rocq_header', 'cnl_proof']
+> & {
+	_markdown_header: Omit<MarkdownWidgetValue, 'position' | 'type'>;
+	_rocq_header: Omit<RocqWidgetValue, 'position' | 'type'>;
+	_cnl_proof: Omit<ProofWidgetValue, 'position' | 'type'>;
 };
 
 export type TrimmedQuestionWidgetValue = {
-	markdown_header: Omit<TrimmedWidgetValue<MarkdownWidget>, 'type'>;
-	rocq_header: Omit<TrimmedWidgetValue<RocqWidget>, 'type'>;
-	cnl_proof: Omit<TrimmedWidgetValue<ProofWidget>, 'type'>;
+	_markdown_header: Omit<TrimmedWidgetValue<MarkdownWidget>, 'type'>;
+	_rocq_header: Omit<TrimmedWidgetValue<RocqWidget>, 'type'>;
+	_cnl_proof: Omit<TrimmedWidgetValue<ProofWidget>, 'type'>;
 };
 
 declare module '$lib/notebook/structure' {
 	interface RootWidgetMap {
 		question: QuestionWidget;
 	}
+}
+
+function strip_child<T extends { position?: unknown; type: unknown }>(
+	value: T
+): Omit<T, 'position' | 'type'> {
+	delete value.position;
+	delete value.type;
+	return value;
+}
+
+function unstrip_child<K extends string, T extends { position?: unknown; type: unknown }>(
+	key: K,
+	type: T['type'],
+	getter: () => Omit<T, 'position' | 'type'>,
+	setter: (v: Omit<T, 'position' | 'type'>) => void
+): { [key in K]: T } {
+	let object = {};
+	Object.defineProperty(object, key, {
+		get() {
+			return { ...getter(), type, position: undefined };
+		},
+		set(value) {
+			strip_child(value);
+			setter(value);
+		}
+	});
+
+	return object as { [key in K]: T };
 }
 
 export const QUESTION_WIDGET: QuestionWidget = {
@@ -49,30 +82,73 @@ export const QUESTION_WIDGET: QuestionWidget = {
 
 	component: QuestionWidgetC,
 	initial() {
-		return {
+		const value: QuestionWidgetValue = {
 			type: 'question',
-			markdown_header: MARKDOWN_WIDGET.initial(),
-			rocq_header: ROCQ_WIDGET.initial(),
-			cnl_proof: PROOF_WIDGET.initial(),
+			_markdown_header: strip_child(MARKDOWN_WIDGET.initial()),
+			_rocq_header: strip_child(ROCQ_WIDGET.initial()),
+			_cnl_proof: strip_child(PROOF_WIDGET.initial()),
+			children: {
+				...unstrip_child(
+					'cnl_proof',
+					'proof',
+					(): QuestionWidgetValue['_cnl_proof'] => value._cnl_proof,
+					(v) => (value._cnl_proof = v)
+				),
+				...unstrip_child(
+					'markdown_header',
+					'markdown',
+					(): QuestionWidgetValue['_markdown_header'] => value._markdown_header,
+					(v) => (value._markdown_header = v)
+				),
+				...unstrip_child(
+					'rocq_header',
+					'rocq',
+					(): QuestionWidgetValue['_rocq_header'] => value._rocq_header,
+					(v) => (value._rocq_header = v)
+				)
+			},
 			position: undefined
 		};
+		return value;
 	},
 	trim(value) {
 		return {
 			type: value.type,
-			markdown_header: MARKDOWN_WIDGET.trim({ type: 'markdown', ...value.markdown_header }),
-			rocq_header: ROCQ_WIDGET.trim({ type: 'rocq', ...value.rocq_header }),
-			cnl_proof: PROOF_WIDGET.trim({ type: 'proof', ...value.cnl_proof })
+			_cnl_proof: value._cnl_proof,
+			_markdown_header: value._markdown_header,
+			_rocq_header: value._rocq_header
 		};
 	},
 	untrim(trimmed) {
-		return {
+		const value: QuestionWidgetValue = {
 			type: 'question',
-			markdown_header: MARKDOWN_WIDGET.untrim({ ...trimmed.markdown_header }),
-			rocq_header: ROCQ_WIDGET.untrim({ ...trimmed.rocq_header }),
-			cnl_proof: PROOF_WIDGET.untrim({ ...trimmed.cnl_proof }),
+			children: {
+				...unstrip_child(
+					'cnl_proof',
+					'proof',
+					(): QuestionWidgetValue['_cnl_proof'] => value._cnl_proof,
+					(v) => (value._cnl_proof = v)
+				),
+				...unstrip_child(
+					'markdown_header',
+					'markdown',
+					(): QuestionWidgetValue['_markdown_header'] => value._markdown_header,
+					(v) => (value._markdown_header = v)
+				),
+				...unstrip_child(
+					'rocq_header',
+					'rocq',
+					(): QuestionWidgetValue['_rocq_header'] => value._rocq_header,
+					(v) => (value._rocq_header = v)
+				)
+			},
+			_cnl_proof: PROOF_WIDGET.untrim(trimmed._cnl_proof),
+			_markdown_header: MARKDOWN_WIDGET.untrim(trimmed._markdown_header),
+			_rocq_header: ROCQ_WIDGET.untrim(trimmed._rocq_header),
 			position: undefined
 		};
+
+		return value;
 	},
 	get(v) {
 		return v.position;
@@ -81,13 +157,13 @@ export const QUESTION_WIDGET: QuestionWidget = {
 		return { field: 'markdown_header', index: 0 };
 	},
 	getEnd(v) {
-		return { field: 'cnl_proof', index: v.cnl_proof.value.length };
+		return { field: 'cnl_proof', index: v._cnl_proof.value.length };
 	},
 	isFirst(v) {
 		return v.position?.field === 'markdown_header' && v.position.index === 0;
 	},
 	isLast(v) {
-		return v.position?.field === 'cnl_proof' && v.position.index === v.cnl_proof.value.length;
+		return v.position?.field === 'cnl_proof' && v.position.index === v._cnl_proof.value.length;
 	},
 	moveLeft(v) {
 		if (v.position && v.position?.index !== 0) {
@@ -99,9 +175,9 @@ export const QUESTION_WIDGET: QuestionWidget = {
 		if (!v.position) return undefined;
 
 		const selected_field_length = {
-			markdown_header: v.markdown_header.value.length,
-			rocq_header: v.rocq_header.value.length,
-			cnl_proof: v.cnl_proof.value.length
+			markdown_header: v._markdown_header.value.length,
+			rocq_header: v._rocq_header.value.length,
+			cnl_proof: v._cnl_proof.value.length
 		}[v.position.field];
 
 		if (v.position && v.position?.index !== selected_field_length) {
