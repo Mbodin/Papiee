@@ -11,12 +11,16 @@
 		document.body.appendChild(element);
 		document.addEventListener('mousemove', drag);
 		document.addEventListener('mouseup', stopDrag);
+		document.addEventListener('scroll', onScroll);
 		return () => {
 			element.remove();
+			document.removeEventListener('scroll', onScroll);
 			document.removeEventListener('mousemove', drag);
 			document.removeEventListener('mouseup', stopDrag);
 		};
 	};
+
+	let scroll_offset = $state({ x: 0, y: 0 });
 
 	let dragging = $state(false);
 	let source = $state({ x: 0, y: 0 });
@@ -43,6 +47,10 @@
 		dragging = true;
 	}
 
+	function onScroll() {
+		scroll_offset.y = document.documentElement.scrollTop;
+	}
+
 	function drag(e: MouseEvent) {
 		if (!dragging) return;
 
@@ -66,7 +74,7 @@
 	class:dragging
 	class="dragging absolute min-h-0 min-w-0 select-none"
 	onmousedown={startDrag}
-	style={`top: ${inbounds_position.y}px; left: ${inbounds_position.x}px;`}
+	style={`top: ${inbounds_position.y + scroll_offset.y}px; left: ${inbounds_position.x}px; transition: top 1s in`}
 >
 	{@render children()}
 </div>

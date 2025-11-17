@@ -5,8 +5,10 @@
 	import { array_position } from '$lib/notebook/position';
 
 	import '$lib/notebook/nodes/nodes';
+	import '$lib/notebook/widgets/widgets';
 	import NotebookUpload from './NotebookUpload.svelte';
 	import NotebookDownload from './NotebookDownload.svelte';
+	import WidgetWindow from './widgets/WidgetWindow.svelte';
 
 	let {
 		notebook_state = $bindable({ title: '', children: [] }),
@@ -79,6 +81,8 @@
 			<NotebookDownload {notebook_state} />
 		</div>
 	</div>
+
+	<WidgetWindow />
 </RocqProvider>
 
 <style>

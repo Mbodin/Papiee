@@ -18,11 +18,10 @@
 	import ProofAutoCompletion from './ProofAutoCompletion.svelte';
 	import {
 		command_parsechunk,
-		getChunks,
 		parsechunks,
 		type ProofChunk
 	} from '$lib/notebook/nodes/proof/chunk';
-	import ProofStateDisplay from './ProofStateDisplay.svelte';
+	import { proof_state_value } from '$lib/notebook/widgets/proof_state/state.svelte';
 
 	let {
 		node = $bindable(),
@@ -127,11 +126,22 @@
 
 	let completion: CompletionState | undefined = $state();
 	let code: string = $state('');
+
+	$effect(() => {
+		if (!view) {
+			proof_state_value.value = undefined;
+		} else {
+			proof_state_value.value = {
+				chunks,
+				position: selected,
+				hide: !display_goal
+			};
+		}
+	});
 </script>
 
 {#if view}
 	<ProofAutoCompletion {view} {completion} />
-	<ProofStateDisplay {chunks} position={selected} hide={!display_goal} />
 {/if}
 <div class="ProseMirror" use:editor></div>
 

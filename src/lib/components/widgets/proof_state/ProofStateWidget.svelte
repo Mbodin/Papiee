@@ -1,12 +1,11 @@
 <script lang="ts">
 	import type { ProofChunk } from '$lib/notebook/nodes/proof/chunk';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
-	import { getContext, untrack } from 'svelte';
+	import { getContext } from 'svelte';
 	import type { Position } from 'vscode-languageserver-types';
 	import * as proto from 'vscode-languageserver-protocol';
 	import * as types from 'vscode-languageserver-types';
 	import type { GoalAnswer } from '$lib/rocq/type';
-	import type { Attachment } from 'svelte/attachments';
 	import Draggable from '$lib/components/Draggable.svelte';
 	import { type SyntaxError } from '$lib/notebook/nodes/proof/errors';
 
