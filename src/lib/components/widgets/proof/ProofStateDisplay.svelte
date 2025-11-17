@@ -78,7 +78,7 @@
 </script>
 
 <Draggable bind:this={draggable}>
-	{#if hide !== true}
+	{#if hide !== true && selected_chunk}
 		<div class="b-1 rounded-mdtext-nowrap flex h-full w-full flex-col text-black shadow-lg">
 			<div class="min-w-20 rounded-t-md border-surface-600-400 bg-surface-600-400">
 				<h4 class="mx-auto my-0 w-fit">Goal</h4>

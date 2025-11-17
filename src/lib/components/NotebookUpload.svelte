@@ -2,7 +2,7 @@
 	import type { NotebookState } from '$lib/notebook/structure';
 	import { FileUpload, useFileUpload } from '@skeletonlabs/skeleton-svelte';
 
-	let { notebook_state }: { notebook_state: NotebookState } = $props();
+	let { notebook_state = $bindable() }: { notebook_state: NotebookState } = $props();
 
 	let id = $props.id();
 	let fileUpload = useFileUpload({
@@ -12,7 +12,6 @@
 			if (!file) return false;
 			const value = await file.text();
 			notebook_state = JSON.parse(value) as NotebookState;
-
 			fileUpload().clearFiles();
 		}
 	});

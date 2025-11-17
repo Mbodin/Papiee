@@ -75,7 +75,7 @@
 			<div class="h-full w-40"></div>
 		</div>
 		<div class="mx-20 my-2 flex flex-row justify-end gap-5">
-			<NotebookUpload {notebook_state} />
+			<NotebookUpload bind:notebook_state />
 			<NotebookDownload {notebook_state} />
 		</div>
 	</div>
