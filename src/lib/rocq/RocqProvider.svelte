@@ -13,7 +13,7 @@
 
 	onMount(() => {
 		setTimeout(async () => {
-			worker.connection = await create().then(
+			worker.connection = await create(origin).then(
 				async (c) => await initialize(c, initialization_params)
 			);
 		});
