@@ -14,6 +14,7 @@ import {
 	FATAL_ERROR,
 	PARAGRAPH_ALREADY_ENDED,
 	TACTIC_AFTER_LINE_END,
+	TACTIC_NOT_RECOGNISED,
 	type ErrorChunk,
 	type ErrorGenerator
 } from './errors';
@@ -203,10 +204,7 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 
 		// If there is text which was not parsed, then the text represents a syntax error
 		if (error_segment.from !== error_segment.to) {
-			chunks.push({
-				type: 'error',
-				range: error_segment
-			});
+			chunks.push(TACTIC_NOT_RECOGNISED(error_segment));
 		}
 
 		chunks = chunks.map((v) =>

@@ -3,6 +3,6 @@
 	import ProofStateWidget from './ProofStateWidget.svelte';
 </script>
 
-{#if proof_state_value.value && proof_state_value.value.chunks && proof_state_value.value.chunks[proof_state_value.value.position]}
+{#if proof_state_value.value}
 	<ProofStateWidget {...proof_state_value.value} />
 {/if}

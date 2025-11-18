@@ -3,10 +3,16 @@
 	import type { RocqNodeValue } from '$lib/notebook/nodes/rocq/structure';
 	import type { NotebookNodeProps } from '$lib/notebook/nodes/types';
 	import CodeMirror from 'svelte-codemirror-editor';
-	import { basicDark } from '@fsegurai/codemirror-theme-basic-dark';
+	import { EditorView } from 'codemirror';
+	import { proof_state_value } from '$lib/notebook/widgets/proof_state/state.svelte';
 
-	let { value, onNodeValueUpdate, setAnchorNode, mode }: NotebookNodeProps<RocqNodeValue> =
-		$props();
+	let {
+		value,
+		onNodeValueUpdate,
+		setAnchorNode,
+		mode,
+		isAnchored
+	}: NotebookNodeProps<RocqNodeValue> = $props();
 
 	let div: HTMLDivElement | undefined = $state();
 </script>
@@ -64,6 +70,16 @@
 			bind:value={
 				() => value.value, (new_value) => onNodeValueUpdate(value, { ...value, value: new_value })
 			}
+			extensions={[
+				EditorView.updateListener.of((update) => {
+					const head = update.state.selection.main.head;
+					const code = value.value.substring(0, head);
+					proof_state_value.value = {
+						code,
+						hide: !isAnchored()
+					};
+				})
+			]}
 		/>
 	</div>
 {/if}

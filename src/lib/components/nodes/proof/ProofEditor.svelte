@@ -23,6 +23,7 @@
 	} from '$lib/notebook/nodes/proof/chunk';
 	import { proof_state_value } from '$lib/notebook/widgets/proof_state/state.svelte';
 	import type { NotebookState } from '$lib/notebook/structure';
+	import { assembleCodeFromChunks } from '$lib/rocq/utils';
 
 	let {
 		node = $bindable(),
@@ -137,15 +138,15 @@
 	let code: string = $state('');
 
 	$effect(() => {
-		if (!view) {
+		const selected_chunk = chunks[selected];
+		if (!view || selected_chunk == null) {
 			proof_state_value.value = undefined;
 		} else {
+			const code = assembleCodeFromChunks(root, chunks, selected, position);
 			proof_state_value.value = {
-				chunks,
-				position: selected,
+				code,
 				hide: !display_goal,
-				state: root,
-				node_position: position
+				error: selected_chunk.type === 'error' ? selected_chunk : undefined
 			};
 		}
 	});
