@@ -1,9 +1,14 @@
 import RocqNodeC from '$lib/components/nodes/RocqNode.svelte';
 import { register } from '$lib/notebook/structure';
-import type { NotebookNode, NotebookNodeValue } from '$lib/notebook/nodes/types';
+import {
+	makeLeafNotebookNode,
+	type LeafNodebookNode,
+	type NotebookNode,
+	type NotebookNodeValue
+} from '$lib/notebook/nodes/types';
 
-export type RocqNode = NotebookNode<number, 'rocq', [], RocqNodeValue, { value: string }>;
-export type RocqNodeValue = NotebookNodeValue<number, 'rocq', []> & { value: string };
+export type RocqNode = LeafNodebookNode<number, 'rocq', RocqNodeValue, { value: string }>;
+export type RocqNodeValue = NotebookNodeValue<number, 'rocq', [], {}> & { value: string };
 
 declare module '$lib/notebook/structure' {
 	interface RootNodeMap {
@@ -11,7 +16,9 @@ declare module '$lib/notebook/structure' {
 	}
 }
 
-export const ROCQ_NODE: RocqNode = {
+type A = RocqNode['component'];
+
+export const ROCQ_NODE: RocqNode = makeLeafNotebookNode({
 	type: 'rocq',
 
 	component: RocqNodeC,
@@ -62,6 +69,6 @@ export const ROCQ_NODE: RocqNode = {
 	moveTo(v, position) {
 		return { ...v, position };
 	}
-};
+});
 
 register('rocq', () => ROCQ_NODE);

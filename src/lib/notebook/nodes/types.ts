@@ -1,40 +1,82 @@
 import type { NotebookState } from '$lib/notebook/structure';
+import type { TagParseRule } from 'prosemirror-model';
 import type { Component } from 'svelte';
 
 export type NotebookNode<
 	Position = any,
 	Type extends string = string,
 	children_keys extends string[] = string[],
+	children_elts extends Record<children_keys[number], any> = Record<children_keys[number], any>,
+	trimmed_children_elts extends Record<children_keys[number], any> = Record<
+		children_keys[number],
+		any
+	>,
 	Value extends NotebookNodeValue<Position, Type, children_keys> = NotebookNodeValue<
 		Position,
 		Type,
-		children_keys
+		children_keys,
+		children_elts
 	>,
-	TrimmedValue = never
-> = (
-	| {
-			name: string;
-			icon?: Component;
-	  }
-	| {}
-) & {
+	TrimmedValue extends children_keys[number] extends never
+		? any
+		: { children: trimmed_children_elts } = any
+> = {
 	type: Type;
 
+	name?: string;
+	icon?: Component<NotebookNodeProps<Value>>;
+	/**
+	 * Define the order of the children position wise
+	 */
+	children: children_keys;
 	trim(value: Value): TrimmedValue;
 	untrim(trimmed: TrimmedValue): Value;
 	initial(): Value;
+
+	trim_child: {
+		[K in children_keys[number]]: (value: children_elts[K]) => trimmed_children_elts[K];
+	};
+
+	untrim_child: {
+		[K in children_keys[number]]: (value: trimmed_children_elts[K]) => children_elts[K];
+	};
+
 	component: Component<NotebookNodeProps<Value>>;
 } & PositionHelper<Value, Position>;
+
+export type LeafNodebookNode<
+	Position = any,
+	Type extends string = string,
+	Value extends NotebookNodeValue<Position, Type, []> = NotebookNodeValue<Position, Type, [], {}>,
+	TrimmedValue extends any = any
+> = NotebookNode<Position, Type, [], {}, {}, Value, TrimmedValue>;
+
+export function makeLeafNotebookNode<
+	T extends LeafNodebookNode<Position, Type, Value, TrimmedValue>,
+	Position = any,
+	Type extends string = string,
+	Value extends NotebookNodeValue<Position, Type, []> = NotebookNodeValue<Position, Type, [], {}>,
+	TrimmedValue extends any = any
+>(value: Omit<T, 'children' | 'trim_child' | 'untrim_child'>): T {
+	return {
+		...value,
+
+		children: [],
+		trim_child: {},
+		untrim_child: {}
+	} as T;
+}
 
 export type NotebookNodeValue<
 	Position = any,
 	Type extends string = string,
-	children_keys extends string[] | [] = string[] | []
+	children_keys extends string[] = string[],
+	children_elts extends Record<children_keys[number], any> = Record<children_keys[number], any>
 > = {
 	type: Type;
 	position?: Position | undefined;
 	children: {
-		[key in children_keys[number]]: ReturnType<NotebookNode['initial']>;
+		[key in children_keys[number]]: children_elts[key];
 	};
 };
 

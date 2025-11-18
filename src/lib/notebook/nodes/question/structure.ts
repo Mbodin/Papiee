@@ -14,6 +14,16 @@ export type QuestionNode = NotebookNode<
 	QuestionPosition,
 	string,
 	['markdown_header', 'rocq_header', 'cnl_proof'],
+	{
+		markdown_header: Omit<MarkdownNodeValue, 'position' | 'type'>;
+		rocq_header: Omit<RocqNodeValue, 'position' | 'type'>;
+		cnl_proof: Omit<ProofNodeValue, 'position' | 'type'>;
+	},
+	{
+		markdown_header: Omit<TrimmedNotebookNodeValue<MarkdownNode>, 'type'>;
+		rocq_header: Omit<TrimmedNotebookNodeValue<RocqNode>, 'type'>;
+		cnl_proof: Omit<TrimmedNotebookNodeValue<ProofNode>, 'type'>;
+	},
 	QuestionNodeValue,
 	TrimmedQuestionNodeValue
 >;
@@ -29,16 +39,14 @@ export type QuestionNodeValue = NotebookNodeValue<
 	QuestionPosition,
 	'question',
 	['markdown_header', 'rocq_header', 'cnl_proof']
-> & {
-	_markdown_header: Omit<MarkdownNodeValue, 'position' | 'type'>;
-	_rocq_header: Omit<RocqNodeValue, 'position' | 'type'>;
-	_cnl_proof: Omit<ProofNodeValue, 'position' | 'type'>;
-};
+>;
 
 export type TrimmedQuestionNodeValue = {
-	_markdown_header: Omit<TrimmedNotebookNodeValue<MarkdownNode>, 'type'>;
-	_rocq_header: Omit<TrimmedNotebookNodeValue<RocqNode>, 'type'>;
-	_cnl_proof: Omit<TrimmedNotebookNodeValue<ProofNode>, 'type'>;
+	children: {
+		markdown_header: Omit<TrimmedNotebookNodeValue<MarkdownNode>, 'type'>;
+		rocq_header: Omit<TrimmedNotebookNodeValue<RocqNode>, 'type'>;
+		cnl_proof: Omit<TrimmedNotebookNodeValue<ProofNode>, 'type'>;
+	};
 };
 
 declare module '$lib/notebook/structure' {
@@ -47,108 +55,62 @@ declare module '$lib/notebook/structure' {
 	}
 }
 
-function strip_child<T extends { position?: unknown; type: unknown }>(
-	value: T
-): Omit<T, 'position' | 'type'> {
-	delete value.position;
-	delete value.type;
-	return value;
-}
-
-function unstrip_child<K extends string, T extends { position?: unknown; type: unknown }>(
-	key: K,
-	type: T['type'],
-	getter: () => Omit<T, 'position' | 'type'>,
-	setter: (v: Omit<T, 'position' | 'type'>) => void
-): { [key in K]: T } {
-	let object = {};
-	Object.defineProperty(object, key, {
-		get() {
-			return { ...getter(), type, position: undefined };
-		},
-		set(value) {
-			strip_child(value);
-			setter(value);
-		}
-	});
-
-	return object as { [key in K]: T };
+function removeFrom<K extends (keyof T)[], T extends { [k in K[number]]?: unknown }>(
+	obj: T,
+	...keys: K
+): Omit<T, K[number]> {
+	keys.forEach((key) => delete obj[key]);
+	return obj;
 }
 
 export const QUESTION_NODE: QuestionNode = {
 	type: 'question',
 	name: 'Question',
 	icon: FileQuestionMark,
+	children: ['markdown_header', 'rocq_header', 'cnl_proof'],
 
 	component: QuestionNodeC,
 	initial() {
-		const value: QuestionNodeValue = {
+		return {
 			type: 'question',
-			_markdown_header: strip_child(MARKDOWN_NODE.initial()),
-			_rocq_header: strip_child(ROCQ_NODE.initial()),
-			_cnl_proof: strip_child(PROOF_NODE.initial()),
 			children: {
-				...unstrip_child(
-					'cnl_proof',
-					'proof',
-					(): QuestionNodeValue['_cnl_proof'] => value._cnl_proof,
-					(v) => (value._cnl_proof = v)
-				),
-				...unstrip_child(
-					'markdown_header',
-					'markdown',
-					(): QuestionNodeValue['_markdown_header'] => value._markdown_header,
-					(v) => (value._markdown_header = v)
-				),
-				...unstrip_child(
-					'rocq_header',
-					'rocq',
-					(): QuestionNodeValue['_rocq_header'] => value._rocq_header,
-					(v) => (value._rocq_header = v)
-				)
+				markdown_header: removeFrom(MARKDOWN_NODE.initial(), 'position'),
+				rocq_header: removeFrom(ROCQ_NODE.initial(), 'position'),
+				cnl_proof: removeFrom(PROOF_NODE.initial(), 'position')
 			},
 			position: undefined
 		};
-		return value;
 	},
 	trim(value) {
 		return {
 			type: value.type,
-			_cnl_proof: value._cnl_proof,
-			_markdown_header: value._markdown_header,
-			_rocq_header: value._rocq_header
+			children: {
+				markdown_header: this.trim_child['markdown_header'](value.children.markdown_header),
+				cnl_proof: this.trim_child['cnl_proof'](value.children.cnl_proof),
+				rocq_header: this.trim_child['rocq_header'](value.children.rocq_header)
+			}
 		};
 	},
 	untrim(trimmed) {
-		const value: QuestionNodeValue = {
+		return {
 			type: 'question',
 			children: {
-				...unstrip_child(
-					'cnl_proof',
-					'proof',
-					(): QuestionNodeValue['_cnl_proof'] => value._cnl_proof,
-					(v) => (value._cnl_proof = v)
-				),
-				...unstrip_child(
-					'markdown_header',
-					'markdown',
-					(): QuestionNodeValue['_markdown_header'] => value._markdown_header,
-					(v) => (value._markdown_header = v)
-				),
-				...unstrip_child(
-					'rocq_header',
-					'rocq',
-					(): QuestionNodeValue['_rocq_header'] => value._rocq_header,
-					(v) => (value._rocq_header = v)
-				)
+				markdown_header: this.untrim_child['markdown_header'](trimmed.children.markdown_header),
+				cnl_proof: this.untrim_child['cnl_proof'](trimmed.children.cnl_proof),
+				rocq_header: this.untrim_child['rocq_header'](trimmed.children.rocq_header)
 			},
-			_cnl_proof: PROOF_NODE.untrim(trimmed._cnl_proof),
-			_markdown_header: MARKDOWN_NODE.untrim(trimmed._markdown_header),
-			_rocq_header: ROCQ_NODE.untrim(trimmed._rocq_header),
 			position: undefined
 		};
-
-		return value;
+	},
+	trim_child: {
+		markdown_header: (v) => MARKDOWN_NODE.trim({ type: 'markdown', ...v }),
+		cnl_proof: (v) => PROOF_NODE.trim({ type: 'proof', ...v }),
+		rocq_header: (v) => ROCQ_NODE.trim({ type: 'rocq', ...v })
+	},
+	untrim_child: {
+		markdown_header: (v) => removeFrom(MARKDOWN_NODE.untrim(v), 'position'),
+		cnl_proof: (v) => removeFrom(PROOF_NODE.untrim(v), 'position'),
+		rocq_header: (v) => removeFrom(ROCQ_NODE.untrim(v), 'position')
 	},
 	get(v) {
 		return v.position;
@@ -157,13 +119,15 @@ export const QUESTION_NODE: QuestionNode = {
 		return { field: 'markdown_header', index: 0 };
 	},
 	getEnd(v) {
-		return { field: 'cnl_proof', index: v._cnl_proof.value.length };
+		return { field: 'cnl_proof', index: v.children.cnl_proof.value.length };
 	},
 	isFirst(v) {
 		return v.position?.field === 'markdown_header' && v.position.index === 0;
 	},
 	isLast(v) {
-		return v.position?.field === 'cnl_proof' && v.position.index === v._cnl_proof.value.length;
+		return (
+			v.position?.field === 'cnl_proof' && v.position.index === v.children.cnl_proof.value.length
+		);
 	},
 	moveLeft(v) {
 		if (v.position && v.position?.index !== 0) {
@@ -175,9 +139,9 @@ export const QUESTION_NODE: QuestionNode = {
 		if (!v.position) return undefined;
 
 		const selected_field_length = {
-			markdown_header: v._markdown_header.value.length,
-			rocq_header: v._rocq_header.value.length,
-			cnl_proof: v._cnl_proof.value.length
+			markdown_header: v.children.markdown_header.value.length,
+			rocq_header: v.children.rocq_header.value.length,
+			cnl_proof: v.children.cnl_proof.value.length
 		}[v.position.field];
 
 		if (v.position && v.position?.index !== selected_field_length) {

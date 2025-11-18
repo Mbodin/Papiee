@@ -1,27 +1,30 @@
 import MarkdownNodeC from '$lib/components/nodes/MarkdownNode.svelte';
 import { register } from '$lib/notebook/structure';
-import type { NotebookNode, NotebookNodeValue } from '$lib/notebook/nodes/types';
+import {
+	makeLeafNotebookNode,
+	type LeafNodebookNode,
+	type NotebookNode,
+	type NotebookNodeValue
+} from '$lib/notebook/nodes/types';
 import { FileTextIcon } from '@lucide/svelte';
 
-export type MarkdownNode = NotebookNode<
+export type MarkdownNode = LeafNodebookNode<
 	number,
 	'markdown',
-	[],
 	MarkdownNodeValue,
-	Omit<MarkdownNodeValue, 'position' | 'type' | 'children'>
+	{ value: string; compiled: boolean }
 >;
-export type MarkdownNodeValue = NotebookNodeValue<number, 'markdown', []> & {
+export type MarkdownNodeValue = NotebookNodeValue<number, 'markdown', [], {}> & {
 	value: string;
 	compiled: boolean;
 };
-
 declare module '$lib/notebook/structure' {
 	interface RootNodeMap {
 		markdown: MarkdownNode;
 	}
 }
 
-export const MARKDOWN_NODE: MarkdownNode = {
+export const MARKDOWN_NODE: MarkdownNode = makeLeafNotebookNode({
 	type: 'markdown',
 	name: 'Markdown',
 	icon: FileTextIcon,
@@ -76,6 +79,6 @@ export const MARKDOWN_NODE: MarkdownNode = {
 	moveTo(v, position) {
 		return { ...v, position };
 	}
-};
+});
 
 register('markdown', () => MARKDOWN_NODE);

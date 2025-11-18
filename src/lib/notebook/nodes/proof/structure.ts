@@ -1,9 +1,14 @@
 import { register } from '$lib/notebook/structure';
-import type { NotebookNode, NotebookNodeValue } from '$lib/notebook/nodes/types';
+import {
+	makeLeafNotebookNode,
+	type LeafNodebookNode,
+	type NotebookNode,
+	type NotebookNodeValue
+} from '$lib/notebook/nodes/types';
 import ProofNodeC from '$lib/components/nodes/ProofNode.svelte';
 
-export type ProofNode = NotebookNode<number, 'proof', [], ProofNodeValue, { value: string }>;
-export type ProofNodeValue = NotebookNodeValue<number, 'proof', []> & { value: string };
+export type ProofNode = LeafNodebookNode<number, 'proof', ProofNodeValue, { value: string }>;
+export type ProofNodeValue = NotebookNodeValue<number, 'proof'> & { value: string };
 
 declare module '$lib/notebook/structure' {
 	interface RootNodeMap {
@@ -11,7 +16,7 @@ declare module '$lib/notebook/structure' {
 	}
 }
 
-export const PROOF_NODE: ProofNode = {
+export const PROOF_NODE: ProofNode = makeLeafNotebookNode({
 	type: 'proof',
 
 	name: 'Proof',
@@ -61,6 +66,6 @@ export const PROOF_NODE: ProofNode = {
 	moveTo(v, position) {
 		return { ...v, position };
 	}
-};
+});
 
 register('proof', () => PROOF_NODE);

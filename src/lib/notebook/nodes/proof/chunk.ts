@@ -17,6 +17,7 @@ import {
 	type ErrorChunk,
 	type ErrorGenerator
 } from './errors';
+import { parse as parse_cnl } from '$lib/cnl/textual';
 
 export type ProofChunk = ErrorChunk | CommentChunk | TacticChunk;
 export type Range = { from: number; to: number };
@@ -336,4 +337,14 @@ export function getChunk(pos: ResolvedPos): ProofChunk | undefined {
 	const text = pos.node().child(index);
 	const main = getMainChunk(getChunks(text));
 	return main;
+}
+
+export function chunksToRocq(value: ProofChunk[]): string {
+	return value
+		.filter((v) => v.type === 'tactic')
+		.map((v) => v.code)
+		.join('');
+}
+export function cnltoRocq(value: string): string {
+	return chunksToRocq(parsechunks(parse_cnl(value)).chunks);
 }
