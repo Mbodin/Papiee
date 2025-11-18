@@ -5,13 +5,16 @@
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { EditorView } from 'codemirror';
 	import { proof_state_value } from '$lib/notebook/widgets/proof_state/state.svelte';
+	import { getCodeBeforePosition } from '$lib/rocq/utils';
 
 	let {
 		value,
 		onNodeValueUpdate,
 		setAnchorNode,
 		mode,
-		isAnchored
+		isAnchored,
+		root,
+		position
 	}: NotebookNodeProps<RocqNodeValue> = $props();
 
 	let div: HTMLDivElement | undefined = $state();
@@ -73,7 +76,7 @@
 			extensions={[
 				EditorView.updateListener.of((update) => {
 					const head = update.state.selection.main.head;
-					const code = value.value.substring(0, head);
+					const code = getCodeBeforePosition(root, position) + value.value.substring(0, head);
 					proof_state_value.value = {
 						code,
 						hide: !isAnchored()

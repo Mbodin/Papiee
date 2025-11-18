@@ -22,6 +22,20 @@ export function addPosition(pos1: Position, pos2: Position): Position {
 	};
 }
 
+export function getCodeBeforePosition(root: NotebookState, position: number[]) {
+	let before = '';
+	visit(root, (node, pos) => {
+		if (comparePosition(pos, position) != 1) return;
+		if (node.type === 'proof') {
+			before += cnltoRocq((node as ProofNodeValue).value);
+		}
+		if (node.type === 'rocq') {
+			before += (node as RocqNodeValue).value.trim() + '\n';
+		}
+	});
+	return before;
+}
+
 export function assembleCodeFromChunks(
 	root: NotebookState,
 	chunks: ProofChunk[],
@@ -34,17 +48,7 @@ export function assembleCodeFromChunks(
 		.map((v) => v.code)
 		.join('');
 
-	let before = '';
-	visit(root, (node, pos) => {
-		if (comparePosition(pos, node_position) != 1) return;
-		if (node.type === 'proof') {
-			before += cnltoRocq((node as ProofNodeValue).value);
-		}
-		if (node.type === 'rocq') {
-			before += (node as RocqNodeValue).value.trim() + '\n';
-		}
-	});
-	let before_position = positionAfterString(before);
+	let before = getCodeBeforePosition(root, node_position);
 	let text = before + code;
 	return text;
 }
