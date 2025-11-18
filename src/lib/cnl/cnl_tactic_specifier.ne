@@ -6,7 +6,7 @@ export type Specification = {
 	content: SpecificationContent;
 	footer: SpecificationFooter;
 };
-export type SpecificationHeader = { type: 'header'; state?: string };
+export type SpecificationHeader = { type: 'header'; states?: string[] | '*' };
 export type SpecificationFooter = {
 	type: 'footer';
 	structure?: StructureSpecification;
@@ -58,8 +58,8 @@ function reference(value: string): Reference {
 	return { type: 'reference', value };
 }
 
-function header(state: string): SpecificationHeader {
-	return { type: 'header', state };
+function header(states: string[]): SpecificationHeader {
+	return { type: 'header', states };
 }
 
 function footer(
@@ -94,7 +94,7 @@ main -> specification {% d => d[0] %}
 
 specification -> "{" header "|" content "|" footer "}" {% d => specification(d[1], d[3], d[5]) %}
 
-header -> (word | "*"):? {% d => header(d.flat().filter(Boolean)[0]) %}
+header -> (header_states | "*"):? {% d => header(d.flat().filter(Boolean)[0]) %}
 footer -> footer_structure_action footer_state_actions {% d => footer(d[0], d[1]) %}
 
 footer_state_actions -> (footer_pop | footer_push):* {%d => d[0].flat(Infinity) %}
@@ -106,6 +106,7 @@ footer_endofline -> "#" {% d => footer_structure_specification_endofline() %}
 footer_beginparagraph -> ">" {% d => footer_structure_specification_beginofparagraph() %}
 footer_endparagraph -> "<" {% d => footer_structure_specification_endofparagraph() %}
 
+header_states -> (word " "):* word {% d=> d[0].map((v: any)=>v[0]).flat().concat(d[1]) %}
 
 content -> text:? (reference text):* reference:? {% d => d.flat(Infinity).filter(Boolean) %}
 text -> ([^|] | "\\|"):+ {% d => text(d[0].map((v: string)=>v[0] === "\\|" ? "|" : v[0]).join("")) %}

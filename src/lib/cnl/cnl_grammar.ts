@@ -39,18 +39,24 @@ export default function tactic_grammar(tactics?: CnlTactic[], state?: string[]):
 		ParserRules: sources
 			.flatMap((v) => v.ParserRules)
 			.concat(
-				{
-					name: 'main',
-					symbols: [state.length === 0 ? filterToName() : filterToName(state[state.length - 1])],
-					postprocess(d) {
-						let _state = [...state];
-						const cnl_tactic = d[0] as { tactic: CnlTactic; value: unknown };
+				...Array.from({ length: state.length })
+					.map((_, i) => state.slice(i))
+					.filter((v) => v.length !== 0) // Only accept empty state array if the initial state array was empty, and we now it's not empty because state.length > 0
+					.concat(state.length === 0 ? [[]] : [])
+					.map(
+						(v): ParserRule => ({
+							name: 'main',
+							symbols: [filterToName(v)],
+							postprocess(d) {
+								let _state = [...state];
+								const cnl_tactic = d[0] as { tactic: CnlTactic; value: unknown };
 
-						_state = resolve_state_actions(_state, cnl_tactic.tactic.spec.footer.actions);
+								_state = resolve_state_actions(_state, cnl_tactic.tactic.spec.footer.actions);
 
-						return { result: cnl_tactic, state: _state };
-					}
-				},
+								return { result: cnl_tactic, state: _state };
+							}
+						})
+					),
 				{
 					name: 'main',
 					symbols: [filterToName('*')],

@@ -4,20 +4,29 @@
 	import { onMount } from 'svelte';
 
 	import { createTacticFromTextual } from '$lib/cnl/cnl_tactic';
-	import { parse } from '$lib/cnl/textual';
-	import { command_parsechunk } from '$lib/notebook/nodes/proof/chunk';
-	import { EditorState } from 'prosemirror-state';
+	import { parse_cnl_chained } from '$lib/cnl/parser';
 	const { Grammar, Parser } = nearley;
 
 	onMount(() => {
-		let document = `(azazzz            $zzzzzz)`;
+		const T1 = createTacticFromTextual<{ comment: string }>(
+			undefined,
+			'{a b c|t1|--}',
+			({ value }) => `(*${value.comment}.*)`
+		);
 
-		const node = parse(document);
-		const state = new EditorState();
-		state.doc = node;
-		command_parsechunk(state, (o) => {
-			console.log(o.doc);
-		});
+		const T2 = createTacticFromTextual<{ comment: string }>(
+			undefined,
+			'{|t2|+a+b}',
+			({ value }) => `(*${value.comment}.*)`
+		);
+
+		const T3 = createTacticFromTextual<{ comment: string }>(
+			undefined,
+			'{a b|t3|+c}',
+			({ value }) => `(*${value.comment}.*)`
+		);
+
+		console.log(parse_cnl_chained('t2t3t1', []));
 	});
 </script>
 

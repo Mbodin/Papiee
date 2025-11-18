@@ -3,10 +3,10 @@ import type { CnlTactic } from './cnl_tactic';
 import { Lexer } from './lexer';
 import type { Reference, SpecificationContentNode, Text } from './cnl_tactic_specifier';
 
-export function filterToName(filter?: string): string {
+export function filterToName(filter?: string[] | '*'): string {
 	if (filter === '*') return 'ANYTHING';
-	if (!filter) return `FILTER_DEFAULT`;
-	return `FILTER_${filter.toUpperCase()}`;
+	if (!filter || filter.length == 0) return `FILTER_DEFAULT`;
+	return `FILTER_${filter.map((v) => v.toUpperCase()).join('$')}`;
 }
 
 export function create_token(t: { type: string }, values?: string[]): Symbol {
@@ -142,7 +142,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 
 	const main_rule: ParserRule[] = [
 		{
-			name: filterToName(spec.header.state),
+			name: filterToName(spec.header.states),
 			symbols: [_space_0_id, ...compiled_content.map((v) => v[0]), _space_0_id],
 			postprocess(v) {
 				const references = v
@@ -175,7 +175,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 			.flat()
 			.concat(...SPACE_0, ...SPACE_1, ...EVERYTHING)
 			.concat(main_rule),
-		ParserStart: filterToName(spec.header.state)
+		ParserStart: filterToName(spec.header.states)
 	};
 	tactic.grammar = grammar;
 
