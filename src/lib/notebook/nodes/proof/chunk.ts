@@ -78,7 +78,10 @@ export function turnToErroChunks(
 	];
 }
 
-export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[] } {
+export function parsechunks(
+	root: Node,
+	initial_state: string[] = []
+): { state: string[]; chunks: ProofChunk[] } {
 	let flatMapChunk = <T>(
 		state: string[],
 		nodes: readonly T[],
@@ -227,7 +230,7 @@ export function parsechunks(root: Node): { state: string[]; chunks: ProofChunk[]
 		return { state: recomputed_state, chunks, pos: pos + node.content.size + 1 }; // + 1 because we exit the line
 	}
 
-	let result_chunked = flatMapChunk([], root.child(0).children, 2, visitParagraph);
+	let result_chunked = flatMapChunk(initial_state, root.child(0).children, 2, visitParagraph);
 	let chunks1: ProofChunk[] = [];
 	if (result_chunked.state.length !== 0) {
 		const { result, state } = parse_cnl_chained('', result_chunked.state, true);
