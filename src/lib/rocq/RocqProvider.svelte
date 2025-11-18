@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { close, create, initialize, WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
 	import { onMount, setContext, type Snippet } from 'svelte';
 
@@ -13,7 +14,9 @@
 
 	onMount(() => {
 		setTimeout(async () => {
-			worker.connection = await create(origin).then(
+			let route = origin + resolve('/');
+			route = route.endsWith('/') ? route.substring(0, route.length - 1) : route;
+			worker.connection = await create(route).then(
 				async (c) => await initialize(c, initialization_params)
 			);
 		});
