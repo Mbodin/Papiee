@@ -22,12 +22,21 @@
 		type ProofChunk
 	} from '$lib/notebook/nodes/proof/chunk';
 	import { proof_state_value } from '$lib/notebook/widgets/proof_state/state.svelte';
+	import type { NotebookState } from '$lib/notebook/structure';
 
 	let {
 		node = $bindable(),
 		onView,
-		display_goal
-	}: { node?: Node; onView?: (view: EditorView) => void; display_goal: boolean } = $props();
+		display_goal,
+		root,
+		position
+	}: {
+		node?: Node;
+		onView?: (view: EditorView) => void;
+		display_goal: boolean;
+		root: NotebookState;
+		position: number[];
+	} = $props();
 
 	const nodeViewFactory = useNodeViewFactory();
 	const markViewFactor = useMarkViewFactory();
@@ -134,7 +143,9 @@
 			proof_state_value.value = {
 				chunks,
 				position: selected,
-				hide: !display_goal
+				hide: !display_goal,
+				state: root,
+				node_position: position
 			};
 		}
 	});

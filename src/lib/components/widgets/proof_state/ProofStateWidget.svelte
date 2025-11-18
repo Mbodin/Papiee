@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ProofChunk } from '$lib/notebook/nodes/proof/chunk';
+	import { cnltoRocq, type ProofChunk } from '$lib/notebook/nodes/proof/chunk';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
 	import { getContext } from 'svelte';
 	import type { Position } from 'vscode-languageserver-types';
@@ -8,9 +8,24 @@
 	import type { GoalAnswer } from '$lib/rocq/type';
 	import Draggable from '$lib/components/Draggable.svelte';
 	import { type SyntaxError } from '$lib/notebook/nodes/proof/errors';
+	import { comparePosition, visit } from '$lib/notebook/utils';
+	import type { NotebookState } from '$lib/notebook/structure';
+	import type { ProofNodeValue } from '$lib/notebook/nodes/proof/structure';
+	import type { RocqNodeValue } from '$lib/notebook/nodes/rocq/structure';
 
-	let { chunks, position, hide }: { chunks: ProofChunk[]; position: number; hide?: boolean } =
-		$props();
+	let {
+		chunks,
+		position,
+		hide,
+		state: root,
+		node_position
+	}: {
+		state: NotebookState;
+		chunks: ProofChunk[];
+		position: number;
+		hide?: boolean;
+		node_position: number[];
+	} = $props();
 
 	const code = $derived(
 		chunks
@@ -50,7 +65,18 @@
 		let uri = 'file:///exercise/main.v';
 		let languageId = 'rocq';
 		let version = 1;
-		let text = 'Lemma test: forall (x: nat), True.\nProof.\n' + code;
+
+		let before = '';
+		visit(root, (node, pos) => {
+			if (comparePosition(pos, node_position) != 1) return;
+			if (node.type === 'proof') {
+				before += cnltoRocq((node as ProofNodeValue).value);
+			}
+			if (node.type === 'rocq') {
+				before += (node as RocqNodeValue).value;
+			}
+		});
+		let text = before + code;
 		let textDocument = types.TextDocumentItem.create(uri, languageId, version, text);
 		let openParams: proto.DidOpenTextDocumentParams = { textDocument };
 		connection.sendNotification(proto.DidOpenTextDocumentNotification.type, openParams).then(() =>

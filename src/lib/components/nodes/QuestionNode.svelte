@@ -28,15 +28,15 @@
 		{isAnchored}
 		{mode}
 		value={{
+			...value.children.markdown_header,
 			type: 'markdown',
-			...value._markdown_header,
 			position: value.position?.field === 'markdown_header' ? value.position.index : undefined
 		}}
 		onNodeValueUpdate={(_old_markdown, new_markdown) => {
 			delete new_markdown.position;
 			onNodeValueUpdate(value, {
 				...value,
-				_markdown_header: new_markdown,
+				children: { ...value.children, markdown_header: new_markdown },
 				position: new_markdown.position
 					? { field: 'markdown_header', index: new_markdown.position }
 					: value.position
@@ -51,15 +51,15 @@
 		{isAnchored}
 		{mode}
 		value={{
+			...value.children.rocq_header,
 			type: 'rocq',
-			...value._rocq_header,
 			position: value.position?.field === 'rocq_header' ? value.position.index : undefined
 		}}
 		onNodeValueUpdate={(_old_rocq, new_rocq) => {
 			delete new_rocq.position;
 			onNodeValueUpdate(value, {
 				...value,
-				_rocq_header: new_rocq,
+				children: { ...value.children, rocq_header: new_rocq },
 				position: new_rocq.position
 					? { field: 'rocq_header', index: new_rocq.position }
 					: value.position
@@ -74,15 +74,15 @@
 		{isAnchored}
 		{mode}
 		value={{
+			...value.children.cnl_proof,
 			type: 'proof',
-			...value._cnl_proof,
 			position: value.position?.field === 'cnl_proof' ? value.position.index : undefined
 		}}
 		onNodeValueUpdate={(_old__cnl_proof, new__cnl_proof) => {
 			delete new__cnl_proof.position;
 			onNodeValueUpdate(value, {
 				...value,
-				_cnl_proof: new__cnl_proof,
+				children: { ...value.children, cnl_proof: new__cnl_proof },
 				position: new__cnl_proof.position
 					? { field: 'cnl_proof', index: new__cnl_proof.position }
 					: value.position

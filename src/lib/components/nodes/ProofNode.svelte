@@ -7,8 +7,14 @@
 	import ProofEditor from './proof/ProofEditor.svelte';
 	import type { EditorView } from 'prosemirror-view';
 
-	let { value, onNodeValueUpdate, setAnchorNode, isAnchored }: NotebookNodeProps<ProofNodeValue> =
-		$props();
+	let {
+		value,
+		onNodeValueUpdate,
+		setAnchorNode,
+		isAnchored,
+		root,
+		position
+	}: NotebookNodeProps<ProofNodeValue> = $props();
 
 	useProsemirrorAdapterProvider();
 
@@ -35,5 +41,5 @@
 </script>
 
 <div class="border-l-2 p-2">
-	<ProofEditor bind:node={cnl_value.value} {onView} display_goal={isAnchored()} />
+	<ProofEditor bind:node={cnl_value.value} {onView} display_goal={isAnchored()} {root} {position} />
 </div>
