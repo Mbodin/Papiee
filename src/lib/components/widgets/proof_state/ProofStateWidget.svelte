@@ -12,6 +12,7 @@
 	import type { NotebookState } from '$lib/notebook/structure';
 	import type { ProofNodeValue } from '$lib/notebook/nodes/proof/structure';
 	import type { RocqNodeValue } from '$lib/notebook/nodes/rocq/structure';
+	import { addPosition, positionAfterString } from '$lib/rocq/utils';
 
 	let {
 		chunks,
@@ -44,12 +45,7 @@
 			.map((v) => v.code)
 			.join('');
 
-		const line_number = before.includes('\n') ? before.split('\n').length - 1 : 0;
-		const last_line = before.includes('\n') ? before.substring(before.lastIndexOf('\n')) : before;
-		return {
-			line: line_number,
-			character: last_line.length
-		};
+		return positionAfterString(before);
 	});
 
 	const worker = getContext<RocqWorker>(WORKER_CONTEXT);
@@ -73,9 +69,10 @@
 				before += cnltoRocq((node as ProofNodeValue).value);
 			}
 			if (node.type === 'rocq') {
-				before += (node as RocqNodeValue).value;
+				before += (node as RocqNodeValue).value.trim() + '\n';
 			}
 		});
+		let before_position = positionAfterString(before);
 		let text = before + code;
 		let textDocument = types.TextDocumentItem.create(uri, languageId, version, text);
 		let openParams: proto.DidOpenTextDocumentParams = { textDocument };
@@ -83,14 +80,15 @@
 			connection
 				.sendRequest('proof/goals', {
 					textDocument: { uri, version } satisfies proto.VersionedTextDocumentIdentifier,
-					position: {
-						character: rocq_position.character,
-						line: rocq_position.line + 2
-					} satisfies Position,
+					position: addPosition(before_position, rocq_position),
 					pp_format: 'String',
 					mode: 'After'
 				})
-				.then((v) => (rocq_state = v as GoalAnswer<string, string>))
+				.catch(console.error)
+				.then((v) => {
+					console.log(v);
+					rocq_state = v as GoalAnswer<string, string>;
+				})
 		);
 	});
 

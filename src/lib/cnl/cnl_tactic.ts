@@ -85,7 +85,7 @@ export function createTacticFromTextual<T = any>(
 		name,
 		textual,
 		spec,
-		transformer
+		transformer: (v) => transformer(v).trim() + ' '
 	};
 	attach_grammar(cnl);
 
