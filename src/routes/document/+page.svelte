@@ -3,8 +3,12 @@
 	import type { NotebookState } from '$lib/notebook/structure';
 	import { PROOF_NODE } from '$lib/notebook/nodes/proof/structure';
 	import { QUESTION_NODE } from '$lib/notebook/nodes/question/structure';
+	import { ROCQ_NODE } from '$lib/notebook/nodes/rocq/structure';
 
-	let notebook_state: NotebookState = $state({ children: [PROOF_NODE.initial()], title: '' });
+	let notebook_state: NotebookState = $state({
+		children: [ROCQ_NODE.initial(), PROOF_NODE.initial()],
+		title: ''
+	});
 
 	let teacher_viewing = $state(true);
 </script>
