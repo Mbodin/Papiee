@@ -85,7 +85,11 @@ export function createTacticFromTextual<T = any>(
 		name,
 		textual,
 		spec,
-		transformer: (v) => transformer(v).trim() + ' '
+		transformer: (v) => {
+			let transformed = transformer(v);
+			if (transformed.endsWith('.')) transformed = transformed + ' ';
+			return transformed;
+		}
 	};
 	attach_grammar(cnl);
 
