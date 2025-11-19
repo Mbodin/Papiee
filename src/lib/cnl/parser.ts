@@ -2,6 +2,7 @@ import nearley from 'nearley';
 
 import rules, { type StructureSpecification } from './cnl_tactic_specifier';
 import tactic_grammar, { type ParseResult } from './cnl_grammar';
+import { resolve_state_actions } from './cnl_tactic';
 
 const { Grammar, Parser } = nearley;
 
@@ -62,7 +63,8 @@ export function parse_cnl(value: string, state?: string[]): CNLParseResult | und
 export function parse_cnl_chained(
 	value: string,
 	state: string[] = [],
-	ignore_structre: boolean = false
+	ignore_structre: boolean = false,
+	trim_empty_end: boolean = true
 ): CNLParseResultChained {
 	let _state = [...state];
 	let _offset = 0;
@@ -78,6 +80,16 @@ export function parse_cnl_chained(
 		_state = result.state;
 		parsed.push(result.result);
 	} while (result && (ignore_structre || !result.result.tactic.spec.footer.structure));
+
+	let trim_end_index = ends.findIndex((v) => v === ends[ends.length - 1]);
+	if (trim_empty_end && trim_end_index !== ends.length - 1) {
+		parsed = parsed.slice(0, trim_end_index + 1);
+		_state = resolve_state_actions(
+			[...state],
+			parsed.map((v) => v.tactic.spec.footer.actions).flat()
+		);
+		ends = ends.slice(0, trim_end_index + 1);
+	}
 
 	return {
 		result: parsed,

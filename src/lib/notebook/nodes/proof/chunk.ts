@@ -232,25 +232,18 @@ export function parsechunks(
 
 	let result_chunked = flatMapChunk(initial_state, root.child(0).children, 2, visitParagraph);
 	let chunks1: ProofChunk[] = [];
-	if (result_chunked.state.length !== 0) {
-		const { result, state } = parse_cnl_chained('', result_chunked.state, true);
+	const { result, state } = parse_cnl_chained('', result_chunked.state, true, false);
 
-		if (result.length === 0) {
-			// Emit a fatal error as no fallback was found
-			chunks1 = [FATAL_ERROR(collapsed_range(result_chunked.pos))];
-		} else {
-			result_chunked.state = state;
-			chunks1 = result.map((v) => ({
-				type: 'tactic',
-				range: { from: result_chunked.pos, to: result_chunked.pos },
-				code: v.tactic.transformer({ value: v.value as any }),
-				tactic: v.tactic,
-				value: v.value
-			}));
-		}
+	result_chunked.state = state;
+	chunks1 = result.map((v) => ({
+		type: 'tactic',
+		range: { from: result_chunked.pos, to: result_chunked.pos },
+		code: v.tactic.transformer({ value: v.value as any }),
+		tactic: v.tactic,
+		value: v.value
+	}));
 
-		result_chunked.chunks = result_chunked.chunks.concat(chunks1);
-	}
+	result_chunked.chunks = result_chunked.chunks.concat(chunks1);
 
 	result_chunked.pos += 2;
 
@@ -261,7 +254,7 @@ export function command_parsechunk(state: EditorState, dispatch?: (tr: Transacti
 	let tr = state.tr;
 	tr = tr.removeMark(0, tr.doc.content.size, schema.marks.chunk);
 
-	let chunks = parsechunks(state.doc);
+	let chunks = parsechunks(state.doc, ['reasoning']);
 
 	chunks.chunks.forEach((chunk) => {
 		let { from, to } = chunk.range;
@@ -347,5 +340,5 @@ export function chunksToRocq(value: ProofChunk[]): string {
 		.join('');
 }
 export function cnltoRocq(value: string): string {
-	return chunksToRocq(parsechunks(parse_cnl(value)).chunks);
+	return chunksToRocq(parsechunks(parse_cnl(value), ['reasoning']).chunks);
 }
