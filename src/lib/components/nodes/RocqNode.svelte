@@ -5,7 +5,7 @@
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { EditorView } from 'codemirror';
 	import { proof_state_value } from '$lib/notebook/widgets/proof_state/state.svelte';
-	import { getCodeBeforePosition } from '$lib/rocq/utils';
+	import { getCodeBeforePosition, positionAfterString } from '$lib/rocq/utils';
 
 	let {
 		value,
@@ -76,10 +76,14 @@
 			extensions={[
 				EditorView.updateListener.of((update) => {
 					const head = update.state.selection.main.head;
-					const code = getCodeBeforePosition(root, position) + value.value.substring(0, head);
+					const value = update.state.doc.toString();
+					const code = getCodeBeforePosition(root, position) + value;
 					proof_state_value.value = {
 						code,
-						hide: !isAnchored()
+						hide: !isAnchored(),
+						position: positionAfterString(
+							getCodeBeforePosition(root, position) + value.substring(0, head)
+						)
 					};
 				})
 			]}
