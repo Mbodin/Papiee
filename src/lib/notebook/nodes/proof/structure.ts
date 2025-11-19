@@ -19,12 +19,11 @@ declare module '$lib/notebook/structure' {
 export const PROOF_NODE: ProofNode = makeLeafNotebookNode({
 	type: 'proof',
 
-	name: 'Proof',
 	component: ProofNodeC,
 	initial() {
 		return {
 			type: 'proof',
-			value: 'Let $x$.',
+			value: '',
 			children: {},
 			position: undefined
 		};
