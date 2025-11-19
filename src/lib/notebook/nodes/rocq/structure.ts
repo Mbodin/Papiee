@@ -8,16 +8,18 @@ import {
 } from '$lib/notebook/nodes/types';
 import { SquareChartGantt } from '@lucide/svelte';
 
+export type RocqEndProofState = 'nothing' | 'open' | 'accessible';
 export type RocqNode = LeafNodebookNode<number, 'rocq', RocqNodeValue, { value: string }>;
-export type RocqNodeValue = NotebookNodeValue<number, 'rocq', [], {}> & { value: string };
+export type RocqNodeValue = NotebookNodeValue<number, 'rocq', [], {}> & {
+	value: string;
+	proof_state?: RocqEndProofState;
+};
 
 declare module '$lib/notebook/structure' {
 	interface RootNodeMap {
 		rocq: RocqNode;
 	}
 }
-
-type A = RocqNode['component'];
 
 export const ROCQ_NODE: RocqNode = makeLeafNotebookNode({
 	type: 'rocq',
@@ -31,7 +33,8 @@ export const ROCQ_NODE: RocqNode = makeLeafNotebookNode({
 			value: '(*Rocq file*)',
 			position: undefined,
 			children: {},
-			compiled: false
+			compiled: false,
+			proof_state: undefined
 		};
 	},
 	trim(value) {

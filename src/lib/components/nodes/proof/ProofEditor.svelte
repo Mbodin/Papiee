@@ -23,7 +23,15 @@
 	} from '$lib/notebook/nodes/proof/chunk';
 	import { proof_state_value } from '$lib/notebook/widgets/proof_state/state.svelte';
 	import type { NotebookState } from '$lib/notebook/structure';
-	import { assembleCodeFromChunks } from '$lib/rocq/utils';
+	import {
+		assembleCodeFromChunks,
+		extractRocqEndProofState,
+		getCodeBeforePosition
+	} from '$lib/rocq/utils';
+	import type { RocqEndProofState } from '$lib/notebook/nodes/rocq/structure';
+	import { getContext } from 'svelte';
+	import { type RocqWorker, WORKER_CONTEXT } from '$lib/rocq/connection';
+	import { FileWarning } from '@lucide/svelte';
 
 	let {
 		node = $bindable(),
@@ -139,7 +147,7 @@
 
 	$effect(() => {
 		const selected_chunk = chunks[selected];
-		if (!view || selected_chunk == null) {
+		if (!view || selected_chunk == null || proof_end_state != 'accessible') {
 			proof_state_value.value = undefined;
 		} else {
 			const code = assembleCodeFromChunks(root, chunks, selected, position);
@@ -150,8 +158,25 @@
 			};
 		}
 	});
+
+	let proof_end_state: RocqEndProofState = $state('nothing');
+
+	const worker = getContext<RocqWorker>(WORKER_CONTEXT);
+	let connection = $derived(worker.connection);
+	$effect(() => {
+		if (!connection) proof_end_state = 'nothing';
+		else
+			extractRocqEndProofState(connection, getCodeBeforePosition(root, position)).then(
+				(v) => (proof_end_state = v)
+			);
+	});
 </script>
 
+{#if proof_end_state == 'nothing'}
+	<h4 class="flex w-full flex-row items-center gap-2 text-nowrap text-error-50-950">
+		<FileWarning /> No rocq proof was found in rocq file
+	</h4>
+{/if}
 {#if view}
 	<ProofAutoCompletion {view} {completion} />
 {/if}

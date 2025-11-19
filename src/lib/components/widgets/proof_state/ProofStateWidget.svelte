@@ -41,7 +41,6 @@
 				})
 				.catch(console.error)
 				.then((v) => {
-					console.log(v);
 					rocq_state = v as GoalAnswer<string, string>;
 				})
 		);

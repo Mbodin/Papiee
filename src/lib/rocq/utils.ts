@@ -1,9 +1,11 @@
 import { cnltoRocq, type ProofChunk } from '$lib/notebook/nodes/proof/chunk';
 import type { ProofNodeValue } from '$lib/notebook/nodes/proof/structure';
-import type { RocqNodeValue } from '$lib/notebook/nodes/rocq/structure';
+import type { RocqEndProofState, RocqNodeValue } from '$lib/notebook/nodes/rocq/structure';
 import type { NotebookState } from '$lib/notebook/structure';
 import { comparePosition, visit } from '$lib/notebook/utils';
 import type { Position } from 'vscode-languageserver-protocol';
+import * as proto from 'vscode-languageserver-protocol';
+import * as types from 'vscode-languageserver-types';
 
 export function positionAfterString(value: string): Position {
 	const line_number = value.includes('\n') ? value.split('\n').length - 1 : 0;
@@ -22,15 +24,32 @@ export function addPosition(pos1: Position, pos2: Position): Position {
 	};
 }
 
+export function getCodeRocqProofStatePosition(root: NotebookState, position: number[]) {
+	let value: RocqEndProofState | undefined = undefined;
+	visit(root, (_node, pos) => {
+		if (comparePosition(pos, position) != 1) return;
+		if (_node.type === 'proof') {
+			value = undefined;
+		}
+		if (_node.type === 'rocq') {
+			const node = _node as RocqNodeValue;
+			value = node.proof_state;
+		}
+	});
+	return value;
+}
+
 export function getCodeBeforePosition(root: NotebookState, position: number[]) {
 	let before = '';
-	visit(root, (node, pos) => {
+	visit(root, (_node, pos) => {
 		if (comparePosition(pos, position) != 1) return;
-		if (node.type === 'proof') {
-			before += cnltoRocq((node as ProofNodeValue).value);
+		if (_node.type === 'proof') {
+			const node = _node as ProofNodeValue;
+			before += cnltoRocq(node.value) + 'admitted. Qed. ';
 		}
-		if (node.type === 'rocq') {
-			before += (node as RocqNodeValue).value.trim() + '\n';
+		if (_node.type === 'rocq') {
+			const node = _node as RocqNodeValue;
+			before += node.value.trim() + '\n' + (node.proof_state === 'accessible' ? 'Proof. ' : '');
 		}
 	});
 	return before;
@@ -51,4 +70,29 @@ export function assembleCodeFromChunks(
 	let before = getCodeBeforePosition(root, node_position);
 	let text = before + code;
 	return text;
+}
+
+export async function extractRocqEndProofState(
+	connection: proto.MessageConnection,
+	code: string
+): Promise<RocqEndProofState> {
+	let uri = 'file:///exercise/main.v';
+	let languageId = 'rocq';
+	let version = 1;
+
+	let textDocument = types.TextDocumentItem.create(uri, languageId, version, code);
+	let openParams: proto.DidOpenTextDocumentParams = { textDocument };
+	await connection.sendNotification(proto.DidOpenTextDocumentNotification.type, openParams);
+	const return_value: any = await connection.sendRequest('coq/getDocument', {
+		textDocument,
+		goals: 'Str',
+		ast: true
+	});
+
+	let o = return_value?.spans?.[return_value.spans.length - 2]?.ast?.v?.expr?.[1]?.[0];
+
+	if (o == null) return 'nothing';
+	else if (o === 'VernacProof' || o === 'VernacExtend') return 'open';
+	else if (o === 'VernacStartTheoremProof') return 'accessible';
+	else return 'nothing';
 }

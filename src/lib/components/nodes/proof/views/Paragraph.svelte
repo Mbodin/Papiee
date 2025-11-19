@@ -170,7 +170,7 @@
 						let rebuild_selection_head = tr.doc.resolve(start).after(); // Before 2nd paragraph
 						rebuild_selection_head += 2; // Enter paragraph then line
 						tr.doc.check();
-						tr = tr.setSelection(Selection.near(tr.doc.resolve(rebuild_selection_head)));
+						// tr = tr.setSelection(Selection.near(tr.doc.resolve(rebuild_selection_head)));
 						dispatch(tr);
 						return true;
 					}

@@ -5,7 +5,15 @@
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { EditorView } from 'codemirror';
 	import { proof_state_value } from '$lib/notebook/widgets/proof_state/state.svelte';
-	import { getCodeBeforePosition, positionAfterString } from '$lib/rocq/utils';
+	import {
+		extractRocqEndProofState,
+		getCodeBeforePosition,
+		positionAfterString
+	} from '$lib/rocq/utils';
+	import { getContext } from 'svelte';
+	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
+	import * as proto from 'vscode-languageserver-protocol';
+	import * as types from 'vscode-languageserver-types';
 
 	let {
 		value,
@@ -18,6 +26,19 @@
 	}: NotebookNodeProps<RocqNodeValue> = $props();
 
 	let div: HTMLDivElement | undefined = $state();
+
+	let selected = $state(0);
+	$effect(() => {
+		const code = getCodeBeforePosition(root, position) + value.value;
+		selected;
+		proof_state_value.value = {
+			code,
+			hide: !isAnchored(),
+			position: positionAfterString(
+				getCodeBeforePosition(root, position) + value.value.substring(0, selected)
+			)
+		};
+	});
 </script>
 
 {#if mode === 'teacher'}
@@ -76,15 +97,7 @@
 			extensions={[
 				EditorView.updateListener.of((update) => {
 					const head = update.state.selection.main.head;
-					const value = update.state.doc.toString();
-					const code = getCodeBeforePosition(root, position) + value;
-					proof_state_value.value = {
-						code,
-						hide: !isAnchored(),
-						position: positionAfterString(
-							getCodeBeforePosition(root, position) + value.substring(0, head)
-						)
-					};
+					if (selected !== head) selected = head;
 				})
 			]}
 		/>
