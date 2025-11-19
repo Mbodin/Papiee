@@ -72,7 +72,7 @@
 	bind:clientHeight={height}
 	{@attach RootAttachment}
 	class:dragging
-	class="dragging absolute min-h-0 min-w-0 select-none"
+	class="dragging absolute z-10 min-h-0 min-w-0 select-none"
 	onmousedown={startDrag}
 	style={`top: ${inbounds_position.y + scroll_offset.y}px; left: ${inbounds_position.x}px; transition: top 1s in`}
 >
