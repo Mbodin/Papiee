@@ -35,11 +35,13 @@
 			connection
 				.sendRequest('proof/goals', {
 					textDocument: { uri, version } satisfies proto.VersionedTextDocumentIdentifier,
-					position: position,
-					pp_format: 'String'
+					position: { ...position },
+					pp_format: 'String',
+					mode: 'After'
 				})
 				.catch(console.error)
 				.then((v) => {
+					console.log(v);
 					rocq_state = v as GoalAnswer<string, string>;
 				})
 		);
@@ -70,13 +72,13 @@
 				{:else}
 					<ul>
 						{#each hyps as h}
-							<li>
+							<li class="text-nowrap">
 								{h.names.join(',')} : {h.ty}
 							</li>
 						{/each}
 					</ul>
 
-					<h4>{goal?.ty}</h4>
+					<h4 class="text-nowrap">{goal?.ty}</h4>
 				{/if}
 			</div>
 		</div>

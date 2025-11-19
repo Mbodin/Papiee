@@ -106,8 +106,8 @@
 				command_parsechunk(_newState, (_tr) => (tr2 = _tr));
 				const newState = tr2 ? _newState.apply(tr2) : _newState;
 
-				chunks = parsechunks(newState.doc).chunks;
-				code = parsechunks(newState.doc)
+				chunks = parsechunks(newState.doc, ['reasoning']).chunks;
+				code = parsechunks(newState.doc, ['reasoning'])
 					.chunks.filter((v) => v.type === 'tactic')
 					.map((v) => v.code)
 					.join('');
