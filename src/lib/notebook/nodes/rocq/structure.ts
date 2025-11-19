@@ -6,6 +6,7 @@ import {
 	type NotebookNode,
 	type NotebookNodeValue
 } from '$lib/notebook/nodes/types';
+import { SquareChartGantt } from '@lucide/svelte';
 
 export type RocqNode = LeafNodebookNode<number, 'rocq', RocqNodeValue, { value: string }>;
 export type RocqNodeValue = NotebookNodeValue<number, 'rocq', [], {}> & { value: string };
@@ -20,6 +21,8 @@ type A = RocqNode['component'];
 
 export const ROCQ_NODE: RocqNode = makeLeafNotebookNode({
 	type: 'rocq',
+	name: 'Rocq',
+	icon: SquareChartGantt,
 
 	component: RocqNodeC,
 	initial() {
