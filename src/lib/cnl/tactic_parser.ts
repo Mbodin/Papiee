@@ -1,7 +1,12 @@
 import nearley from 'nearley';
 
 import rules, { type StructureSpecification } from './cnl_tactic_specifier';
-import tactic_grammar, { type ParseResult } from './cnl_grammar';
+import {
+	createGlobalGrammarFromTactics,
+	type CnlParsingState,
+	type CnlTactic,
+	type ParseResult
+} from './cnl_tactic';
 import { resolve_state_actions } from './cnl_tactic';
 
 const { Grammar, Parser } = nearley;
@@ -11,26 +16,30 @@ export const grammar = Grammar.fromCompiled(rules);
 export type CNLParseResult = {
 	offset: number;
 	result: ParseResult;
-	state: string[];
+	state: CnlParsingState;
 };
 
 export type CNLParseResultChained = {
 	offset: number;
 	result: ParseResult[];
 	ends: number[];
-	state: string[];
+	state: CnlParsingState;
 	action?: StructureSpecification['specification'];
 };
 
-export function parse_cnl(value: string, state?: string[]): CNLParseResult | undefined {
-	const compiled_rules = tactic_grammar(undefined, state);
+export function parse_cnl(
+	tactics: CnlTactic[],
+	value: string,
+	state?: CnlParsingState
+): CNLParseResult | undefined {
+	const compiled_rules = createGlobalGrammarFromTactics(tactics, state);
 	const grammar = Grammar.fromCompiled(compiled_rules);
 	const parser = new Parser(grammar);
 
 	let max: CNLParseResult | undefined = undefined;
 
 	parser.feed([]);
-	const results = parser.results as { state: string[]; result: ParseResult }[];
+	const results = parser.results as { state: CnlParsingState; result: ParseResult }[];
 	if (results && results.length !== 0) {
 		const { state, result } = results[0];
 		max = {
@@ -61,8 +70,9 @@ export function parse_cnl(value: string, state?: string[]): CNLParseResult | und
 }
 
 export function parse_cnl_chained(
+	tactics: CnlTactic[],
 	value: string,
-	state: string[] = [],
+	state: CnlParsingState,
 	ignore_structre: boolean = false,
 	trim_empty_end: boolean = true
 ): CNLParseResultChained {
@@ -73,7 +83,7 @@ export function parse_cnl_chained(
 	let parsed: ParseResult[] = [];
 	let ends: number[] = [];
 	do {
-		result = parse_cnl(value.substring(_offset), _state);
+		result = parse_cnl(tactics, value.substring(_offset), _state);
 		if (!result) continue;
 		_offset += result.offset;
 		ends.push(_offset);

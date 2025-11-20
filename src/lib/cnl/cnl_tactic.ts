@@ -1,8 +1,9 @@
-import type { CompiledRules } from 'nearley';
-import { attach_grammar } from './cnl_tactic_to_grammar';
+import type { CompiledRules, ParserRule } from 'nearley';
+import { attach_grammar, filterToName } from './cnl_tactic_to_grammar';
 import nearley from 'nearley';
 import rules, { type Specification, type StateAction } from './cnl_tactic_specifier';
 import type { ParseError } from '$lib/parsing';
+import { Lexer } from './lexer';
 
 const { Grammar, Parser } = nearley;
 const grammar = Grammar.fromCompiled(rules);
@@ -105,4 +106,58 @@ export function createTacticFromTextual<T = any>(
 	}
 	registry.push(cnl);
 	return cnl;
+}
+
+export type ParseResult<T = unknown> = { tactic: CnlTactic<T>; value: T };
+
+export function createGlobalGrammarFromTactics(
+	tactics?: CnlTactic[],
+	state?: CnlParsingState
+): CompiledRules {
+	if (!tactics) tactics = getTactics();
+	if (state == null) state = [];
+
+	const sources = tactics.map((v) => ({
+		...v.grammar!,
+		tactic: { ...v, grammar: undefined } satisfies CnlTactic
+	}));
+
+	return {
+		ParserStart: 'main',
+		Lexer: new Lexer(),
+		ParserRules: sources
+			.flatMap((v) => v.ParserRules)
+			.concat(
+				...Array.from({ length: state.length })
+					.map((_, i) => state.slice(i))
+					.filter((v) => v.length !== 0) // Only accept empty state array if the initial state array was empty, and we now it's not empty because state.length > 0
+					.concat(state.length === 0 ? [[]] : [])
+					.map(
+						(v): ParserRule => ({
+							name: 'main',
+							symbols: [filterToName(v)],
+							postprocess(d) {
+								let _state = [...state];
+								const cnl_tactic = d[0] as { tactic: CnlTactic; value: unknown };
+
+								_state = resolve_state_actions(_state, cnl_tactic.tactic.spec.footer.actions);
+
+								return { result: cnl_tactic, state: _state };
+							}
+						})
+					),
+				{
+					name: 'main',
+					symbols: [filterToName('*')],
+					postprocess(d) {
+						let _state = [...state];
+						const cnl_tactic = d[0] as { tactic: CnlTactic; value: unknown };
+
+						_state = resolve_state_actions(_state, cnl_tactic.tactic.spec.footer.actions);
+
+						return { result: cnl_tactic, state: _state };
+					}
+				}
+			)
+	};
 }
