@@ -1,9 +1,14 @@
 import type { CompiledRules, Grammar, ParserRule, Symbol } from 'nearley';
 import type { CnlTactic } from './cnl_tactic';
 import { Lexer } from './lexer';
-import type { Reference, SpecificationContentNode, Text } from './cnl_tactic_specifier';
+import type {
+	Reference,
+	SpecificationContentNode,
+	StateFilter,
+	Text
+} from './cnl_tactic_specifier';
 
-export function filterToName(filter?: string[] | '*'): string {
+export function filterToName(filter?: StateFilter): string {
 	if (filter === '*') return 'ANYTHING';
 	if (!filter || filter.length == 0) return `FILTER_DEFAULT`;
 	return `FILTER_${filter.map((v) => v.toUpperCase()).join('$')}`;

@@ -6,7 +6,9 @@ export type Specification = {
 	content: SpecificationContent;
 	footer: SpecificationFooter;
 };
-export type SpecificationHeader = { type: 'header'; states?: string[] | '*' };
+
+export type StateFilter = string[] | '*';
+export type SpecificationHeader = { type: 'header'; states?: StateFilter };
 export type SpecificationFooter = {
 	type: 'footer';
 	structure?: StructureSpecification;
@@ -58,7 +60,7 @@ function reference(value: string): Reference {
 	return { type: 'reference', value };
 }
 
-function header(states: string[]): SpecificationHeader {
+function header(states: StateFilter): SpecificationHeader {
 	return { type: 'header', states };
 }
 

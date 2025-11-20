@@ -1,4 +1,4 @@
-import tactic_grammar from './cnl_grammar';
+import { createGlobalGrammarFromTactics, type CnlParsingState } from './cnl_tactic';
 import nearley from 'nearley';
 
 const { Grammar, Parser } = nearley;
@@ -15,10 +15,10 @@ type ParserSnapshot = unknown;
 
 export function predict(
 	value: string,
-	state: string[] = [],
+	state: CnlParsingState,
 	max_iter = 32
 ): InputPrediction[] | undefined {
-	const compiled_rules = tactic_grammar(undefined, state);
+	const compiled_rules = createGlobalGrammarFromTactics(undefined, state);
 	const grammar = Grammar.fromCompiled(compiled_rules);
 	const parser = new Parser(grammar);
 
