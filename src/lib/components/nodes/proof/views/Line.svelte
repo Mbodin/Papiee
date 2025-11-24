@@ -19,7 +19,7 @@
 	const contentRef = useNodeViewContext('contentRef');
 </script>
 
-<div class="line flex min-h-4 w-full flex-row py-3" use:contentRef></div>
+<div class="line flex min-h-4 w-full flex-row" use:contentRef></div>
 
 <style>
 	.line {

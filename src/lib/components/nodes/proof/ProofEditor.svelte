@@ -71,11 +71,11 @@
 						};
 					}
 				}),
-				chunk_plugins
-				// paragraph_plugins,
-				// doc_plugins,
-				// line_plugins,
-				// content_plugins
+				chunk_plugins,
+				paragraph_plugins,
+				doc_plugins,
+				line_plugins,
+				content_plugins
 			].flat()
 		});
 		view = new EditorView(element, {
@@ -171,7 +171,7 @@
 {#if view}
 	<ProofAutoCompletion {view} {completion} />
 {/if}
-<div class="ProseMirror" use:editor></div>
+<div class="ProseMirror py-5" use:editor></div>
 
 <style>
 	:global(.ProseMirror:focus) {

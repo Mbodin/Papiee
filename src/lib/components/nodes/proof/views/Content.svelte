@@ -20,6 +20,6 @@
 	node.subscribe((value) => (isRoot = value === view.state.doc.child(0)));
 </script>
 
-<div class="paragraph-content">
+<div class="paragraph-content gap-1">
 	<div use:contentRef class:ml-5={!isRoot}></div>
 </div>
