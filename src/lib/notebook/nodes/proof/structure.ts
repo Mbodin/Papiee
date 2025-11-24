@@ -6,9 +6,14 @@ import {
 	type NotebookNodeValue
 } from '$lib/notebook/nodes/types';
 import ProofNodeC from '$lib/components/nodes/ProofNode.svelte';
+import type { CnlParsingState } from '$lib/cnl/cnl_tactic';
 
-export type ProofNode = LeafNodebookNode<number, 'proof', ProofNodeValue, { value: string }>;
-export type ProofNodeValue = NotebookNodeValue<number, 'proof'> & { value: string };
+export type ProofNode = LeafNodebookNode<number, 'proof', ProofNodeValue, Data>;
+export type ProofNodeValue = NotebookNodeValue<number, 'proof'> & Data;
+type Data = {
+	value: string;
+	initial_state: CnlParsingState;
+};
 
 declare module '$lib/notebook/structure' {
 	interface RootNodeMap {
@@ -25,18 +30,21 @@ export const PROOF_NODE: ProofNode = makeLeafNotebookNode({
 			type: 'proof',
 			value: '',
 			children: {},
+			initial_state: ['START'],
 			position: undefined
 		};
 	},
 	trim(value) {
 		return {
-			value: value.value
+			value: value.value,
+			initial_state: value.initial_state
 		};
 	},
 	untrim(trimmed) {
 		return {
 			type: 'proof',
 			value: trimmed.value,
+			initial_state: trimmed.initial_state,
 			children: {},
 			position: 0
 		};

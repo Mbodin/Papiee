@@ -1,4 +1,7 @@
 import { ParseError } from '$lib/parsing';
+import type { Node } from 'prosemirror-model';
+import type { CnlChunk } from './chunks/types';
+import { schema } from '$lib/notebook/nodes/proof/schema';
 
 export type CnlRoot = { type: 'root'; value: CnlContent };
 export type CnlContent = { type: 'content'; value: CnlParagraph[] };
@@ -13,6 +16,21 @@ export type CnlLine = { type: 'line'; value: string };
 
 export type CnlPosition = number[];
 
+export function comparePosition(pos1: CnlPosition, pos2: CnlPosition): number {
+	if (pos1.length === 0)
+		if (pos2.length === 0) return 0;
+		else return 1;
+	if (pos2.length === 0) return -1;
+	for (let i = 0; i < Math.max(pos1.length, pos2.length); i++) {
+		if (pos1.length <= i) return 1;
+		if (pos2.length <= i) return -1;
+		if (pos1[i] < pos2[i]) return 1;
+		if (pos2[i] < pos1[i]) return -1;
+	}
+
+	return 0;
+}
+
 /**
  * A cnl file is a text file where :
  * - First line of paragraph must start with \t
@@ -25,7 +43,7 @@ export type CnlPosition = number[];
  * @param value the string value to be parsed
  * @returns a cnl root
  */
-export function parse(value: string): CnlRoot {
+export function fromTextualToTree(value: string): CnlRoot {
 	const lines = value.includes('\n') ? value.split('\n') : [value];
 
 	let index = 0;
@@ -123,4 +141,19 @@ function getIndentationLevel(line: string): number {
 		else break;
 	}
 	return count;
+}
+
+export function fromTreeToTextual(root: CnlRoot): string {
+	function fromParagraphToTextual(indent: number, paragraph: CnlParagraph): string {
+		const line = '\t'.repeat(indent) + paragraph.line.value;
+		const content = paragraph.content ? fromContentToTextual(indent + 1, paragraph.content) : '';
+
+		return `${line}\n${content}`;
+	}
+
+	function fromContentToTextual(indent: number, content: CnlContent): string {
+		return content.value.map((v) => fromParagraphToTextual(indent, v)).join('');
+	}
+
+	return fromContentToTextual(0, root.value).trimEnd();
 }

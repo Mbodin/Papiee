@@ -15,64 +15,66 @@ import { createTacticFromTextual } from './cnl_tactic';
  * end : the goal is supposedly empty
  */
 
-const ADMITTED = createTacticFromTextual<{}>('admitted', '{reasoning||-+end}', ({}) => 'admitted.');
+// const ADMITTED = createTacticFromTextual<{}>('admitted', '{reasoning||-+end}', ({}) => 'admitted.');
 
-const DESTRUCTION = createTacticFromTextual<{ identifier: string }>(
-	'destruction',
-	'{reasoning|destruct |identifier|.|>+destruction}',
-	({ value }) => `destruct ${value.identifier}.\n`
-);
+// const DESTRUCTION = createTacticFromTextual<{ identifier: string }>(
+// 	'destruction',
+// 	'{reasoning|destruct |identifier|.|>+destruction}',
+// 	({ value }) => `destruct ${value.identifier}.\n`
+// );
 
-const DESTRUCT_ITEM = createTacticFromTextual<{}>(
-	'destruct_item',
-	'{destruction|-|+reasoning}',
-	({ value }) => ``
-);
+// const DESTRUCT_ITEM = createTacticFromTextual<{}>(
+// 	'destruct_item',
+// 	'{destruction|-|+reasoning}',
+// 	({ value }) => ``
+// );
 
-const DESTRUCT_ITEM_END = createTacticFromTextual<{}>(
-	'destruct_item_end',
-	'{destruction end||#-}',
-	({ value }) => ``
-);
+// const DESTRUCT_ITEM_END = createTacticFromTextual<{}>(
+// 	'destruct_item_end',
+// 	'{destruction end||#-}',
+// 	({ value }) => ``
+// );
 
-const DESTRUCTION_END = createTacticFromTextual<{}>(
-	'destruction_end',
-	'{destruction||--+end}',
-	() => ''
-);
+// const DESTRUCTION_END = createTacticFromTextual<{}>(
+// 	'destruction_end',
+// 	'{destruction||--+end}',
+// 	() => ''
+// );
 
-const REWRITE_LEFT = createTacticFromTextual<{ rewrite: string }>(
-	'rewrite_left',
-	'{reasoning|rewrite < |rewrite|.|}',
-	({ value }) => `rewrite < ${value.rewrite}.`
-);
+// const REWRITE_LEFT = createTacticFromTextual<{ rewrite: string }>(
+// 	'rewrite_left',
+// 	'{reasoning|rewrite < |rewrite|.|}',
+// 	({ value }) => `rewrite < ${value.rewrite}.`
+// );
 
-const REWRITE_RIGHT = createTacticFromTextual<{ rewrite: string }>(
-	'rewrite_right',
-	'{reasoning|rewrite > |rewrite|.|}',
-	({ value }) => `rewrite < ${value.rewrite}.`
-);
+// const REWRITE_RIGHT = createTacticFromTextual<{ rewrite: string }>(
+// 	'rewrite_right',
+// 	'{reasoning|rewrite > |rewrite|.|}',
+// 	({ value }) => `rewrite < ${value.rewrite}.`
+// );
 
-const REFLEXIVITY = createTacticFromTextual<{}>(
-	'rewrite_right',
-	'{reasoning|reflexivity.|-+end}',
-	({ value }) => `reflexivity.`
-);
+// const REFLEXIVITY = createTacticFromTextual<{}>(
+// 	'rewrite_right',
+// 	'{reasoning|reflexivity.|-+end}',
+// 	({ value }) => `reflexivity.`
+// );
 
-const APPLY = createTacticFromTextual<{ apply: string }>(
-	'apply',
-	'{reasoning|apply |apply|.|}',
-	({ value }) => `apply ${value.apply}.`
-);
+// const APPLY = createTacticFromTextual<{ apply: string }>(
+// 	'apply',
+// 	'{reasoning|apply |apply|.|}',
+// 	({ value }) => `apply ${value.apply}.`
+// );
 
-const INTROS = createTacticFromTextual<{ identifier: string }>(
-	'intros',
-	'{reasoning|intros |identifier|.|}',
-	({ value }) => `intros ${value.identifier}.`
-);
+// const INTROS = createTacticFromTextual<{ identifier: string }>(
+// 	'intros',
+// 	'{reasoning|intros |identifier|.|}',
+// 	({ value }) => `intros ${value.identifier}.`
+// );
 
-const SIMPL = createTacticFromTextual<{}>('simpl', '{reasoning|simpl.|}', () => `simpl.`);
+// const SIMPL = createTacticFromTextual<{}>('simpl', '{reasoning|simpl.|}', () => `simpl.`);
 
-const LEFT = createTacticFromTextual<{}>('left', '{reasoning|left.|}', () => `left.`);
+// const LEFT = createTacticFromTextual<{}>('left', '{reasoning|left.|}', () => `left.`);
 
-const RIGHT = createTacticFromTextual<{}>('right', '{reasoning|right.|}', () => `right.`);
+// const RIGHT = createTacticFromTextual<{}>('right', '{reasoning|right.|}', () => `right.`);
+
+const T1 = createTacticFromTextual<{}>('right', '{START|test1.|}', () => '(**)');

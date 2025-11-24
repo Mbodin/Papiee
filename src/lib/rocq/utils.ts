@@ -1,4 +1,8 @@
-import { cnltoRocq, type ProofChunk } from '$lib/notebook/nodes/proof/chunk';
+import { newCnlParser } from '$lib/cnl/chunks/parser';
+import type { CnlChunk } from '$lib/cnl/chunks/types';
+import { getTactics } from '$lib/cnl/cnl_tactic';
+import { fromTextualToTree } from '$lib/cnl/tree';
+import { fromCnlToSchema, fromProofNodeToRocq } from '$lib/notebook/nodes/proof/cnl';
 import type { ProofNodeValue } from '$lib/notebook/nodes/proof/structure';
 import type { RocqEndProofState, RocqNodeValue } from '$lib/notebook/nodes/rocq/structure';
 import type { NotebookState } from '$lib/notebook/structure';
@@ -45,7 +49,7 @@ export function getCodeBeforePosition(root: NotebookState, position: number[]) {
 		if (comparePosition(pos, position) != 1) return;
 		if (_node.type === 'proof') {
 			const node = _node as ProofNodeValue;
-			before += cnltoRocq(node.value) + 'admitted. Qed. ';
+			before += fromProofNodeToRocq(node) + 'admitted. Qed. ';
 		}
 		if (_node.type === 'rocq') {
 			const node = _node as RocqNodeValue;
@@ -57,7 +61,7 @@ export function getCodeBeforePosition(root: NotebookState, position: number[]) {
 
 export function assembleCodeFromChunks(
 	root: NotebookState,
-	chunks: ProofChunk[],
+	chunks: CnlChunk[],
 	position: number,
 	node_position: number[]
 ): string {

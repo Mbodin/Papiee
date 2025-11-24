@@ -1,4 +1,4 @@
-import { ResolvedPos } from 'prosemirror-model';
+import { Node, ResolvedPos } from 'prosemirror-model';
 
 declare module 'prosemirror-model' {
 	interface ResolvedPos {
@@ -10,6 +10,8 @@ declare module 'prosemirror-model' {
 		$posAtIndex(index: number, depth?: number | null): ResolvedPos;
 		$decrement(): ResolvedPos;
 		$increment(): ResolvedPos;
+		tree_position(): number[];
+		$from_tree(tree: number[]): ResolvedPos;
 	}
 }
 
@@ -37,4 +39,17 @@ ResolvedPos.prototype.$decrement = function () {
 };
 ResolvedPos.prototype.$increment = function () {
 	return this.$(this.pos + 1);
+};
+ResolvedPos.prototype.tree_position = function () {
+	const value = this;
+	return Array.from({ length: value.depth }).map((_, i) => value.index(i));
+};
+ResolvedPos.prototype.$from_tree = function (tree) {
+	const doc = this.doc;
+
+	const value = this.$(0);
+
+	const position = tree.reduce((a, b) => a, value);
+
+	return this;
 };

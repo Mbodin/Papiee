@@ -1,7 +1,12 @@
 <script lang="ts" module>
 	export const LineNodeView = (factory: NodeViewFactory) =>
 		factory({
-			component: Line
+			component: Line,
+			contentAs(node) {
+				const div = document.createElement('div');
+				div.className = 'flex flex-row gap-5';
+				return div;
+			}
 		});
 	export const plugins: Plugin[] = [];
 </script>
@@ -14,7 +19,7 @@
 	const contentRef = useNodeViewContext('contentRef');
 </script>
 
-<div class="line min-h-4 py-3" use:contentRef></div>
+<div class="line flex min-h-4 w-full flex-row py-3" use:contentRef></div>
 
 <style>
 	.line {

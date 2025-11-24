@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Draggable from '$lib/components/Draggable.svelte';
-	import type { SyntaxError } from '$lib/notebook/nodes/proof/errors';
+	import type { SyntaxError } from '$lib/cnl/chunks/errors';
 	import type { ProofStateProps } from '$lib/notebook/widgets/proof_state/state.svelte';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
 	import type { GoalAnswer } from '$lib/rocq/type';

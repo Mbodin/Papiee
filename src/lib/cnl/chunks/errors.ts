@@ -1,15 +1,16 @@
-import type { ChunkGenerator } from './chunk';
+import type { Range } from './range';
+import type { ChunkGenerator } from './types';
 
 type CommonErrorFields = {
 	type: 'error';
-	range: { from: number; to: number };
+	range: Range;
 };
 
 export type ErrorChunk = SyntaxError | CommonErrorFields;
 
 export type SyntaxError = {
 	type: 'error';
-	range: { from: number; to: number };
+	range: Range;
 	reason: string;
 };
 

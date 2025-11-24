@@ -1,7 +1,5 @@
-import type { NotebookState } from '$lib/notebook/structure';
 import type { Position } from 'vscode-languageserver-types';
-import type { ProofChunk } from '../../nodes/proof/chunk';
-import type { ErrorChunk } from '$lib/notebook/nodes/proof/errors';
+import type { ErrorChunk } from '$lib/cnl/chunks/errors';
 
 export type ProofStateProps = {
 	hide?: boolean;

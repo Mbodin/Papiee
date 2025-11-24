@@ -1,23 +1,10 @@
 <script lang="ts">
-	import nearley from 'nearley';
-	import '$lib/cnl/tactics';
+	import { fromTextualToTree } from '$lib/cnl/tree';
 	import { onMount } from 'svelte';
 
-	import { parse } from '$lib/cnl/textual';
-	import { parsechunks } from '$lib/notebook/nodes/proof/chunk';
-	import { EditorState } from 'prosemirror-state';
-	const { Grammar, Parser } = nearley;
-
 	onMount(() => {
-		let document = `           reflexivity.`.trim();
-
-		const node = parse(document);
-		const state = new EditorState();
-		state.doc = node;
-		console.log('='.repeat(20));
-		const result = parsechunks(node, ['reasoning']);
-		console.log(result.state);
-		result.chunks.forEach((v) => console.log(v));
+		let document = `ligne1\n\tligne2\n\tligne3\n\t\tligne4\n\tligne5\nligne6`;
+		console.log(JSON.stringify(fromTextualToTree(document), undefined, 1));
 	});
 </script>
 
