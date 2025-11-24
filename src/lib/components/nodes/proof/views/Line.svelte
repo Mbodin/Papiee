@@ -4,7 +4,7 @@
 			component: Line,
 			contentAs(node) {
 				const div = document.createElement('div');
-				div.className = 'flex flex-row gap-5';
+				div.className = 'flex flex-row';
 				return div;
 			}
 		});

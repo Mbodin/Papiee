@@ -33,7 +33,7 @@
 	import { newCnlParser } from '$lib/cnl/chunks/parser';
 	import { getTactics } from '$lib/cnl/cnl_tactic';
 	import type { ProofNodeValue } from '$lib/notebook/nodes/proof/structure';
-	import { ChunkNodeView } from './views/Chunk.svelte';
+	import { ChunkNodeView, plugins as chunk_plugins } from './views/Chunk.svelte';
 	import { fromTreeToTextual } from '$lib/cnl/tree';
 
 	let {
@@ -63,14 +63,15 @@
 			schema,
 			plugins: [
 				new Plugin({
-					view(view) {
+					view() {
 						return {
 							update(view, prevState) {
 								node = view.state.doc;
 							}
 						};
 					}
-				})
+				}),
+				chunk_plugins
 				// paragraph_plugins,
 				// doc_plugins,
 				// line_plugins,
@@ -98,9 +99,7 @@
 				if (JSON.stringify(cnl.chunks) !== JSON.stringify(chunks)) {
 					const head = tr.selection.$head;
 					tr = tr.replaceRangeWith(0, tr.doc.content.size - 1, fromCnlToSchema(cnl.root, chunks));
-					tr = tr.setSelection(
-						Selection.near(getNewSelectionPosition(view!.state, head, view!.state.apply(tr)))
-					);
+					tr = tr.setSelection(Selection.near(getNewSelectionPosition(view!.state, head, tr.doc)));
 				}
 				const state = view!.state.apply(tr);
 

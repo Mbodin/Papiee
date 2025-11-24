@@ -148,7 +148,7 @@ export function fromProofNodeToRocq(value: ProofNodeValue) {
 export function getNewSelectionPosition(
 	previous_state: EditorState,
 	previous_head: ResolvedPos,
-	state: EditorState
+	current_doc: Node
 ): ResolvedPos {
 	const line = previous_head.$posAtIndex(0, -1);
 
@@ -163,7 +163,7 @@ export function getNewSelectionPosition(
 	const real_text_offset = real_text.length;
 
 	let current_text_offset = 0;
-	let node = state.doc.resolve(line.pos).$increment(); // First chunk selected
+	let node = current_doc.resolve(line.pos).$increment(); // First chunk selected
 
 	while (current_text_offset < real_text_offset) {
 		const length = node.end() - node.start();

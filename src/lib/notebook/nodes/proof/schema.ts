@@ -41,6 +41,9 @@ export const nodes = {
 		attrs: {
 			value: {
 				default: undefined
+			},
+			selected: {
+				default: false
 			}
 		},
 		toDOM(node) {
