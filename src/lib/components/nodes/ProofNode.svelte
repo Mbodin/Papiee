@@ -14,6 +14,9 @@
 	import { extractRocqEndProofNodeState, getCodeBeforePosition } from '$lib/rocq/utils';
 	import { getContext } from 'svelte';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
+	import { Portal, Tooltip } from '@skeletonlabs/skeleton-svelte';
+	import { CircleAlert, CircleCheck, CircleX, LoaderCircle } from '@lucide/svelte';
+	import ProofNodeStateDisplayChip from './proof/ProofNodeStateDisplayChip.svelte';
 
 	let {
 		value,
@@ -70,28 +73,7 @@
 <div class="border-l-2 p-2">
 	<ProofEditor bind:node={cnl_value.value} {onView} display_goal={true} {root} {position} {value} />
 
-	<div class="proofnode-state ml-5 flex pl-5" data-state={value.state || 'none'}>
-		{#if value.state}
-			{value.state}
-		{/if}
+	<div class="relative w-full">
+		<ProofNodeStateDisplayChip state={value.state} />
 	</div>
 </div>
-
-<style>
-	.proofnode-state {
-		display: block;
-	}
-
-	.proofnode-state[data-state='done'] {
-		background-color: green;
-	}
-	.proofnode-state[data-state='error'] {
-		background-color: red;
-	}
-	.proofnode-state[data-state='admit'] {
-		background-color: yellow;
-	}
-	.proofnode-state[data-state='loading'] {
-		background-color: gray;
-	}
-</style>
