@@ -50,7 +50,7 @@
 			debouncing_timeout = setTimeout(() => {
 				debouncing_timeout = undefined;
 				debounced_rocq = undefined;
-			}, 200);
+			}, 50);
 		}
 	});
 

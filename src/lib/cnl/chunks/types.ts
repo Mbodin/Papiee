@@ -22,13 +22,13 @@ export type TacticChunk = {
 export const COMMENT = (result: ParseResult, range: Range): CommentChunk => ({
 	...result,
 	range,
-	comment_code: result.tactic.transformer(result.value as any),
+	comment_code: result.tactic.transformer({ value: result.value as any }),
 	type: 'comment'
 });
 
 export const TACTIC = (result: ParseResult, range: Range): TacticChunk => ({
 	...result,
 	range,
-	code: result.tactic.transformer(result.value as any),
+	code: result.tactic.transformer({ value: result.value as any }),
 	type: 'tactic'
 });
