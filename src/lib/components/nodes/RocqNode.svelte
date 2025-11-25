@@ -12,8 +12,6 @@
 	} from '$lib/rocq/utils';
 	import { getContext } from 'svelte';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
-	import * as proto from 'vscode-languageserver-protocol';
-	import * as types from 'vscode-languageserver-types';
 
 	let {
 		value,
@@ -31,14 +29,31 @@
 	$effect(() => {
 		const code = getCodeBeforePosition(root, position) + value.value;
 		selected;
-		proof_state_value.value = {
-			code,
-			hide: !isAnchored(),
-			position: positionAfterString(
-				getCodeBeforePosition(root, position) + value.value.substring(0, selected)
-			)
-		};
+		if (isAnchored()) {
+			proof_state_value.value = {
+				code,
+				position: positionAfterString(
+					getCodeBeforePosition(root, position) + value.value.substring(0, selected)
+				)
+			};
+		}
 	});
+
+	const worker = getContext<RocqWorker>(WORKER_CONTEXT);
+	const connection = $derived(worker.connection);
+
+	let passed = $derived(value.proof_state != null);
+
+	$effect(() => {
+		if (passed || !connection) return;
+
+		const code = getCodeBeforePosition(root, position) + value.value;
+		extractRocqEndProofState(connection, code).then((proof_state) => {
+			onNodeValueUpdate(value, { ...value, proof_state });
+		});
+	});
+
+	let string_value = $derived(value.value);
 </script>
 
 {#if mode === 'teacher'}
@@ -91,8 +106,11 @@
 		<CodeMirror
 			class="w-full"
 			lang={rocq()}
+			onready={() => {}}
 			bind:value={
-				() => value.value, (new_value) => onNodeValueUpdate(value, { ...value, value: new_value })
+				() => string_value,
+				(new_value) =>
+					onNodeValueUpdate(value, { ...value, value: new_value, proof_state: undefined })
 			}
 			extensions={[
 				EditorView.updateListener.of((update) => {

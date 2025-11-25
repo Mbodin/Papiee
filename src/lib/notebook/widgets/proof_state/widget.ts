@@ -1,4 +1,4 @@
-import UnsafeWidget from '$lib/components/widgets/proof_state/UnsafeWidget.svelte';
+import ProofStateWidget_interface from '$lib/components/widgets/proof_state/ProofStateWidget_interface.svelte';
 import { addWidget } from '../../widgets';
 
-addWidget(UnsafeWidget);
+addWidget(ProofStateWidget_interface);

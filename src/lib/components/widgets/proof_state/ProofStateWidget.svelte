@@ -1,50 +1,9 @@
 <script lang="ts">
 	import Draggable from '$lib/components/Draggable.svelte';
 	import type { SyntaxError } from '$lib/cnl/chunks/errors';
-	import type { ProofStateProps } from '$lib/notebook/widgets/proof_state/state.svelte';
-	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
-	import type { GoalAnswer } from '$lib/rocq/type';
-	import { positionAfterString } from '$lib/rocq/utils';
-	import { getContext } from 'svelte';
-	import * as proto from 'vscode-languageserver-protocol';
-	import * as types from 'vscode-languageserver-types';
+	import type { RocqStateProps } from '$lib/notebook/widgets/proof_state/state.svelte';
 
-	let {
-		hide = false,
-		code,
-		position = positionAfterString(code),
-		error = undefined
-	}: ProofStateProps = $props();
-
-	const worker = getContext<RocqWorker>(WORKER_CONTEXT);
-	const connection = $derived(worker.connection);
-
-	let rocq_state: GoalAnswer<string, string> | undefined = $state();
-
-	$effect(() => {
-		if (!connection) {
-			return undefined;
-		}
-		let uri = 'file:///exercise/main.v';
-		let languageId = 'rocq';
-		let version = 1;
-
-		let textDocument = types.TextDocumentItem.create(uri, languageId, version, code);
-		let openParams: proto.DidOpenTextDocumentParams = { textDocument };
-		connection.sendNotification(proto.DidOpenTextDocumentNotification.type, openParams).then(() =>
-			connection
-				.sendRequest('proof/goals', {
-					textDocument: { uri, version } satisfies proto.VersionedTextDocumentIdentifier,
-					position: { ...position },
-					pp_format: 'String',
-					mode: 'After'
-				})
-				.catch(console.error)
-				.then((v) => {
-					rocq_state = v as GoalAnswer<string, string>;
-				})
-		);
-	});
+	let { value: rocq_state, error, hide }: RocqStateProps = $props();
 
 	let goals = $derived(rocq_state?.goals);
 	let goal = $derived(goals?.goals[0]);
@@ -61,7 +20,7 @@
 			<div class="rounded-b-md bg-white p-2">
 				{#if error}
 					<div class="rounded-md bg-red-500 p-2">
-						{#if 'fatal' in error}
+						{#if typeof error === 'object' && 'fatal' in error}
 							Fatal Error
 						{:else}
 							{@const reason = (error as SyntaxError).reason}

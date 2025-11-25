@@ -44,12 +44,5 @@
 </script>
 
 <div class="border-l-2 p-2">
-	<ProofEditor
-		bind:node={cnl_value.value}
-		{onView}
-		display_goal={isAnchored()}
-		{root}
-		{position}
-		{value}
-	/>
+	<ProofEditor bind:node={cnl_value.value} {onView} display_goal={true} {root} {position} {value} />
 </div>

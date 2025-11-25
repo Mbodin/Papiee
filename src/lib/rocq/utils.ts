@@ -80,21 +80,32 @@ export async function extractRocqEndProofState(
 	connection: proto.MessageConnection,
 	code: string
 ): Promise<RocqEndProofState> {
-	let uri = 'file:///exercise/main.v';
+	const uuid = 'extract_rocq_' + crypto.randomUUID().replaceAll('-', '_');
+	let uri = 'file:///exercise/' + uuid + '.v';
 	let languageId = 'rocq';
 	let version = 1;
+	let textDocument = types.TextDocumentItem.create(
+		uri,
+		languageId,
+		version,
+		code.replaceAll(/\u00A0/g, ' ')
+	);
 
-	let textDocument = types.TextDocumentItem.create(uri, languageId, version, code);
 	let openParams: proto.DidOpenTextDocumentParams = { textDocument };
-	await connection.sendNotification(proto.DidOpenTextDocumentNotification.type, openParams);
+	await connection
+		.sendNotification(proto.DidOpenTextDocumentNotification.type, openParams)
+		.catch(console.error);
 	const return_value: any = await connection.sendRequest('coq/getDocument', {
 		textDocument,
 		goals: 'Str',
 		ast: true
 	});
 
-	let o = return_value?.spans?.[return_value.spans.length - 2]?.ast?.v?.expr?.[1]?.[0];
+	await connection
+		.sendNotification(proto.DidDeleteFilesNotification.type, { files: [{ uri }] })
+		.catch(console.error);
 
+	let o = return_value?.spans?.[return_value.spans.length - 2]?.ast?.v?.expr?.[1]?.[0];
 	if (o == null) return 'nothing';
 	else if (o === 'VernacProof' || o === 'VernacExtend') return 'open';
 	else if (o === 'VernacStartTheoremProof') return 'accessible';

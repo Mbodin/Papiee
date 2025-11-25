@@ -94,17 +94,35 @@
 
 			dispatchTransaction(tr) {
 				const cnl = fromSchemaToCnl(tr.doc);
-				const chunks = newCnlParser(getTactics(), value.initial_state)(cnl.root);
+				const newly_parsed = newCnlParser(getTactics(), value.initial_state)(cnl.root);
 
-				if (JSON.stringify(cnl.chunks) !== JSON.stringify(chunks)) {
+				if (JSON.stringify(cnl.chunks) !== JSON.stringify(newly_parsed)) {
 					const head = tr.selection.$head;
-					tr = tr.replaceRangeWith(0, tr.doc.content.size - 1, fromCnlToSchema(cnl.root, chunks));
+					tr = tr.replaceRangeWith(
+						0,
+						tr.doc.content.size - 1,
+						fromCnlToSchema(cnl.root, newly_parsed)
+					);
 					tr = tr.setSelection(Selection.near(getNewSelectionPosition(view!.state, head, tr.doc)));
 				}
 				const state = view!.state.apply(tr);
 
+				{
+					const head = tr.selection.$head;
+					let _selected = 0;
+					tr.doc.nodesBetween(0, head.before(), (node) => {
+						if (node.type.name === schema.nodes.chunk.name) {
+							_selected += node.attrs?.value?.length || 0;
+						}
+					});
+					selected = _selected;
+					chunks = newly_parsed;
+				}
+
 				view!.updateState(state);
 			},
+
+			handleClick(view, pos, event) {},
 
 			// As long a copy/paste is broken prevent it
 			transformCopied(slice, view) {
@@ -113,6 +131,21 @@
 
 			transformPasted(slice, view, plain) {
 				return Slice.empty;
+			},
+
+			handleDOMEvents: {
+				focus(view, event) {
+					const head = view.state.selection.$head;
+					let _selected = 0;
+					view.state.doc.nodesBetween(0, head.before(), (node) => {
+						if (node.type.name === schema.nodes.chunk.name) {
+							_selected += node.attrs?.value?.length || 0;
+						}
+					});
+					selected = _selected;
+					chunks = chunks;
+					updateProofState();
+				}
 			}
 		});
 
@@ -136,18 +169,26 @@
 	let completion: CompletionState | undefined = $state();
 	let code: string = $state('');
 
-	$effect(() => {
+	function updateProofState() {
 		const selected_chunk = chunks[selected];
-		if (!view || selected_chunk == null || proof_end_state != 'accessible') {
+		if (!view || (proof_end_state != 'accessible' && proof_end_state != 'open')) {
 			proof_state_value.value = undefined;
 		} else {
 			const code = assembleCodeFromChunks(root, chunks, selected, position);
 			proof_state_value.value = {
 				code,
 				hide: !display_goal,
-				error: selected_chunk.type === 'error' ? selected_chunk : undefined
+				error: selected_chunk?.type === 'error' ? selected_chunk : undefined
 			};
 		}
+	}
+
+	$effect(() => {
+		chunks;
+		selected;
+		view;
+		proof_end_state;
+		updateProofState();
 	});
 
 	let proof_end_state: RocqEndProofState = $state('nothing');
@@ -155,6 +196,7 @@
 	const worker = getContext<RocqWorker>(WORKER_CONTEXT);
 	let connection = $derived(worker.connection);
 	$effect(() => {
+		root;
 		if (!connection) proof_end_state = 'nothing';
 		else
 			extractRocqEndProofState(connection, getCodeBeforePosition(root, position)).then(
