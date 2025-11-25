@@ -11,6 +11,7 @@ import { comparePosition, visit } from '$lib/notebook/utils';
 import type { Position } from 'vscode-languageserver-protocol';
 import * as proto from 'vscode-languageserver-protocol';
 import * as types from 'vscode-languageserver-types';
+import { getRocqFileHeaderContent } from './connection';
 
 export function positionAfterString(value: string): Position {
 	const line_number = value.includes('\n') ? value.split('\n').length - 1 : 0;
@@ -45,7 +46,7 @@ export function getCodeRocqProofStatePosition(root: NotebookState, position: num
 }
 
 export function getCodeBeforePosition(root: NotebookState, position: number[]) {
-	let before = '';
+	let before = getRocqFileHeaderContent();
 	visit(root, (_node, pos) => {
 		if (comparePosition(pos, position) != 1) return;
 		if (_node.type === 'proof') {

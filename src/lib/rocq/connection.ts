@@ -10,6 +10,15 @@ type RocqDumpFile = {
 	files: { [filename in string]: string };
 };
 
+export function getRocqFileHeaderContent(): string {
+	return (
+		Object.keys(rocqDumpFile.files)
+			.map((v) => v.replace('.v', ''))
+			.map((v) => `Require Import ${v}.`) // It would be better to just import the file but it works to just paste the code before
+			.join('\n') + '\n'
+	);
+}
+
 export async function create(origin: string): Promise<proto.MessageConnection> {
 	let wuri = 'wasm-bin/wacoq_worker.js';
 
@@ -43,6 +52,8 @@ export async function initialize(
 		}
 	};
 
+	// connection.onNotification(proto.LogTraceNotification.type, (e) => console.log(e.message));
+
 	await connection.sendNotification(proto.SetTraceNotification.type, { value: 'verbose' });
 	await connection.sendRequest(proto.InitializeRequest.type, initializeParameters);
 	await connection.sendNotification(proto.InitializedNotification.type, {});
@@ -75,6 +86,7 @@ export async function initialize(
 			await connection.sendRequest('coq/saveVo', openParams);
 		})
 	);
+
 	return connection;
 }
 
