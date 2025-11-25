@@ -10,9 +10,12 @@ import type { CnlParsingState } from '$lib/cnl/cnl_tactic';
 
 export type ProofNode = LeafNodebookNode<number, 'proof', ProofNodeValue, Data>;
 export type ProofNodeValue = NotebookNodeValue<number, 'proof'> & Data;
+
+export type ProofNodeState = 'done' | 'admit' | 'error' | undefined;
 type Data = {
 	value: string;
 	initial_state: CnlParsingState;
+	state?: ProofNodeState | 'loading';
 };
 
 declare module '$lib/notebook/structure' {

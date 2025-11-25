@@ -17,7 +17,7 @@ import { createTacticFromTextual } from './cnl_tactic';
 
 const START = createTacticFromTextual<{}>('start', '{START||-+reasoning}', ({}) => '');
 
-const ADMITTED = createTacticFromTextual<{}>('admitted', '{reasoning||-+end}', ({}) => 'admitted.');
+const ADMITTED = createTacticFromTextual<{}>('admitted', '{reasoning||-+end}', ({}) => 'admit.');
 
 const DESTRUCTION = createTacticFromTextual<{ identifier: string }>(
 	'destruction',

@@ -1,9 +1,10 @@
+import { Cache } from '$lib/cache';
 import { newCnlParser } from '$lib/cnl/chunks/parser';
 import type { CnlChunk } from '$lib/cnl/chunks/types';
 import { getTactics } from '$lib/cnl/cnl_tactic';
 import { fromTextualToTree } from '$lib/cnl/tree';
 import { fromCnlToSchema, fromProofNodeToRocq } from '$lib/notebook/nodes/proof/cnl';
-import type { ProofNodeValue } from '$lib/notebook/nodes/proof/structure';
+import type { ProofNodeState, ProofNodeValue } from '$lib/notebook/nodes/proof/structure';
 import type { RocqEndProofState, RocqNodeValue } from '$lib/notebook/nodes/rocq/structure';
 import type { NotebookState } from '$lib/notebook/structure';
 import { comparePosition, visit } from '$lib/notebook/utils';
@@ -110,4 +111,53 @@ export async function extractRocqEndProofState(
 	else if (o === 'VernacProof' || o === 'VernacExtend') return 'open';
 	else if (o === 'VernacStartTheoremProof') return 'accessible';
 	else return 'nothing';
+}
+
+const CACHE_extractRocqEndProofNodeState = new Cache<string, ProofNodeState>(128);
+
+export async function extractRocqEndProofNodeState(
+	connection: proto.MessageConnection,
+	code: string
+): Promise<ProofNodeState> {
+	code = code.replaceAll(/\u00A0/g, ' ') + 'Qed.';
+
+	const cached = CACHE_extractRocqEndProofNodeState.get(code);
+	if (cached) return cached.value;
+
+	const uuid = 'extract_rocq_' + crypto.randomUUID().replaceAll('-', '_');
+	let uri = 'file:///exercise/' + uuid + '.v';
+	let languageId = 'rocq';
+	let version = 1;
+	let textDocument = types.TextDocumentItem.create(uri, languageId, version, code);
+
+	let openParams: proto.DidOpenTextDocumentParams = { textDocument };
+	await connection
+		.sendNotification(proto.DidOpenTextDocumentNotification.type, openParams)
+		.catch(console.error);
+	const return_value: any = await connection.sendRequest('coq/getDocument', {
+		textDocument,
+		goals: 'Str',
+		ast: true
+	});
+
+	await connection
+		.sendNotification(proto.DidDeleteFilesNotification.type, { files: [{ uri }] })
+		.catch(console.error);
+
+	const errors = return_value.spans.filter((v: any) => 'error' in v.goals);
+	if (errors.length > 1) {
+		CACHE_extractRocqEndProofNodeState.set(code, 'error');
+		return 'error';
+	} else {
+		try {
+			let o = return_value?.spans?.[return_value.spans.length - 2]?.goals?.error;
+			if (o[1][0][1].includes('Attempt to save an incomplete proof')) {
+				CACHE_extractRocqEndProofNodeState.set(code, 'admit');
+				return 'admit';
+			}
+		} catch (_e) {}
+
+		CACHE_extractRocqEndProofNodeState.set(code, 'done');
+		return 'done';
+	}
 }

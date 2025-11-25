@@ -167,7 +167,6 @@
 	};
 
 	let completion: CompletionState | undefined = $state();
-	let code: string = $state('');
 
 	function updateProofState() {
 		const selected_chunk = chunks[selected];
