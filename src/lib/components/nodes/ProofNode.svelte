@@ -34,6 +34,22 @@
 
 	let timeout: NodeJS.Timeout | undefined = undefined;
 
+	function updateNodeStateDisplay(current_value: ProofNodeValue = value) {
+		if (current_value.initial_state == null) {
+			onNodeValueUpdate(current_value, { ...current_value, state: 'loading' });
+			current_value = { ...current_value, state: 'loading' };
+		}
+		if (timeout) clearTimeout(timeout);
+		timeout = setTimeout(async () => {
+			timeout = undefined;
+			if (!connection) return;
+			const code = getCodeBeforePosition(root, position) + fromProofNodeToRocq(current_value);
+			const result = await extractRocqEndProofNodeState(connection, code);
+
+			onNodeValueUpdate(current_value, { ...current_value, state: result });
+		}, 1000);
+	}
+
 	let cnl_value = {
 		get value() {
 			return fromCnlToSchema(fromTextualToTree(value.value), []);
@@ -51,17 +67,20 @@
 				state: 'loading'
 			};
 			onNodeValueUpdate(value, new_value);
-			if (timeout) clearTimeout(timeout);
-			timeout = setTimeout(async () => {
-				timeout = undefined;
-				if (!connection) return;
-				const value = getCodeBeforePosition(root, position) + fromProofNodeToRocq(new_value);
-				const result = await extractRocqEndProofNodeState(connection, value);
-
-				onNodeValueUpdate(new_value, { ...new_value, state: result });
-			}, 1000);
+			updateNodeStateDisplay(new_value);
 		}
 	};
+
+	let code_before = $derived.by(() => getCodeBeforePosition(root, position));
+	$effect(() => {
+		connection;
+		if (value.state == null) updateNodeStateDisplay();
+	});
+
+	$effect(() => {
+		code_before;
+		updateNodeStateDisplay();
+	});
 
 	function onView(view: EditorView) {
 		view.dom.addEventListener('focusin', () => {
