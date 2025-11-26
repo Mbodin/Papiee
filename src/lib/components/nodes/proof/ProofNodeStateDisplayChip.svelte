@@ -10,7 +10,7 @@
 {#if value !== 'none'}
 	<div
 		class="proofnode-state absolute right-0 bottom-0 flex flex-row flex-nowrap items-center justify-center gap-1 rounded-lg p-2 text-sm select-none"
-		data-state={value}
+		data-state={value || 'loading'}
 	>
 		{#if value === 'admit'}
 			<CircleAlert size="22px" /> Admitted
@@ -18,7 +18,7 @@
 			<CircleX size="22px" /> Error
 		{:else if value === 'done'}
 			<CircleCheck size="22px" /> Success
-		{:else if value === 'loading'}
+		{:else if (value || 'loading') === 'loading'}
 			<LoaderCircle size="22px" class="animate-spin" /> Loading ...
 		{:else if value === 'none'}{/if}
 	</div>

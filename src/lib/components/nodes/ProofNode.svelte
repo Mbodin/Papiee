@@ -12,11 +12,11 @@
 	} from '$lib/notebook/nodes/proof/cnl';
 	import { fromTextualToTree, fromTreeToTextual } from '$lib/cnl/tree';
 	import { extractRocqEndProofNodeState, getCodeBeforePosition } from '$lib/rocq/utils';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
-	import { Portal, Tooltip } from '@skeletonlabs/skeleton-svelte';
-	import { CircleAlert, CircleCheck, CircleX, LoaderCircle } from '@lucide/svelte';
 	import ProofNodeStateDisplayChip from './proof/ProofNodeStateDisplayChip.svelte';
+	import { derived_trivial } from '$lib/svelte/derived.svelte';
+	import { debounced_task } from '$lib/svelte/debounced.svelte';
 
 	let {
 		value,
@@ -32,23 +32,16 @@
 	const worker = getContext<RocqWorker>(WORKER_CONTEXT);
 	let connection = $derived(worker.connection);
 
-	let timeout: NodeJS.Timeout | undefined = undefined;
+	let _code_before = derived_trivial(() => getCodeBeforePosition(root, position));
+	let code_before = $derived(_code_before.value);
 
-	function updateNodeStateDisplay(current_value: ProofNodeValue = value) {
-		if (current_value.initial_state == null) {
-			onNodeValueUpdate(current_value, { ...current_value, state: 'loading' });
-			current_value = { ...current_value, state: 'loading' };
-		}
-		if (timeout) clearTimeout(timeout);
-		timeout = setTimeout(async () => {
-			timeout = undefined;
-			if (!connection) return;
-			const code = getCodeBeforePosition(root, position) + fromProofNodeToRocq(current_value);
-			const result = await extractRocqEndProofNodeState(connection, code);
+	const debounced_updatestate = debounced_task(async (current_value: ProofNodeValue = value) => {
+		if (!connection) return;
+		const code = code_before + fromProofNodeToRocq(current_value);
+		const result = await extractRocqEndProofNodeState(connection, code);
 
-			onNodeValueUpdate(current_value, { ...current_value, state: result });
-		}, 1000);
-	}
+		onNodeValueUpdate(current_value, { ...current_value, state: result });
+	}, 200);
 
 	let cnl_value = {
 		get value() {
@@ -67,20 +60,11 @@
 				state: 'loading'
 			};
 			onNodeValueUpdate(value, new_value);
-			updateNodeStateDisplay(new_value);
+			debounced_updatestate(new_value);
 		}
 	};
 
-	let code_before = $derived.by(() => getCodeBeforePosition(root, position));
-	$effect(() => {
-		connection;
-		if (value.state == null) updateNodeStateDisplay();
-	});
-
-	$effect(() => {
-		code_before;
-		updateNodeStateDisplay();
-	});
+	onMount(() => debounced_updatestate());
 
 	function onView(view: EditorView) {
 		view.dom.addEventListener('focusin', () => {
@@ -90,7 +74,15 @@
 </script>
 
 <div class="border-l-2 p-2">
-	<ProofEditor bind:node={cnl_value.value} {onView} display_goal={true} {root} {position} {value} />
+	<ProofEditor
+		bind:node={cnl_value.value}
+		{onView}
+		display_goal={true}
+		{root}
+		{position}
+		{value}
+		{isAnchored}
+	/>
 
 	<div class="relative w-full">
 		<ProofNodeStateDisplayChip state={value.state} />

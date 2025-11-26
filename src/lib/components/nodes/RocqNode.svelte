@@ -12,9 +12,11 @@
 	} from '$lib/rocq/utils';
 	import { getContext } from 'svelte';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
+	import { derived_trivial } from '$lib/svelte/derived.svelte';
+	import { debounced_task } from '$lib/svelte/debounced.svelte';
 
 	let {
-		value,
+		value: node_value,
 		onNodeValueUpdate,
 		setAnchorNode,
 		mode,
@@ -22,38 +24,45 @@
 		root,
 		position
 	}: NotebookNodeProps<RocqNodeValue> = $props();
-
-	let div: HTMLDivElement | undefined = $state();
-
-	let selected = $state(0);
-	$effect(() => {
-		const code = getCodeBeforePosition(root, position) + value.value;
-		selected;
-		if (isAnchored()) {
-			proof_state_value.value = {
-				code,
-				position: positionAfterString(
-					getCodeBeforePosition(root, position) + value.value.substring(0, selected)
-				)
-			};
-		}
-	});
-
 	const worker = getContext<RocqWorker>(WORKER_CONTEXT);
+	let selected = $state(0);
+	let div: HTMLDivElement | undefined = $state();
 	const connection = $derived(worker.connection);
 
-	let passed = $derived(value.proof_state != null);
+	let _value = derived_trivial(() => node_value.value);
+	let value = $derived(_value.value);
+
+	let _code_before = derived_trivial(() => getCodeBeforePosition(root, position));
+	let code_before = $derived(_code_before.value);
+
+	let _total_code = derived_trivial(() => code_before + value);
+	let total_code = $derived(_total_code.value);
+
+	let _passed = derived_trivial(() => node_value.proof_state != null);
+	let passed = $derived(_passed);
+
+	const debounced_update = debounced_task(() => {
+		proof_state_value.value = {
+			code: total_code,
+			position: positionAfterString(code_before + value.substring(0, selected))
+		};
+	}, 200);
+
+	$effect(() => {
+		if (!isAnchored()) return;
+		code_before;
+		value;
+		selected;
+		debounced_update();
+	});
 
 	$effect(() => {
 		if (passed || !connection) return;
 
-		const code = getCodeBeforePosition(root, position) + value.value;
-		extractRocqEndProofState(connection, code).then((proof_state) => {
-			onNodeValueUpdate(value, { ...value, proof_state });
+		extractRocqEndProofState(connection, total_code).then((proof_state) => {
+			onNodeValueUpdate(node_value, { ...node_value, proof_state });
 		});
 	});
-
-	let string_value = $derived(value.value);
 </script>
 
 {#if mode === 'teacher'}
@@ -108,9 +117,9 @@
 			lang={rocq()}
 			onready={() => {}}
 			bind:value={
-				() => string_value,
+				() => value,
 				(new_value) =>
-					onNodeValueUpdate(value, { ...value, value: new_value, proof_state: undefined })
+					onNodeValueUpdate(node_value, { ...node_value, value: new_value, proof_state: undefined })
 			}
 			extensions={[
 				EditorView.updateListener.of((update) => {

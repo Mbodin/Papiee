@@ -18,5 +18,3 @@ export type RocqStateProps = {
 export let proof_state_value: { value: undefined } | { value: ProofStateProps } = $state({
 	value: undefined
 });
-
-export let proof_state_rocq: GoalAnswer<string, string> | undefined = $state(undefined);

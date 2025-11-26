@@ -35,6 +35,8 @@
 	import type { ProofNodeValue } from '$lib/notebook/nodes/proof/structure';
 	import { ChunkNodeView, plugins as chunk_plugins } from './views/Chunk.svelte';
 	import { fromTreeToTextual } from '$lib/cnl/tree';
+	import { debounced_task } from '$lib/svelte/debounced.svelte';
+	import { derived as _derived } from '$lib/svelte/derived.svelte';
 
 	let {
 		node = $bindable(),
@@ -42,7 +44,8 @@
 		display_goal,
 		root,
 		position,
-		value
+		value,
+		isAnchored
 	}: {
 		node?: Node;
 		onView?: (view: EditorView) => void;
@@ -50,6 +53,7 @@
 		root: NotebookState;
 		position: number[];
 		value: ProofNodeValue;
+		isAnchored: () => boolean;
 	} = $props();
 
 	const nodeViewFactory = useNodeViewFactory();
@@ -144,7 +148,7 @@
 					});
 					selected = _selected;
 					chunks = chunks;
-					updateProofState();
+					debounced_updateproofstate();
 				}
 			}
 		});
@@ -168,7 +172,8 @@
 
 	let completion: CompletionState | undefined = $state();
 
-	function updateProofState() {
+	const debounced_updateproofstate = debounced_task(() => {
+		if (!isAnchored()) return;
 		const selected_chunk = chunks[selected];
 		if (!view || (proof_end_state != 'accessible' && proof_end_state != 'open')) {
 			proof_state_value.value = undefined;
@@ -180,27 +185,36 @@
 				error: selected_chunk?.type === 'error' ? selected_chunk : undefined
 			};
 		}
-	}
+	}, 500);
 
 	$effect(() => {
 		chunks;
 		selected;
 		view;
 		proof_end_state;
-		updateProofState();
+		debounced_updateproofstate();
 	});
 
 	let proof_end_state: RocqEndProofState = $state('nothing');
+	let _code_before = $derived.by(() => getCodeBeforePosition(root, position));
+	let code_before = $state(getCodeBeforePosition(root, position));
+
+	let debounced_updateproofendstate = debounced_task(async () => {
+		const new_state = await extractRocqEndProofState(connection, code_before + '\n');
+		proof_end_state = new_state;
+	}, 1000);
+
+	$effect(() => {
+		if (_code_before !== code_before) {
+			code_before = _code_before;
+		}
+	});
 
 	const worker = getContext<RocqWorker>(WORKER_CONTEXT);
-	let connection = $derived(worker.connection);
+	let connection = $derived(worker.connection!);
 	$effect(() => {
-		root;
-		if (!connection) proof_end_state = 'nothing';
-		else
-			extractRocqEndProofState(connection, getCodeBeforePosition(root, position)).then(
-				(v) => (proof_end_state = v)
-			);
+		code_before;
+		debounced_updateproofendstate();
 	});
 </script>
 

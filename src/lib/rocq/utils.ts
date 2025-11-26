@@ -13,6 +13,10 @@ import * as proto from 'vscode-languageserver-protocol';
 import * as types from 'vscode-languageserver-types';
 import { getRocqFileHeaderContent } from './connection';
 
+export function new_file_name(prefix: string) {
+	return (prefix === '' ? '_' : prefix) + crypto.randomUUID().replaceAll('-', '_') + '.v';
+}
+
 export function positionAfterString(value: string): Position {
 	const line_number = value.includes('\n') ? value.split('\n').length - 1 : 0;
 	const last_line = value.includes('\n') ? value.substring(value.lastIndexOf('\n') + 1) : value;
@@ -22,12 +26,31 @@ export function positionAfterString(value: string): Position {
 	};
 }
 
+export function fromPositionToIndex(value: string, pos: Position): number {
+	if (!value.includes('\n')) {
+		if (pos.line > 0) return value.length;
+		return Math.min(pos.character, value.length);
+	}
+
+	const lines = value.split('\n');
+	if (pos.line >= lines.length) return value.length;
+
+	const character = Math.min(value[pos.line].length, pos.character);
+	return lines.slice(0, pos.line).concat(lines[pos.line].substring(0, character)).join('\n').length;
+}
+
 export function addPosition(pos1: Position, pos2: Position): Position {
 	if (pos2.line === 0) return { line: pos1.line, character: pos1.character + pos1.character };
 	return {
 		line: pos1.line + pos2.line,
 		character: pos2.character
 	};
+}
+
+export function minPosition(pos1: Position, pos2: Position): Position {
+	if (pos2.line > pos1.line) return pos1;
+	if (pos2.line === pos1.line) return pos1.character > pos2.character ? pos2 : pos1;
+	return pos2;
 }
 
 export function getCodeRocqProofStatePosition(root: NotebookState, position: number[]) {
@@ -82,8 +105,7 @@ export async function extractRocqEndProofState(
 	connection: proto.MessageConnection,
 	code: string
 ): Promise<RocqEndProofState> {
-	const uuid = 'extract_rocq_' + crypto.randomUUID().replaceAll('-', '_');
-	let uri = 'file:///exercise/' + uuid + '.v';
+	let uri = 'file:///exercise/' + new_file_name('extract_rocq_');
 	let languageId = 'rocq';
 	let version = 1;
 	let textDocument = types.TextDocumentItem.create(
@@ -125,8 +147,7 @@ export async function extractRocqEndProofNodeState(
 	const cached = CACHE_extractRocqEndProofNodeState.get(code);
 	if (cached) return cached.value;
 
-	const uuid = 'extract_rocq_' + crypto.randomUUID().replaceAll('-', '_');
-	let uri = 'file:///exercise/' + uuid + '.v';
+	let uri = 'file:///exercise/' + new_file_name('extract_rocq_');
 	let languageId = 'rocq';
 	let version = 1;
 	let textDocument = types.TextDocumentItem.create(uri, languageId, version, code);
