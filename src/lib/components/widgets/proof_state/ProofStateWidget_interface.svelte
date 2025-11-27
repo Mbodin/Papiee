@@ -3,15 +3,9 @@
 	import { getContext } from 'svelte';
 	import ProofStateWidget from './ProofStateWidget.svelte';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
-	import * as proto from 'vscode-languageserver-protocol';
 	import * as types from 'vscode-languageserver-types';
 	import type { GoalAnswer } from '$lib/rocq/type';
-	import {
-		fromPositionToIndex,
-		minPosition,
-		new_file_name,
-		positionAfterString
-	} from '$lib/rocq/utils';
+	import { fromPositionToIndex, minPosition, positionAfterString } from '$lib/rocq/utils';
 	import { debounced_get } from '$lib/svelte/debounced.svelte';
 	import { derived as _derived, derived_trivial } from '$lib/svelte/derived.svelte';
 	import { Loader } from '@lucide/svelte';
@@ -50,24 +44,14 @@
 			if (!connection) {
 				return undefined;
 			}
-			let uri = 'file:///exercise/' + new_file_name('extract_rocq_');
-			let languageId = 'rocq';
-			let version = 1;
-
-			let textDocument = types.TextDocumentItem.create(uri, languageId, version, code);
-			let openParams: proto.DidOpenTextDocumentParams = { textDocument };
-			await connection
-				.sendNotification(proto.DidOpenTextDocumentNotification.type, openParams)
-				.catch(console.error);
-			const value = await connection
-				.sendRequest('proof/goals', {
-					textDocument: { uri, version } satisfies proto.VersionedTextDocumentIdentifier,
+			return await connection.transient_file(async ({ document }) => {
+				return (await connection.sendRequest('proof/goals', {
+					textDocument: { uri: document.uri, version: document.version },
 					position: { ...position },
 					pp_format: 'Str',
 					mode: 'After'
-				})
-				.catch(console.error);
-			return value as GoalAnswer<string, string>;
+				})) as GoalAnswer<string, string>;
+			}, code);
 		},
 		1000
 	);

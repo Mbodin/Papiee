@@ -6,7 +6,7 @@
 	import { EditorView } from 'codemirror';
 	import { proof_state_value } from '$lib/notebook/widgets/proof_state/state.svelte';
 	import {
-		extractRocqEndProofState,
+		lsp_getProofEndState,
 		getCodeBeforePosition,
 		positionAfterString
 	} from '$lib/rocq/utils';
@@ -59,7 +59,7 @@
 	$effect(() => {
 		if (passed || !connection) return;
 
-		extractRocqEndProofState(connection, total_code).then((proof_state) => {
+		lsp_getProofEndState(connection, total_code).then((proof_state) => {
 			onNodeValueUpdate(node_value, { ...node_value, proof_state });
 		});
 	});

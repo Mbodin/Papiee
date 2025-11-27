@@ -3,6 +3,8 @@ import * as proto from 'vscode-languageserver-protocol';
 import * as types from 'vscode-languageserver-types';
 
 import * as raw from '$lib/../../rocq/rocq.json';
+import type { MessageConnection } from './type';
+import { transient_file_consume } from './transient_file';
 
 const rocqDumpFile = raw as RocqDumpFile;
 
@@ -19,7 +21,7 @@ export function getRocqFileHeaderContent(): string {
 	);
 }
 
-export async function create(origin: string): Promise<proto.MessageConnection> {
+export async function create(origin: string): Promise<MessageConnection> {
 	let wuri = 'wasm-bin/wacoq_worker.js';
 
 	let worker = new Worker(wuri);
@@ -27,16 +29,21 @@ export async function create(origin: string): Promise<proto.MessageConnection> {
 
 	let reader = new BrowserMessageReader(worker);
 	let writer = new BrowserMessageWriter(worker);
-	let conn = proto.createMessageConnection(reader, writer);
+	let connection = proto.createMessageConnection(reader, writer);
 
-	conn.listen();
-	return conn;
+	connection.listen();
+
+	(connection as MessageConnection).transient_file = (async (consumer, content) => {
+		return transient_file_consume(connection as MessageConnection, consumer, content);
+	}) as MessageConnection['transient_file'];
+
+	return connection as MessageConnection;
 }
 
 export async function initialize(
-	connection: proto.MessageConnection,
+	connection: MessageConnection,
 	params: Partial<proto.InitializeParams> = {}
-) {
+): Promise<MessageConnection> {
 	let initializeParameters: proto.InitializeParams = {
 		...params,
 		processId: null,
@@ -52,7 +59,7 @@ export async function initialize(
 		}
 	};
 
-	// connection.onNotification(proto.LogTraceNotification.type, (e) => console.log(e.message));
+	connection.onNotification(proto.LogTraceNotification.type, (e) => console.log(e.message));
 
 	await connection.sendNotification(proto.SetTraceNotification.type, { value: 'verbose' });
 	await connection.sendRequest(proto.InitializeRequest.type, initializeParameters);
@@ -87,15 +94,15 @@ export async function initialize(
 		})
 	);
 
-	return connection;
+	return connection as MessageConnection;
 }
 
-export async function close(connection: proto.MessageConnection) {
+export async function close(connection: MessageConnection) {
 	await connection.sendNotification(proto.ExitNotification.type);
 	return connection;
 }
 
 export const WORKER_CONTEXT = 'worker-connection';
 export type RocqWorker = {
-	connection: proto.MessageConnection | undefined;
+	connection: MessageConnection | undefined;
 };

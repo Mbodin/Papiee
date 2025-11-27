@@ -16,7 +16,7 @@
 	import type { NotebookState } from '$lib/notebook/structure';
 	import {
 		assembleCodeFromChunks,
-		extractRocqEndProofState,
+		lsp_getProofEndState,
 		getCodeBeforePosition
 	} from '$lib/rocq/utils';
 	import type { RocqEndProofState } from '$lib/notebook/nodes/rocq/structure';
@@ -200,7 +200,7 @@
 	let code_before = $state(getCodeBeforePosition(root, position));
 
 	let debounced_updateproofendstate = debounced_task(async () => {
-		const new_state = await extractRocqEndProofState(connection, code_before + '\n');
+		const new_state = await lsp_getProofEndState(connection, code_before + '\n');
 		proof_end_state = new_state;
 	}, 1000);
 

@@ -1,21 +1,13 @@
 import { Cache } from '$lib/cache';
-import { newCnlParser } from '$lib/cnl/chunks/parser';
 import type { CnlChunk } from '$lib/cnl/chunks/types';
-import { getTactics } from '$lib/cnl/cnl_tactic';
-import { fromTextualToTree } from '$lib/cnl/tree';
-import { fromCnlToSchema, fromProofNodeToRocq } from '$lib/notebook/nodes/proof/cnl';
+import { fromProofNodeToRocq } from '$lib/notebook/nodes/proof/cnl';
 import type { ProofNodeState, ProofNodeValue } from '$lib/notebook/nodes/proof/structure';
 import type { RocqEndProofState, RocqNodeValue } from '$lib/notebook/nodes/rocq/structure';
 import type { NotebookState } from '$lib/notebook/structure';
 import { comparePosition, visit } from '$lib/notebook/utils';
 import type { Position } from 'vscode-languageserver-protocol';
-import * as proto from 'vscode-languageserver-protocol';
-import * as types from 'vscode-languageserver-types';
 import { getRocqFileHeaderContent } from './connection';
-
-export function new_file_name(prefix: string) {
-	return (prefix === '' ? '_' : prefix) + crypto.randomUUID().replaceAll('-', '_') + '.v';
-}
+import type { MessageConnection } from './type';
 
 export function positionAfterString(value: string): Position {
 	const line_number = value.includes('\n') ? value.split('\n').length - 1 : 0;
@@ -101,45 +93,32 @@ export function assembleCodeFromChunks(
 	return text;
 }
 
-export async function extractRocqEndProofState(
-	connection: proto.MessageConnection,
+export async function lsp_getProofEndState(
+	connection: MessageConnection,
 	code: string
 ): Promise<RocqEndProofState> {
-	let uri = 'file:///exercise/' + new_file_name('extract_rocq_');
-	let languageId = 'rocq';
-	let version = 1;
-	let textDocument = types.TextDocumentItem.create(
-		uri,
-		languageId,
-		version,
+	return connection.transient_file(
+		async ({ document }) => {
+			const return_value: any = await connection.sendRequest('coq/getDocument', {
+				textDocument: document,
+				goals: 'Str',
+				ast: true
+			});
+
+			let o = return_value?.spans?.[return_value.spans.length - 2]?.ast?.v?.expr?.[1]?.[0];
+			if (o == null) return 'nothing';
+			else if (o === 'VernacProof' || o === 'VernacExtend') return 'open';
+			else if (o === 'VernacStartTheoremProof') return 'accessible';
+			else return 'nothing';
+		},
 		code.replaceAll(/\u00A0/g, ' ')
 	);
-
-	let openParams: proto.DidOpenTextDocumentParams = { textDocument };
-	await connection
-		.sendNotification(proto.DidOpenTextDocumentNotification.type, openParams)
-		.catch(console.error);
-	const return_value: any = await connection.sendRequest('coq/getDocument', {
-		textDocument,
-		goals: 'Str',
-		ast: true
-	});
-
-	await connection
-		.sendNotification(proto.DidDeleteFilesNotification.type, { files: [{ uri }] })
-		.catch(console.error);
-
-	let o = return_value?.spans?.[return_value.spans.length - 2]?.ast?.v?.expr?.[1]?.[0];
-	if (o == null) return 'nothing';
-	else if (o === 'VernacProof' || o === 'VernacExtend') return 'open';
-	else if (o === 'VernacStartTheoremProof') return 'accessible';
-	else return 'nothing';
 }
 
 const CACHE_extractRocqEndProofNodeState = new Cache<string, ProofNodeState>(128);
 
-export async function extractRocqEndProofNodeState(
-	connection: proto.MessageConnection,
+export async function lsp_getProofBeginState(
+	connection: MessageConnection,
 	code: string
 ): Promise<ProofNodeState> {
 	code = code.replaceAll(/\u00A0/g, ' ') + 'Qed.';
@@ -147,39 +126,28 @@ export async function extractRocqEndProofNodeState(
 	const cached = CACHE_extractRocqEndProofNodeState.get(code);
 	if (cached) return cached.value;
 
-	let uri = 'file:///exercise/' + new_file_name('extract_rocq_');
-	let languageId = 'rocq';
-	let version = 1;
-	let textDocument = types.TextDocumentItem.create(uri, languageId, version, code);
+	return connection.transient_file(async ({ document }) => {
+		const return_value: any = await connection.sendRequest('coq/getDocument', {
+			textDocument: document,
+			goals: 'Str',
+			ast: true
+		});
 
-	let openParams: proto.DidOpenTextDocumentParams = { textDocument };
-	await connection
-		.sendNotification(proto.DidOpenTextDocumentNotification.type, openParams)
-		.catch(console.error);
-	const return_value: any = await connection.sendRequest('coq/getDocument', {
-		textDocument,
-		goals: 'Str',
-		ast: true
-	});
+		const errors = return_value.spans.filter((v: any) => 'error' in v.goals);
+		if (errors.length > 1) {
+			CACHE_extractRocqEndProofNodeState.set(code, 'error');
+			return 'error';
+		} else {
+			try {
+				let o = return_value?.spans?.[return_value.spans.length - 2]?.goals?.error;
+				if (o[1][0][1].includes('Attempt to save an incomplete proof')) {
+					CACHE_extractRocqEndProofNodeState.set(code, 'admit');
+					return 'admit';
+				}
+			} catch (_e) {}
 
-	await connection
-		.sendNotification(proto.DidDeleteFilesNotification.type, { files: [{ uri }] })
-		.catch(console.error);
-
-	const errors = return_value.spans.filter((v: any) => 'error' in v.goals);
-	if (errors.length > 1) {
-		CACHE_extractRocqEndProofNodeState.set(code, 'error');
-		return 'error';
-	} else {
-		try {
-			let o = return_value?.spans?.[return_value.spans.length - 2]?.goals?.error;
-			if (o[1][0][1].includes('Attempt to save an incomplete proof')) {
-				CACHE_extractRocqEndProofNodeState.set(code, 'admit');
-				return 'admit';
-			}
-		} catch (_e) {}
-
-		CACHE_extractRocqEndProofNodeState.set(code, 'done');
-		return 'done';
-	}
+			CACHE_extractRocqEndProofNodeState.set(code, 'done');
+			return 'done';
+		}
+	}, code);
 }
