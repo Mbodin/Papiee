@@ -59,7 +59,7 @@ export async function initialize(
 		}
 	};
 
-	connection.onNotification(proto.LogTraceNotification.type, (e) => console.log(e.message));
+	// connection.onNotification(proto.LogTraceNotification.type, (e) => console.log(e.message));
 
 	await connection.sendNotification(proto.SetTraceNotification.type, { value: 'verbose' });
 	await connection.sendRequest(proto.InitializeRequest.type, initializeParameters);

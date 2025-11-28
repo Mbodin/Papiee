@@ -21,7 +21,7 @@
 
 			const a_v = fromPositionToIndex(a.code, a.position || positionAfterString(a.code));
 			const b_v = fromPositionToIndex(b.code, b.position || positionAfterString(b.code));
-			return a.code.substring(0, a_v).trim() === b.code.substring(0, b_v).trim();
+			return a.code.substring(0, a_v) === b.code.substring(0, b_v);
 		}
 	);
 
@@ -43,14 +43,19 @@
 			if (!connection) {
 				return undefined;
 			}
-			return await connection.transient_file(({ document }) => {
-				return connection.sendRequest('proof/goals', {
-					textDocument: { uri: document.uri, version: document.version },
-					position: { ...position },
-					pp_format: 'Str',
-					mode: 'After'
-				}) as Promise<GoalAnswer<string, string>>;
-			}, code);
+			console.log('='.repeat(20));
+			console.log(code);
+			return await connection.transient_file(
+				({ document }) => {
+					return connection.sendRequest('proof/goals', {
+						textDocument: { uri: document.uri, version: document.version },
+						position: { ...position },
+						pp_format: 'Str',
+						mode: 'After'
+					}) as Promise<GoalAnswer<string, string>>;
+				},
+				{ text: code, uri: 'file:///exercise/exercise.v' }
+			);
 		},
 		20
 	);

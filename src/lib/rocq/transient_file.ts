@@ -20,9 +20,18 @@ export function findExistingTransientFile(content: string): types.TextDocumentIt
 export async function transient_file_consume<T>(
 	connection: MessageConnection,
 	consumer: (value: { uri: string; document: types.TextDocumentItem }) => T,
-	content?: string
+	preset: Partial<proto.TextDocumentItem> = {}
 ): Promise<T> {
-	const existing = content ? findExistingTransientFile(content) : undefined;
+	const existing_document = preset.text ? findExistingTransientFile(preset.text) : undefined;
+	const document: types.TextDocumentItem = {
+		languageId: 'rocq',
+		uri:
+			preset.uri ||
+			existing_document?.uri ||
+			'file:///exercise/_' + crypto.randomUUID().replaceAll('-', '_') + '.v',
+		version: preset.version || existing_document?.version || 1,
+		text: preset.text || ''
+	};
 
 	[...toremove].forEach((uri) => {
 		connection
@@ -35,20 +44,18 @@ export async function transient_file_consume<T>(
 			});
 	});
 
-	let document =
-		existing ||
-		types.TextDocumentItem.create(
-			'file:///exercise/_' + crypto.randomUUID().replaceAll('-', '_') + '.v',
-			'rocq',
-			1,
-			content || ''
-		);
-	if (content && !existing) {
-		let openParams: proto.DidOpenTextDocumentParams = { textDocument: document };
+	if (
+		preset.text &&
+		(!existing_document || preset.uri) &&
+		(!existing_document || existing_document.text !== preset.text)
+	) {
+		let openParams: proto.DidOpenTextDocumentParams = {
+			textDocument: document
+		};
 		await connection
 			.sendNotification(proto.DidOpenTextDocumentNotification.type, openParams)
 			.catch(console.error);
-		transient_file_cache.set(document.uri, document);
+		if (!preset.uri) transient_file_cache.set(document.uri, document);
 	}
 	return consumer({ uri: document.uri, document });
 }

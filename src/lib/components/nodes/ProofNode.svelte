@@ -41,7 +41,7 @@
 		const result = await lsp_getProofBeginState(connection, code);
 
 		onNodeValueUpdate(current_value, { ...current_value, state: result });
-	}, 0);
+	}, 1000);
 
 	let cnl_value = {
 		get value() {

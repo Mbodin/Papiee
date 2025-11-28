@@ -111,7 +111,7 @@ export async function lsp_getProofEndState(
 			else if (o === 'VernacStartTheoremProof') return 'accessible';
 			else return 'nothing';
 		},
-		code.replaceAll(/\u00A0/g, ' ')
+		{ text: code.replaceAll(/\u00A0/g, ' ') }
 	);
 }
 
@@ -126,28 +126,31 @@ export async function lsp_getProofBeginState(
 	const cached = CACHE_extractRocqEndProofNodeState.get(code);
 	if (cached) return cached.value;
 
-	return connection.transient_file(async ({ document }) => {
-		const return_value: any = await connection.sendRequest('coq/getDocument', {
-			textDocument: document,
-			goals: 'Str',
-			ast: true
-		});
+	return connection.transient_file(
+		async ({ document }) => {
+			const return_value: any = await connection.sendRequest('coq/getDocument', {
+				textDocument: document,
+				goals: 'Str',
+				ast: true
+			});
 
-		const errors = return_value.spans.filter((v: any) => 'error' in v.goals);
-		if (errors.length > 1) {
-			CACHE_extractRocqEndProofNodeState.set(code, 'error');
-			return 'error';
-		} else {
-			try {
-				let o = return_value?.spans?.[return_value.spans.length - 2]?.goals?.error;
-				if (o[1][0][1].includes('Attempt to save an incomplete proof')) {
-					CACHE_extractRocqEndProofNodeState.set(code, 'admit');
-					return 'admit';
-				}
-			} catch (_e) {}
+			const errors = return_value.spans.filter((v: any) => 'error' in v.goals);
+			if (errors.length > 1) {
+				CACHE_extractRocqEndProofNodeState.set(code, 'error');
+				return 'error';
+			} else {
+				try {
+					let o = return_value?.spans?.[return_value.spans.length - 2]?.goals?.error;
+					if (o[1][0][1].includes('Attempt to save an incomplete proof')) {
+						CACHE_extractRocqEndProofNodeState.set(code, 'admit');
+						return 'admit';
+					}
+				} catch (_e) {}
 
-			CACHE_extractRocqEndProofNodeState.set(code, 'done');
-			return 'done';
-		}
-	}, code);
+				CACHE_extractRocqEndProofNodeState.set(code, 'done');
+				return 'done';
+			}
+		},
+		{ text: code }
+	);
 }
