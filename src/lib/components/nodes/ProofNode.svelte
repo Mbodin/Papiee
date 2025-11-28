@@ -15,7 +15,7 @@
 	import { getContext, onMount } from 'svelte';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
 	import ProofNodeStateDisplayChip from './proof/ProofNodeStateDisplayChip.svelte';
-	import { derived_trivial } from '$lib/svelte/derived.svelte';
+	import { value_derived_trivial } from '$lib/svelte/derived.svelte';
 	import { debounced_task } from '$lib/svelte/debounced.svelte';
 
 	let {
@@ -32,7 +32,7 @@
 	const worker = getContext<RocqWorker>(WORKER_CONTEXT);
 	let connection = $derived(worker.connection);
 
-	let _code_before = derived_trivial(() => getCodeBeforePosition(root, position));
+	let _code_before = value_derived_trivial(() => getCodeBeforePosition(root, position));
 	let code_before = $derived(_code_before.value);
 
 	const debounced_updatestate = debounced_task(async (current_value: ProofNodeValue = value) => {

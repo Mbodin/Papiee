@@ -7,11 +7,11 @@
 	import type { GoalAnswer } from '$lib/rocq/type';
 	import { fromPositionToIndex, minPosition, positionAfterString } from '$lib/rocq/utils';
 	import { debounced_get } from '$lib/svelte/debounced.svelte';
-	import { derived as _derived, derived_trivial } from '$lib/svelte/derived.svelte';
+	import { value_derived, value_derived_trivial } from '$lib/svelte/derived.svelte';
 	import { Loader } from '@lucide/svelte';
 	import Draggable from '$lib/components/Draggable.svelte';
 
-	const proof_state_value = _derived(
+	const proof_state_value = value_derived(
 		() => imported_proof_state_value.value,
 		(a, b) => {
 			if (!a && !b) return true;
@@ -32,7 +32,7 @@
 		proof_state_value.value?.position || positionAfterString(proof_state_value.value?.code || '')
 	);
 	let value = $derived(proof_state_value.value);
-	let _code = derived_trivial(() => proof_state_value.value?.code || '');
+	let _code = value_derived_trivial(() => proof_state_value.value?.code || '');
 	let code = $derived(_code.value);
 
 	const debounced_extraction = debounced_get(

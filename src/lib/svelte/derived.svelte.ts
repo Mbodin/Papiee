@@ -1,4 +1,4 @@
-export function derived<T>(getter: () => T, equal: (a: T, b: T) => boolean) {
+export function value_derived<T>(getter: () => T, equal: (a: T, b: T) => boolean) {
 	let derived_state = $derived.by(getter);
 
 	let cached_value = $state(derived_state);
@@ -14,6 +14,6 @@ export function derived<T>(getter: () => T, equal: (a: T, b: T) => boolean) {
 	};
 }
 
-export function derived_trivial<T extends number | string | boolean>(getter: () => T) {
-	return derived(getter, (a, b) => a === b);
+export function value_derived_trivial<T extends number | string | boolean>(getter: () => T) {
+	return value_derived(getter, (a, b) => a === b);
 }

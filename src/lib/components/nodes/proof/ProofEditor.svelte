@@ -36,7 +36,6 @@
 	import { ChunkNodeView, plugins as chunk_plugins } from './views/Chunk.svelte';
 	import { fromTreeToTextual } from '$lib/cnl/tree';
 	import { debounced_task } from '$lib/svelte/debounced.svelte';
-	import { derived as _derived } from '$lib/svelte/derived.svelte';
 
 	let {
 		node = $bindable(),

@@ -13,7 +13,7 @@
 	} from '$lib/rocq/utils';
 	import { getContext } from 'svelte';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
-	import { derived_trivial } from '$lib/svelte/derived.svelte';
+	import { value_derived_trivial } from '$lib/svelte/derived.svelte';
 	import { debounced_task } from '$lib/svelte/debounced.svelte';
 
 	let {
@@ -30,16 +30,16 @@
 	let div: HTMLDivElement | undefined = $state();
 	const connection = $derived(worker.connection);
 
-	let _value = derived_trivial(() => node_value.value);
+	let _value = value_derived_trivial(() => node_value.value);
 	let value = $derived(_value.value);
 
-	let _code_before = derived_trivial(() => getCodeBeforePosition(root, position));
+	let _code_before = value_derived_trivial(() => getCodeBeforePosition(root, position));
 	let code_before = $derived(_code_before.value);
 
-	let _total_code = derived_trivial(() => code_before + value);
+	let _total_code = value_derived_trivial(() => code_before + value);
 	let total_code = $derived(_total_code.value);
 
-	let _passed = derived_trivial(() => node_value.proof_state != null);
+	let _passed = value_derived_trivial(() => node_value.proof_state != null);
 	let passed = $derived(_passed);
 
 	const debounced_update = debounced_task(() => {
