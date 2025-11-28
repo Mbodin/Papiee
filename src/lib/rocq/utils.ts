@@ -27,7 +27,7 @@ export function fromPositionToIndex(value: string, pos: Position): number {
 	const lines = value.split('\n');
 	if (pos.line >= lines.length) return value.length;
 
-	const character = Math.min(value[pos.line].length, pos.character);
+	const character = Math.min(lines[pos.line].length, pos.character);
 	return lines.slice(0, pos.line).concat(lines[pos.line].substring(0, character)).join('\n').length;
 }
 

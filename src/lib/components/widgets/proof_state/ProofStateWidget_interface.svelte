@@ -21,8 +21,7 @@
 
 			const a_v = fromPositionToIndex(a.code, a.position || positionAfterString(a.code));
 			const b_v = fromPositionToIndex(b.code, b.position || positionAfterString(b.code));
-
-			return a.code.substring(a_v).trim() === b.code.substring(b_v).trim();
+			return a.code.substring(0, a_v).trim() === b.code.substring(0, b_v).trim();
 		}
 	);
 
@@ -44,16 +43,16 @@
 			if (!connection) {
 				return undefined;
 			}
-			return await connection.transient_file(async ({ document }) => {
-				return (await connection.sendRequest('proof/goals', {
+			return await connection.transient_file(({ document }) => {
+				return connection.sendRequest('proof/goals', {
 					textDocument: { uri: document.uri, version: document.version },
 					position: { ...position },
 					pp_format: 'Str',
 					mode: 'After'
-				})) as GoalAnswer<string, string>;
+				}) as Promise<GoalAnswer<string, string>>;
 			}, code);
 		},
-		1000
+		20
 	);
 	let loading = $derived(debounced_extraction.waiting || debounced_extraction.running);
 

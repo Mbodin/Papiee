@@ -32,7 +32,6 @@
 
 	let document_size = $state({ width: 0, height: 0 });
 	function onResize() {
-		console.log('HH');
 		document_size = {
 			width: document.body.clientWidth,
 			height: document.body.clientHeight

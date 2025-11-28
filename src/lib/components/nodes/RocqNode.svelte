@@ -8,7 +8,8 @@
 	import {
 		lsp_getProofEndState,
 		getCodeBeforePosition,
-		positionAfterString
+		positionAfterString,
+		fromPositionToIndex
 	} from '$lib/rocq/utils';
 	import { getContext } from 'svelte';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';

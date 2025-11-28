@@ -33,7 +33,7 @@ export async function create(origin: string): Promise<MessageConnection> {
 
 	connection.listen();
 
-	(connection as MessageConnection).transient_file = (async (consumer, content) => {
+	(connection as MessageConnection).transient_file = ((consumer, content) => {
 		return transient_file_consume(connection as MessageConnection, consumer, content);
 	}) as MessageConnection['transient_file'];
 
