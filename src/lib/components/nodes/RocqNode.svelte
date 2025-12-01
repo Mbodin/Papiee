@@ -42,7 +42,6 @@
 	let passed = $derived(_passed);
 
 	const debounced_update = debounced_task(() => {
-		console.log('IIII', total_code);
 		proof_state_value.value = {
 			code: total_code,
 			position: positionAfterString(code_before + value.substring(0, selected))

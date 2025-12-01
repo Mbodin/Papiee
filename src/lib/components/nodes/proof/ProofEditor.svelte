@@ -36,6 +36,7 @@
 	import { ChunkNodeView, plugins as chunk_plugins } from './views/Chunk.svelte';
 	import { fromTreeToTextual } from '$lib/cnl/tree';
 	import { debounced_task } from '$lib/svelte/debounced.svelte';
+	import { value_derived_trivial } from '$lib/svelte/derived.svelte';
 
 	let {
 		node = $bindable(),
@@ -195,19 +196,13 @@
 	});
 
 	let proof_end_state: RocqEndProofState = $state('nothing');
-	let _code_before = $derived.by(() => getCodeBeforePosition(root, position));
-	let code_before = $state(getCodeBeforePosition(root, position));
+	let _code_before = value_derived_trivial(() => getCodeBeforePosition(root, position));
+	let code_before = $derived(_code_before.value);
 
 	let debounced_updateproofendstate = debounced_task(async () => {
 		const new_state = await lsp_getProofEndState(connection, code_before + '\n');
 		proof_end_state = new_state;
 	}, 1000);
-
-	$effect(() => {
-		if (_code_before !== code_before) {
-			code_before = _code_before;
-		}
-	});
 
 	const worker = getContext<RocqWorker>(WORKER_CONTEXT);
 	let connection = $derived(worker.connection!);

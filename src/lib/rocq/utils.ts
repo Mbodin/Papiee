@@ -5,7 +5,12 @@ import type { ProofNodeState, ProofNodeValue } from '$lib/notebook/nodes/proof/s
 import type { RocqEndProofState, RocqNodeValue } from '$lib/notebook/nodes/rocq/structure';
 import type { NotebookState } from '$lib/notebook/structure';
 import { comparePosition, visit } from '$lib/notebook/utils';
-import type { Position } from 'vscode-languageserver-protocol';
+import {
+	DocumentDiagnosticRequest,
+	DocumentSymbolRequest,
+	PublishDiagnosticsNotification,
+	type Position
+} from 'vscode-languageserver-protocol';
 import { getRocqFileHeaderContent } from './connection';
 import type { MessageConnection } from './type';
 
@@ -99,17 +104,36 @@ export async function lsp_getProofEndState(
 ): Promise<RocqEndProofState> {
 	return connection.transient_file(
 		async ({ document }) => {
-			const return_value: any = await connection.sendRequest('coq/getDocument', {
-				textDocument: document,
-				goals: 'Str',
-				ast: true
+			let ast_spans: [string, [string, ...any]][] = await connection
+				.sendRequest('coq/getDocument', {
+					textDocument: document,
+					goals: 'Str',
+					ast: true
+				})
+				.then((v: any) => v.spans.filter((v: any) => 'ast' in v).map((v: any) => v.ast.v.expr));
+
+			let last_endproof_i = ast_spans.findIndex(
+				(v: any) => v[0] === 'VernacSynPure' && v[1][0] === 'VernacEndProof'
+			);
+
+			let after_last = ast_spans.slice(last_endproof_i + 1);
+
+			let begin_i = ast_spans.findIndex((v: [string, [string, ...any]]) => {
+				if (v[0] === 'VernacSynPure') {
+					if (v[1][0] === 'VernacDefinition') return true;
+					if (v[1][0] === 'VernacStartTheoremProof') return true;
+				}
+
+				return false;
 			});
 
-			let o = return_value?.spans?.[return_value.spans.length - 2]?.ast?.v?.expr?.[1]?.[0];
-			if (o == null) return 'nothing';
-			else if (o === 'VernacProof' || o === 'VernacExtend') return 'open';
-			else if (o === 'VernacStartTheoremProof') return 'accessible';
-			else return 'nothing';
+			let begin = ast_spans[begin_i];
+
+			if (begin == null) return 'nothing';
+
+			let opened = after_last.find((v) => v[0] === 'VernacSynPure' && v[1][0] === 'VernacProof');
+
+			return opened ? 'open' : 'accessible';
 		},
 		{ text: code.replaceAll(/\u00A0/g, ' ') }
 	);

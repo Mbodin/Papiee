@@ -43,8 +43,6 @@
 			if (!connection) {
 				return undefined;
 			}
-			console.log('='.repeat(20));
-			console.log(code);
 			return await connection.transient_file(
 				({ document }) => {
 					return connection.sendRequest('proof/goals', {
