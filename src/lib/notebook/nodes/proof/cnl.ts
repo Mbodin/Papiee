@@ -172,20 +172,22 @@ export function fromProofNodeToRocq(value: ProofNodeValue) {
 		.join('');
 }
 
-function getInlinePosition(position: ResolvedPos): number {
-	const type = position.node().type.name;
+function getInlinePosition($p: ResolvedPos): number {
+	const type = $p.node().type.name;
+	if ($p.pos === 0) return 0;
 
-	if (position.pos === 0) return 0;
-
-	if (position.parentOffset === 0 && type === schema.nodes.line.name) return 0;
-
-	return (
-		(type === schema.nodes.math.name ? 1 : 0) +
-		(type === schema.nodes.chunk.name || type === schema.nodes.math.name
-			? position.parentOffset
-			: 0) +
-		getInlinePosition(position.$decrement(position.parentOffset + 1))
-	);
+	if (type === schema.nodes.line.name) {
+		if ($p.pos === $p.$start().pos) return 0; // We can't exit the line
+		// Either start of line, or just before start of chunks : in both case there is no character so we increment the position alone
+		return getInlinePosition($p.$decrement());
+	} else if (type === schema.nodes.chunk.name) {
+		const size = $p.parentOffset;
+		return size + getInlinePosition($p.$before());
+	} else if (type === schema.nodes.math.name) {
+		const size = $p.parentOffset + 1;
+		return size + getInlinePosition($p.$before());
+	}
+	throw new Error('Should not happen (generic)');
 }
 
 function getSchemaPosition($p: ResolvedPos, value: number): ResolvedPos {
