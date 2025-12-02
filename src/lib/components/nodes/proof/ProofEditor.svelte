@@ -37,6 +37,7 @@
 	import { fromTreeToTextual } from '$lib/cnl/tree';
 	import { debounced_task } from '$lib/svelte/debounced.svelte';
 	import { value_derived_trivial } from '$lib/svelte/derived.svelte';
+	import { plugins as math_plugins, MathLiveNodeView } from './views/Math';
 
 	let {
 		node = $bindable(),
@@ -79,7 +80,8 @@
 				paragraph_plugins,
 				doc_plugins,
 				line_plugins,
-				content_plugins
+				content_plugins,
+				math_plugins
 			].flat()
 		});
 		view = new EditorView(element, {
@@ -89,7 +91,9 @@
 				doc: DocNodeView(nodeViewFactory),
 				line: LineNodeView(nodeViewFactory),
 				content: ContentNodeView(nodeViewFactory),
-				chunk: ChunkNodeView(nodeViewFactory)
+				chunk: ChunkNodeView(nodeViewFactory),
+				math: (node, view, getPos, decorations, innerDecorations) =>
+					new MathLiveNodeView(node, view, getPos, decorations, innerDecorations)
 			},
 
 			attributes(state) {

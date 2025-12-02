@@ -1,0 +1,29 @@
+.math-node {
+	color-scheme: light;
+	min-height: 28px;
+}
+
+.math-node math-field:focus-within {
+	outline: none;
+	background: rgba(200, 200, 255, 0.2);
+}
+
+.math-node math-field::part(container) {
+	padding: 0px !important;
+	--_contains-highlight-background-color: unset;
+}
+
+.math-node math-field::part(container) {
+	padding: 0px !important;
+}
+
+.math-node math-field::part(content) {
+	padding: 0px !important;
+}
+
+.math-node math-field::part(virtual-keyboard-toggle) {
+	display: none;
+}
+.math-node math-field::part(menu-toggle) {
+	display: none;
+}

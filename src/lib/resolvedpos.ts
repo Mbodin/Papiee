@@ -8,8 +8,8 @@ declare module 'prosemirror-model' {
 		$before(depth?: number | null): ResolvedPos;
 		$after(depth?: number | null): ResolvedPos;
 		$posAtIndex(index: number, depth?: number | null): ResolvedPos;
-		$decrement(): ResolvedPos;
-		$increment(): ResolvedPos;
+		$decrement(value?: number): ResolvedPos;
+		$increment(value?: number): ResolvedPos;
 		tree_position(): number[];
 		$from_tree(tree: number[]): ResolvedPos;
 	}
@@ -34,11 +34,11 @@ ResolvedPos.prototype.$after = function (depth) {
 ResolvedPos.prototype.$posAtIndex = function (index, depth) {
 	return this.$(this.posAtIndex(index, depth));
 };
-ResolvedPos.prototype.$decrement = function () {
-	return this.$(this.pos - 1);
+ResolvedPos.prototype.$decrement = function (v = 1) {
+	return this.$(this.pos - v);
 };
-ResolvedPos.prototype.$increment = function () {
-	return this.$(this.pos + 1);
+ResolvedPos.prototype.$increment = function (v = 1) {
+	return this.$(this.pos + v);
 };
 ResolvedPos.prototype.tree_position = function () {
 	const value = this;

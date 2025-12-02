@@ -51,7 +51,10 @@ export function fromSchemaToCnl(node: Node): { root: CnlRoot; chunks: CnlChunk[]
 			throw new Error('fromSchemaLineToCnlLine must be called with a line node');
 		}
 
-		const value = node.textContent;
+		const value = node.children
+			.map((chunk) => chunk.children.map((v) => fromSchemaInlineToString(v)))
+			.flat()
+			.join('');
 
 		chunks.push(
 			...node.children
@@ -72,6 +75,12 @@ export function fromSchemaToCnl(node: Node): { root: CnlRoot; chunks: CnlChunk[]
 		},
 		chunks
 	};
+}
+
+function fromSchemaInlineToString(node: Node): string {
+	if (node.type.name === schema.nodes.text.name) return node.textContent;
+	if (node.type.name === schema.nodes.math.name) return `$${node.textContent}$`;
+	return '';
 }
 
 export function fromCnlToSchema(root: CnlRoot, chunks: CnlChunk[]) {
@@ -117,12 +126,30 @@ export function fromCnlToSchema(root: CnlRoot, chunks: CnlChunk[]) {
 
 				return schema.nodes.chunk.create(
 					{ value: [chunk] },
-					chunk.range.startOffset === chunk.range.endOffset
-						? undefined
-						: schema.text(text.substring(chunk.range.startOffset, chunk.range.endOffset))
+					fromCnlLineTextToSchema(text.substring(chunk.range.startOffset, chunk.range.endOffset))
 				);
 			})
 		);
+	}
+
+	function fromCnlLineTextToSchema(value: string): Node | Node[] | undefined {
+		if (value.length === 0) return undefined;
+		const nodes = [];
+		const regex = /\$(.*?)\$|([^$]+)/gs;
+		let match;
+		while ((match = regex.exec(value))) {
+			if (match[1]) {
+				nodes.push(
+					schema.nodes.math.create(
+						undefined,
+						match[1].length !== 0 ? schema.text(match[1]) : undefined
+					)
+				);
+			} else if (match[2]) {
+				nodes.push(schema.text(match[2]));
+			}
+		}
+		return nodes;
 	}
 
 	return schema.nodes.doc.create(undefined, fromCnlContentToSchema([], root.value));
@@ -145,38 +172,55 @@ export function fromProofNodeToRocq(value: ProofNodeValue) {
 		.join('');
 }
 
+function getInlinePosition(position: ResolvedPos): number {
+	const type = position.node().type.name;
+
+	if (position.pos === 0) return 0;
+
+	if (position.parentOffset === 0 && type === schema.nodes.line.name) return 0;
+
+	return (
+		(type === schema.nodes.math.name ? 1 : 0) +
+		(type === schema.nodes.chunk.name || type === schema.nodes.math.name
+			? position.parentOffset
+			: 0) +
+		getInlinePosition(position.$decrement(position.parentOffset + 1))
+	);
+}
+
+function getSchemaPosition($p: ResolvedPos, value: number): ResolvedPos {
+	const type = $p.node().type.name;
+	if (value === 0) return $p;
+
+	if (type === schema.nodes.line.name) {
+		if ($p.pos === $p.$end().pos) return $p; // We can't exit the line
+		// Either start of line, or just before start of chunks : in both case there is no character so we increment the position alone
+		return getSchemaPosition($p.$increment(), value);
+	} else if (type === schema.nodes.chunk.name) {
+		const size = $p.node().content.size;
+		const diff = Math.min(size, value);
+
+		$p = $p.$start();
+		if (value > size) {
+			return getSchemaPosition($p.$after(), value - diff);
+		}
+		return getSchemaPosition($p.$increment(diff), 0);
+	} else if (type === schema.nodes.math.name) {
+		throw new Error('Should not happen (math node)');
+	}
+	throw new Error('Should not happen (generic)');
+}
+
 export function getNewSelectionPosition(
 	previous_state: EditorState,
 	previous_head: ResolvedPos,
 	current_doc: Node
 ): ResolvedPos {
-	const line = previous_head.$posAtIndex(0, -1);
+	let line_level = previous_head.node().type.name === schema.nodes.math.name ? -2 : -1;
+	const $line_begin = previous_head.$posAtIndex(0, line_level);
 
-	const nodes: string[] = [];
-	previous_head.doc.nodesBetween(line.pos, previous_head.pos, (n) => {
-		if (n.type.name === schema.nodes.chunk.name) nodes.push(n.textContent);
-	});
+	const $new_line_begin = current_doc.resolve($line_begin.pos);
+	const new_head = getSchemaPosition($new_line_begin, getInlinePosition(previous_head));
 
-	const real_text = nodes
-		.map((v, i) => (i === previous_head.index(-1) ? v.substring(0, previous_head.parentOffset) : v))
-		.join('');
-	const real_text_offset = real_text.length;
-
-	let current_text_offset = 0;
-	let node = current_doc.resolve(line.pos).$increment(); // First chunk selected
-
-	while (current_text_offset < real_text_offset) {
-		const length = node.end() - node.start();
-		current_text_offset += length;
-		if (current_text_offset < real_text_offset) {
-			const index = node.index(-1);
-			node = node.$posAtIndex(index + 1, -1).$increment();
-		} else {
-			// real_text_offset <= curent_text_offset
-			const i = real_text_offset - (current_text_offset - length);
-			node = node.$(node.pos + i);
-		}
-	}
-
-	return node;
+	return new_head;
 }

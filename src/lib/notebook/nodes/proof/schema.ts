@@ -37,7 +37,7 @@ export const nodes = {
 	},
 	chunk: {
 		group: 'chunk',
-		content: 'text*',
+		content: 'inline*',
 		attrs: {
 			value: {
 				default: undefined
@@ -61,6 +61,16 @@ export const nodes = {
 			return ['span', { class: 'pm-text' }, 0];
 		},
 		parseDOM: [{ tag: 'span.pm-text' }]
+	},
+	math: {
+		inline: true,
+		isolating: true,
+		group: 'inline',
+		content: 'text*',
+		toDOM(node) {
+			return ['span', { class: 'pm-math' }, 0];
+		},
+		parseDOM: [{ tag: 'span.pm-math' }]
 	}
 } satisfies { [key: string]: NodeSpec };
 
