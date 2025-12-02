@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { useMarkViewFactory, useNodeViewFactory } from '@prosemirror-adapter/svelte';
-	import { EditorState, Plugin, Selection, Transaction } from 'prosemirror-state';
+	import { useNodeViewFactory } from '@prosemirror-adapter/svelte';
+	import { EditorState, Plugin, Selection } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
 	import { ParagraphNodeView, plugins as paragraph_plugins } from './views/Paragraph.svelte';
 	import { Slice, type Node } from 'prosemirror-model';
@@ -10,8 +10,6 @@
 	import { schema } from '$lib/notebook/nodes/proof/schema';
 
 	import '$lib/cnl/tactics';
-	import type { CompletionState } from './ProofAutoCompletion.svelte';
-	import ProofAutoCompletion from './ProofAutoCompletion.svelte';
 	import { proof_state_value } from '$lib/notebook/widgets/proof_state/state.svelte';
 	import type { NotebookState } from '$lib/notebook/structure';
 	import {
@@ -38,6 +36,8 @@
 	import { debounced_task } from '$lib/svelte/debounced.svelte';
 	import { value_derived_trivial } from '$lib/svelte/derived.svelte';
 	import { plugins as math_plugins, MathLiveNodeView } from './views/Math';
+	import { proof_complete_value } from '$lib/notebook/widgets/proof_complete/state.svelte';
+	import { plugins as complete_plugins } from '$lib/components/widgets/proof_complete/ProofComplete_interface.svelte';
 
 	let {
 		node = $bindable(),
@@ -76,6 +76,7 @@
 						};
 					}
 				}),
+				complete_plugins,
 				chunk_plugins,
 				paragraph_plugins,
 				doc_plugins,
@@ -153,6 +154,9 @@
 					selected = _selected;
 					chunks = chunks;
 					debounced_updateproofstate();
+				},
+				focusout(view, event) {
+					// proof_complete_value.value = undefined;
 				}
 			}
 		});
@@ -173,8 +177,6 @@
 		});
 		if (onView) onView(view);
 	};
-
-	let completion: CompletionState | undefined = $state();
 
 	const debounced_updateproofstate = debounced_task(() => {
 		if (!isAnchored()) return;
@@ -220,9 +222,6 @@
 	<h4 class="flex w-full flex-row items-center gap-2 text-nowrap text-error-50-950">
 		<FileWarning /> No rocq proof was found in rocq file
 	</h4>
-{/if}
-{#if view}
-	<ProofAutoCompletion {view} {completion} />
 {/if}
 <div class="ProseMirror py-5" use:editor></div>
 

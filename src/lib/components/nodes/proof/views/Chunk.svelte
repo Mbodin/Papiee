@@ -47,12 +47,14 @@
 	import { Plugin, Transaction } from 'prosemirror-state';
 	import Chunk from './Chunk.svelte';
 	import { useNodeViewContext, type NodeViewFactory } from '@prosemirror-adapter/svelte';
-	import { ResolvedPos, type Node } from 'prosemirror-model';
+	import { type Node } from 'prosemirror-model';
 	import type { CnlChunk } from '$lib/cnl/chunks/types';
 	import { schema } from '$lib/notebook/nodes/proof/schema';
+	import { proof_complete_value } from '$lib/notebook/widgets/proof_complete/state.svelte';
 
 	const contentRef = useNodeViewContext('contentRef');
 	const node = useNodeViewContext('node');
+	const view = useNodeViewContext('view');
 
 	let node_value = $state(undefined as Node | undefined);
 	node.subscribe((value) => (node_value = value));
@@ -61,9 +63,31 @@
 	const chunk = $derived(chunks?.find((v) => v.range.startOffset !== v.range.endOffset));
 
 	const selected = $derived((node_value?.attrs.selected as boolean) || false);
+
+	let id = $props.id();
+
+	$effect(() => {
+		if (!selected || !chunk) return;
+
+		// We need to wait for hydration because if the element does not exist the popup will not be able to render
+		setTimeout(() => {
+			proof_complete_value.value = {
+				state: {
+					from: chunk.range.startOffset,
+					to: chunk.range.endOffset,
+					selector: '#' + id,
+					value: [],
+					view: view,
+					selected: 0
+				},
+				hide: false
+			};
+		}, 10);
+	});
 </script>
 
 <div
+	{id}
 	class="paragraph-line-chunk text-nowrap"
 	data-type={chunk?.type}
 	class:selected
