@@ -1,38 +1,8 @@
 <script lang="ts">
+	import { fromAnchorToRealPoint, type InbeetweenAnchorPoint } from '$lib/types/anchor';
 	import type { Anchor } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
-
-	type Anchor =
-		| 'top'
-		| 'top-left'
-		| 'left'
-		| 'bottom-left'
-		| 'bottom'
-		| 'bottom-right'
-		| 'right'
-		| 'top-right';
-
-	function fromAnchorToRelative(v: Anchor): { x: -1 | 1 | 0; y: -1 | 1 | 0 } {
-		switch (v) {
-			case 'top':
-				return { x: 0, y: 1 };
-			case 'top-right':
-				return { x: 1, y: 1 };
-			case 'right':
-				return { x: 1, y: 0 };
-			case 'bottom-right':
-				return { x: 1, y: -1 };
-			case 'bottom':
-				return { x: 0, y: -1 };
-			case 'bottom-left':
-				return { x: -1, y: -1 };
-			case 'left':
-				return { x: -1, y: 0 };
-			case 'top-left':
-				return { x: -1, y: 1 };
-		}
-	}
 
 	let {
 		selector,
@@ -41,8 +11,8 @@
 		children
 	}: {
 		selector: string;
-		parent_anchor: Anchor;
-		children_anchor?: Anchor;
+		parent_anchor: InbeetweenAnchorPoint;
+		children_anchor?: InbeetweenAnchorPoint;
 		children: Snippet<[]>;
 	} = $props();
 
@@ -63,8 +33,8 @@
 		const child_dx = element_size.width / 2;
 		const child_dy = -element_size.height / 2;
 
-		const parent_relative = fromAnchorToRelative(parent_anchor);
-		const child_relative = fromAnchorToRelative(children_anchor);
+		const parent_relative = fromAnchorToRealPoint(parent_anchor);
+		const child_relative = fromAnchorToRealPoint(children_anchor);
 
 		position = {
 			x:
