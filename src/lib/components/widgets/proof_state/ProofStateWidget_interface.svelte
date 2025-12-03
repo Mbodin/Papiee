@@ -21,7 +21,9 @@
 
 			const a_v = fromPositionToIndex(a.code, a.position || positionAfterString(a.code));
 			const b_v = fromPositionToIndex(b.code, b.position || positionAfterString(b.code));
-			return a.code.substring(0, a_v) === b.code.substring(0, b_v);
+			// We'd prefer checking for the prefix but syntax error won't be recovered with just the prefix
+			// return a.code.substring(0, a_v) === b.code.substring(0, b_v);
+			return a.code === b.code;
 		}
 	);
 
