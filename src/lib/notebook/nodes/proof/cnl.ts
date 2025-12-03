@@ -77,7 +77,11 @@ export function fromSchemaToCnl(node: Node): { root: CnlRoot; chunks: CnlChunk[]
 	};
 }
 
-function fromSchemaInlineToString(node: Node): string {
+export function fromChunkToString(node: Node): string {
+	return node.children.map(fromSchemaInlineToString).join('');
+}
+
+export function fromSchemaInlineToString(node: Node): string {
 	if (node.type.name === schema.nodes.text.name) return node.textContent;
 	if (node.type.name === schema.nodes.math.name) return `$${node.textContent}$`;
 	return '';

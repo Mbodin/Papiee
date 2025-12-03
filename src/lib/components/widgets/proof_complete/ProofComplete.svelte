@@ -4,7 +4,7 @@
 	let { value, selected }: CompletionState = $props();
 </script>
 
-<div class="mt-0.5 card border border-surface-500 px-2 py-1 scheme-light">
+<div class="mt-2 card border border-surface-500 bg-white px-2 py-1 scheme-light">
 	{#each value as v, i}
 		{#if selected === i}
 			<div class="mx-1 rounded-md bg-surface-50 px-1">{v}</div>

@@ -71,12 +71,13 @@
 
 		// We need to wait for hydration because if the element does not exist the popup will not be able to render
 		setTimeout(() => {
+			if (proof_complete_value.value?.state.selector === '#' + id) return;
 			proof_complete_value.value = {
 				state: {
 					from: chunk.range.startOffset,
 					to: chunk.range.endOffset,
 					selector: '#' + id,
-					value: [],
+					value: ['intros d.', 'simpl.'],
 					view: view,
 					selected: 0
 				},

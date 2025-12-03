@@ -70,7 +70,10 @@ export const nodes = {
 		toDOM(node) {
 			return ['span', { class: 'pm-math' }, 0];
 		},
-		parseDOM: [{ tag: 'span.pm-math' }]
+		parseDOM: [{ tag: 'span.pm-math' }],
+		leafText(node) {
+			return '$' + node.text + '$';
+		}
 	}
 } satisfies { [key: string]: NodeSpec };
 

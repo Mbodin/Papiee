@@ -1,9 +1,11 @@
+import type { CnlParsingState } from '../cnl_tactic';
 import type { Range } from './range';
 import type { ChunkGenerator } from './types';
 
 type CommonErrorFields = {
 	type: 'error';
 	range: Range;
+	state_before: CnlParsingState;
 };
 
 export type ErrorChunk = SyntaxError | CommonErrorFields;
@@ -12,14 +14,15 @@ export type SyntaxError = {
 	type: 'error';
 	range: Range;
 	reason: string;
+	state_before: CnlParsingState;
 };
 
 export type ErrorGenerator<T extends CommonErrorFields = CommonErrorFields> = ChunkGenerator<T>;
 
 export function error<T extends CommonErrorFields>(
-	value?: Omit<T, 'range' | 'type'>
+	value?: Omit<T, 'range' | 'type' | 'state_before'>
 ): ErrorGenerator<T> {
-	return (range) => ({ ...(value || {}), range, type: 'error' }) as T;
+	return (state_before, range) => ({ ...(value || {}), range, type: 'error', state_before }) as T;
 }
 
 export function syntax(reason: string) {
