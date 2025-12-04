@@ -4,7 +4,7 @@
 	import ProofStateWidget from './ProofStateWidget.svelte';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
 	import * as types from 'vscode-languageserver-types';
-	import type { GoalAnswer } from '$lib/rocq/type';
+	import { EMPTY_GOAL, type GoalAnswer, type Pp } from '$lib/rocq/pp';
 	import { fromPositionToIndex, minPosition, positionAfterString } from '$lib/rocq/utils';
 	import { debounced_get } from '$lib/svelte/debounced.svelte';
 	import { value_derived, value_derived_trivial } from '$lib/svelte/derived.svelte';
@@ -22,14 +22,14 @@
 			const a_v = fromPositionToIndex(a.code, a.position || positionAfterString(a.code));
 			const b_v = fromPositionToIndex(b.code, b.position || positionAfterString(b.code));
 			// We'd prefer checking for the prefix but syntax error won't be recovered with just the prefix
-			// return a.code.substring(0, a_v) === b.code.substring(0, b_v);
-			return a.code === b.code;
+			return a.code.substring(0, a_v) === b.code.substring(0, b_v);
+			// return a.code === b.code;
 		}
 	);
 
 	const worker = getContext<RocqWorker>(WORKER_CONTEXT);
 	const connection = $derived(worker.connection);
-	let rocq: GoalAnswer<string, string> | undefined = $state();
+	let rocq: GoalAnswer<Pp, Pp> | undefined = $state();
 	let position = $derived(
 		proof_state_value.value?.position || positionAfterString(proof_state_value.value?.code || '')
 	);
@@ -50,9 +50,9 @@
 					return connection.sendRequest('proof/goals', {
 						textDocument: { uri: document.uri, version: document.version },
 						position: { ...position },
-						pp_format: 'Str',
+						pp_format: 'Pp',
 						mode: 'After'
-					}) as Promise<GoalAnswer<string, string>>;
+					}) as Promise<GoalAnswer<Pp, Pp>>;
 				},
 				{ text: code, uri: 'file:///exercise/exercise.v' }
 			);
@@ -74,11 +74,11 @@
 	<div
 		class="b-1 rounded-mdtext-nowrap flex h-full w-full flex-col rounded-lg bg-white text-black shadow-lg"
 	>
-		{#if rocq}
-			<ProofStateWidget error={value?.error} hide={value?.hide} value={rocq} />
-		{/if}
-		{#if loading}
-			<Loader class="mx-auto animate-spin" />
-		{/if}
+		<ProofStateWidget
+			error={value?.error}
+			hide={value?.hide}
+			value={rocq || EMPTY_GOAL}
+			{loading}
+		/>
 	</div>
 </Draggable>

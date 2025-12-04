@@ -12,7 +12,8 @@ import {
 	type Position
 } from 'vscode-languageserver-protocol';
 import { getRocqFileHeaderContent } from './connection';
-import type { MessageConnection } from './type';
+import type { LspProofState, LspVariable, MessageConnection } from './type';
+import type { GoalAnswer } from './pp';
 
 export function positionAfterString(value: string): Position {
 	const line_number = value.includes('\n') ? value.split('\n').length - 1 : 0;
@@ -177,4 +178,24 @@ export async function lsp_getProofBeginState(
 		},
 		{ text: code }
 	);
+}
+
+export function fromRocqGoalAnswerToLspRocqState(state: GoalAnswer<string, string>): LspProofState {
+	let goals = state.goals;
+	let goal = goals?.goals[0];
+
+	let hyps = goal?.hyps;
+
+	let internals =
+		hyps?.filter((v) => v.names[0].startsWith('__internal_name_')).map((v) => v.ty) || [];
+
+	let values = internals
+		.filter((v) => v.includes('\\in'))
+		.map((v) => v.split('\\in', 2).map((v) => v.trim()))
+		.map((v): LspVariable => ({ identifier: v[0], set: v[1] }));
+
+	return {
+		variables: values,
+		goal: goal?.ty || ''
+	};
 }

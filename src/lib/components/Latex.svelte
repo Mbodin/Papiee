@@ -22,6 +22,10 @@
 <math-field read-only style="display:inline-block" use:init {...rest}></math-field>
 
 <style>
+	math-field {
+		background-color: transparent;
+	}
+
 	math-field:focus-within {
 		outline: none;
 		background: rgba(200, 200, 255, 0.2);

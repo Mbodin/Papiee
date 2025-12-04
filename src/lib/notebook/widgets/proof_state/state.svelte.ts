@@ -1,6 +1,6 @@
 import type { Position } from 'vscode-languageserver-types';
 import type { ErrorChunk } from '$lib/cnl/chunks/errors';
-import type { GoalAnswer } from '$lib/rocq/type';
+import type { GoalAnswer, Pp } from '$lib/rocq/pp';
 
 export type ProofStateProps = {
 	hide?: boolean;
@@ -10,9 +10,10 @@ export type ProofStateProps = {
 };
 
 export type RocqStateProps = {
-	value?: GoalAnswer<string, string>;
+	value?: GoalAnswer<Pp, Pp>;
 	error?: ErrorChunk;
 	hide?: boolean;
+	loading?: boolean;
 };
 
 export let proof_state_value: { value: undefined } | { value: ProofStateProps } = $state({
