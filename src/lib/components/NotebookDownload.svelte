@@ -27,9 +27,9 @@
 </script>
 
 <Dialog.Provider value={dialog}>
-	<Dialog.Trigger class="btn bg-primary-500 text-neutral-50">Save</Dialog.Trigger>
+	<Dialog.Trigger class="btn bg-primary-500">Save</Dialog.Trigger>
 	<Portal>
-		<Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
+		<Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950" />
 		<Dialog.Positioner class="fixed inset-0 z-50 flex items-center justify-center">
 			<Dialog.Content class="w-md space-y-2 card bg-surface-100-900 p-4 shadow-xl">
 				<Dialog.Title class="text-2xl font-bold">Saving Notebook</Dialog.Title>
@@ -38,7 +38,7 @@
 					<span class="flex flex-row">
 						<input
 							bind:value={title}
-							class="input bg-surface-950 text-white"
+							class="input bg-surface-950-50"
 							onkeydown={(e) => {
 								if (e.key === 'Enter') {
 									e.preventDefault();
@@ -59,9 +59,8 @@
 						href={URL.createObjectURL(
 							new Blob([JSON.stringify(notebook_state)], { type: 'application/json' })
 						)}
-						><button
-							class="btn bg-primary-500 text-neutral-50"
-							onclick={() => dialog().setOpen(false)}>Save</button
+						><button class=" btn bg-primary-500" onclick={() => dialog().setOpen(false)}
+							>Save</button
 						></a
 					>
 				</footer>

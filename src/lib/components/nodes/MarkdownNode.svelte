@@ -46,7 +46,7 @@
 	<div bind:this={div} class="relative" onfocusin={() => setAnchorNode(div)}>
 		{#if value.compiled || mode === 'student'}
 			<div
-				class="prose min-h-10 w-full"
+				class="prose min-h-10 w-full dark:prose-invert"
 				role="article"
 				ondblclick={() => onNodeValueUpdate(value, { ...value, compiled: false })}
 				tabindex="-1"
@@ -70,7 +70,7 @@
 					/></svg
 				>
 				<CodeMirror
-					class="w-full"
+					class="w-full preset-filled-surface-50-950 scheme-light"
 					onready={(v) => {
 						view = v;
 						if (position != null) {

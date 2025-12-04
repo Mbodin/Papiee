@@ -112,7 +112,7 @@
 		bind:clientWidth={element_size.width}
 		bind:clientHeight={element_size.height}
 		{@attach RootAttachment}
-		class="absolute z-10 min-h-0 min-w-0 text-black select-none"
+		class="absolute z-10 min-h-0 min-w-0 select-none"
 		style={`top: ${inbounds_position.y * document_size.height}px; left: ${inbounds_position.x * document_size.width}px; transition: top 1s in`}
 	>
 		{@render children()}

@@ -34,18 +34,20 @@
 </script>
 
 <RocqProvider>
-	<div class="bg-surface-0 my-5 mt-5 flex h-full flex-col rounded-lg bg-white text-neutral-950">
-		<div class="notebook_header relative z-10 rounded-lg bg-surface-500">
+	<div class="my-5 mt-5 flex h-full flex-col rounded-lg bg-surface-50-950">
+		<div
+			class="relative z-10 preset-filled-surface-400-600 before:pointer-events-none before:absolute before:-inset-4 before:rounded-lg before:border-16 before:border-surface-400-600"
+		>
 			<div class="flex flex-row gap-5 p-2 text-nowrap">
-				<h5 class="text-neutral-50">Title :</h5>
+				<h5 class="text-white">Title :</h5>
 				<input
 					type="text"
-					class="input bg-white text-neutral-950"
+					class="m-0 input border-none text-white ring-2 outline-none"
 					bind:value={notebook_state.title}
 				/>
 			</div>
 		</div>
-		<div class="flex h-full w-full flex-row scheme-dark" bind:this={container}>
+		<div class="flex h-full w-full flex-row" bind:this={container}>
 			<div class="relative h-full w-40 py-10">
 				{#if anchor && mode === 'teacher'}
 					<div
@@ -84,14 +86,3 @@
 
 	<WidgetWindow />
 </RocqProvider>
-
-<style>
-	:global(.notebook_header::before) {
-		content: '';
-		position: absolute;
-		pointer-events: none;
-		inset: -10px;
-		border-radius: var(--radius-lg);
-		border: solid 20px var(--color-surface-500);
-	}
-</style>

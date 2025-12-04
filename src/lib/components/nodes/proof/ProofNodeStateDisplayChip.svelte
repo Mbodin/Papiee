@@ -26,23 +26,19 @@
 
 <style>
 	.proofnode-state[data-state='done'] {
-		background-color: green;
+		background-color: var(--color-success-500);
 		content: 'Success';
-		color: var(--color-white);
 	}
 	.proofnode-state[data-state='error'] {
-		background-color: red;
+		background-color: var(--color-error-500);
 		content: 'Error';
-		color: var(--color-white);
 	}
 	.proofnode-state[data-state='admit'] {
-		background-color: yellow;
+		background-color: var(--color-warning-500);
 		content: 'Admitted';
-		color: var(--color-black);
 	}
 	.proofnode-state[data-state='loading'] {
-		background-color: gray;
+		background-color: var(--color-surface-50-950);
 		content: 'Loading ...';
-		color: var(--color-white);
 	}
 </style>

@@ -28,19 +28,17 @@
 	setContext(WORKER_CONTEXT, worker);
 </script>
 
-{#if worker.connection != null}
+{#if worker.connection != null || true}
 	{@render children?.()}
 {:else}
-	<div
-		class="bg-surface-0 my-5 mt-5 flex h-full flex-col rounded-lg bg-white p-20 text-neutral-950"
-	>
+	<div class="bg-surface-0 my-5 mt-5 flex h-full flex-col rounded-lg bg-surface-50-950 p-20">
 		<div
 			class="m-auto block max-w-md overflow-hidden card border-surface-900-100 preset-filled-surface-900-100 card-hover"
 		>
 			<article class="space-y-4 p-4">
 				<div>
-					<h2 class="h6 text-neutral-950">Loading ...</h2>
-					<h3 class="h3 text-neutral-950">The worker is loading</h3>
+					<h2 class="h6">Loading ...</h2>
+					<h3 class="h3">The worker is loading</h3>
 				</div>
 
 				<Loader class="m-auto animate-spin text-primary-500" size="128px" />

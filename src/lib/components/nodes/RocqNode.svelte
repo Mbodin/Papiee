@@ -68,7 +68,7 @@
 {#if mode === 'teacher'}
 	<div
 		bind:this={div}
-		class="relative flex flex-col items-start gap-1"
+		class="relative flex flex-col items-start gap-1 scheme-light"
 		onfocusin={() => setAnchorNode(div)}
 	>
 		<svg
@@ -113,7 +113,7 @@
 			</g>
 		</svg>
 		<CodeMirror
-			class="w-full"
+			class="w-full  preset-filled-error-50-950"
 			lang={rocq()}
 			onready={() => {}}
 			bind:value={

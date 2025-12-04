@@ -72,7 +72,7 @@
 
 <Draggable>
 	<div
-		class="b-1 rounded-mdtext-nowrap flex h-full w-full flex-col rounded-lg bg-white text-black shadow-lg"
+		class="b-1 flex h-full w-full flex-col rounded-lg text-nowrap text-black scheme-light shadow-lg"
 	>
 		<ProofStateWidget
 			error={value?.error}
