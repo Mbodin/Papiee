@@ -30,3 +30,6 @@ static/worker_artifact.zip
 static/worker_artifact
 static/wasm-bin
 rocq/rocq.json
+
+# Paraglide
+src/lib/paraglide

@@ -22,7 +22,7 @@ export function getRocqFileHeaderContent(): string {
 }
 
 export async function create(origin: string): Promise<MessageConnection> {
-	let wuri = 'wasm-bin/wacoq_worker.js';
+	let wuri = '/wasm-bin/wacoq_worker.js';
 
 	let worker = new Worker(wuri);
 	worker.postMessage(origin);

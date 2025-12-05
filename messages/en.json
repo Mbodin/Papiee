@@ -1,0 +1,31 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"hello_world": "Hello, {name} from en!",
+	"notebook": {
+		"proof": {
+			"error_norocqproof": "No rocq proof was found in rocq file before this.",
+			"begin_state": {
+				"error": "Error",
+				"success": "Success",
+				"loading": "Loading ...",
+				"admit": "Incomplete"
+			}
+		},
+		"widgets": {
+			"proof_state": {
+				"state": "State",
+				"definitions": "Definitions :",
+				"error_nogoal": "No goal currently found ..."
+			}
+		},
+		"save": "Saving Notebook"
+	},
+	"error": "Error",
+	"fatal_error": "Fatal Error",
+	"title": "Title",
+	"cancel": "Cancel",
+	"download": "Download",
+	"save": "Save",
+	"import": "Import",
+	"switch_mode": "Swicth mode"
+}

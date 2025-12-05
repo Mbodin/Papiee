@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import { useNodeViewFactory } from '@prosemirror-adapter/svelte';
 	import { EditorState, Plugin, Selection } from 'prosemirror-state';
 	import { EditorView } from 'prosemirror-view';
@@ -219,8 +220,9 @@
 </script>
 
 {#if proof_end_state == 'nothing'}
-	<h4 class="flex w-full flex-row items-center gap-2 text-nowrap text-error-50-950">
-		<FileWarning /> No rocq proof was found in rocq file
+	<h4 class="flex w-full flex-row items-center gap-2 text-nowrap text-error-600-400">
+		<FileWarning />
+		{m['notebook.proof.error_norocqproof']()}
 	</h4>
 {/if}
 <div class="ProseMirror py-5" use:editor></div>

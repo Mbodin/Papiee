@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import type { ProofNodeValue } from '$lib/notebook/nodes/proof/structure';
 	import { CircleAlert, CircleCheck, CircleX, LoaderCircle } from '@lucide/svelte';
 
@@ -13,13 +14,13 @@
 		data-state={value || 'loading'}
 	>
 		{#if value === 'admit'}
-			<CircleAlert size="22px" /> Admitted
+			<CircleAlert size="22px" /> {m['notebook.proof.begin_state.admit']()}
 		{:else if value === 'error'}
-			<CircleX size="22px" /> Error
+			<CircleX size="22px" /> {m['notebook.proof.begin_state.error']()}
 		{:else if value === 'done'}
-			<CircleCheck size="22px" /> Success
+			<CircleCheck size="22px" /> {m['notebook.proof.begin_state.success']()}
 		{:else if (value || 'loading') === 'loading'}
-			<LoaderCircle size="22px" class="animate-spin" /> Loading ...
+			<LoaderCircle size="22px" class="animate-spin" /> {m['notebook.proof.begin_state.loading']()}
 		{:else if value === 'none'}{/if}
 	</div>
 {/if}

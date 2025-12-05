@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages';
 	import type { NotebookState } from '$lib/notebook/structure';
 	import { FileUpload, useFileUpload } from '@skeletonlabs/skeleton-svelte';
 
@@ -18,6 +19,6 @@
 </script>
 
 <FileUpload.Provider value={fileUpload} class="w-fit">
-	<FileUpload.Trigger class="btn preset-filled-primary-400-600">Load</FileUpload.Trigger>
+	<FileUpload.Trigger class="btn preset-filled-primary-600-400">{m.import()}</FileUpload.Trigger>
 	<FileUpload.HiddenInput />
 </FileUpload.Provider>

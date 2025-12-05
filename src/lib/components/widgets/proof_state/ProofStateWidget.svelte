@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
 	import type { SyntaxError } from '$lib/cnl/chunks/errors';
 	import Latex from '$lib/components/Latex.svelte';
 	import type { RocqStateProps } from '$lib/notebook/widgets/proof_state/state.svelte';
@@ -39,15 +40,15 @@
 
 {#if hide !== true}
 	<section class="w-md rounded-md shadow-md shadow-surface-500" aria-live="polite">
-		<header class="rounded-t-md preset-filled-primary-300-700 text-center">
-			<h3 class="text-3xl">State</h3>
+		<header class="rounded-t-md preset-filled-primary-600-400 text-center">
+			<h3 class="text-3xl">{m['notebook.widgets.proof_state.state']()}</h3>
 		</header>
 
 		<div class="text-md flex min-h-10 flex-col gap-5 preset-filled-surface-50-950 p-2">
 			{#if values_by_sets.length !== 0}
 				<section>
 					<header>
-						<h5 class="">Definitions :</h5>
+						<h5 class="">{m['notebook.widgets.proof_state.definitions']()}</h5>
 					</header>
 
 					<ul class="ml-10">
@@ -62,12 +63,12 @@
 
 			{#if error || rocq_state?.error}
 				<section class="card preset-filled-error-950-50 p-2">
-					<header>Error</header>
+					<header>{m.error()}</header>
 
 					<p>
 						{#if error}
 							{#if typeof error === 'object' && 'fatal' in error}
-								Fatal Error
+								{m.fatal_error()}
 							{:else}
 								{@const reason = (error as SyntaxError).reason}
 								{reason}
@@ -90,7 +91,7 @@
 					<Latex value={fromPpToString(goal?.ty || ['Pp_empty'])} />
 				</h4>
 			{:else}
-				<em class="italic">No goal currently found ...</em>
+				<em class="italic">{m['notebook.widgets.proof_state.error_nogoal']()}</em>
 			{/if}
 		</footer>
 	</section>

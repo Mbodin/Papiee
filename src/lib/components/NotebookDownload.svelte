@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { NotebookState } from '$lib/notebook/structure';
+	import { m } from '$lib/paraglide/messages';
 	import { Dialog, Portal, useDialog } from '@skeletonlabs/skeleton-svelte';
 
 	let { notebook_state }: { notebook_state: NotebookState } = $props();
@@ -27,12 +28,12 @@
 </script>
 
 <Dialog.Provider value={dialog}>
-	<Dialog.Trigger class="btn preset-filled-primary-400-600">Save</Dialog.Trigger>
+	<Dialog.Trigger class="btn preset-filled-primary-600-400">{m.save()}</Dialog.Trigger>
 	<Portal>
 		<Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950" />
 		<Dialog.Positioner class="fixed inset-0 z-50 flex items-center justify-center">
 			<Dialog.Content class="w-md space-y-2 card bg-surface-100-900 p-4 shadow-xl">
-				<Dialog.Title class="text-2xl font-bold">Saving Notebook</Dialog.Title>
+				<Dialog.Title class="text-2xl font-bold">{m['notebook.save']()}</Dialog.Title>
 				<div class="flex flex-row items-center gap-5 text-nowrap">
 					<h4>File name :</h4>
 					<span class="flex flex-row">
@@ -51,7 +52,7 @@
 					</span>
 				</div>
 				<footer class="flex justify-end gap-2">
-					<Dialog.CloseTrigger class="btn preset-tonal">Close</Dialog.CloseTrigger>
+					<Dialog.CloseTrigger class="btn preset-tonal">{m.cancel()}</Dialog.CloseTrigger>
 
 					<a
 						bind:this={anode}
@@ -60,7 +61,7 @@
 							new Blob([JSON.stringify(notebook_state)], { type: 'application/json' })
 						)}
 						><button class=" btn bg-primary-500" onclick={() => dialog().setOpen(false)}
-							>Save</button
+							>{m.download()}</button
 						></a
 					>
 				</footer>
