@@ -12,29 +12,26 @@
 		document.body.appendChild(element);
 		document.addEventListener('mousemove', drag);
 		document.addEventListener('mouseup', stopDrag);
-		document.addEventListener('scroll', onScroll);
 		window.addEventListener('resize', onResize);
 
 		onResize();
 		return () => {
 			element.remove();
-			document.removeEventListener('scroll', onScroll);
 			document.removeEventListener('mousemove', drag);
 			document.removeEventListener('mouseup', stopDrag);
 			window.removeEventListener('resize', onResize);
 		};
 	};
 
-	let scroll_offset = $state({ x: 0, y: 0 });
-	function onScroll() {
-		scroll_offset.y = document.documentElement.scrollTop;
-	}
-
+	let offset_height = $state(0);
 	let document_size = $state({ width: 0, height: 0 });
 	function onResize() {
+		let header = document.body.querySelector('header');
+		if (header?.getBoundingClientRect().top !== 0) header = null;
+		offset_height = header?.clientHeight || 0;
 		document_size = {
 			width: document.body.clientWidth,
-			height: document.body.clientHeight
+			height: document.body.clientHeight - offset_height
 		};
 	}
 
@@ -56,7 +53,7 @@
 	function startDrag(e: MouseEvent) {
 		source = {
 			x: e.clientX / document_size.width,
-			y: e.clientY / document_size.height
+			y: (e.clientY - offset_height) / document_size.height
 		};
 		initial = { x: inbounds_position.x, y: inbounds_position.y };
 		dragging = true;
@@ -66,7 +63,7 @@
 		if (!dragging) return;
 
 		let x = initial.x + e.clientX / document_size.width - source.x;
-		let y = initial.y + e.clientY / document_size.height - source.y;
+		let y = initial.y + (e.clientY - offset_height) / document_size.height - source.y;
 		drag_position = { x, y };
 	}
 
@@ -83,9 +80,9 @@
 	bind:clientHeight={element_size.height}
 	{@attach RootAttachment}
 	class:dragging
-	class="dragging absolute z-10 min-h-0 min-w-0 select-none"
+	class="dragging fixed z-10 min-h-0 min-w-0 select-none"
 	onmousedown={startDrag}
-	style={`top: ${inbounds_position.y * document_size.height + scroll_offset.y}px; left: ${inbounds_position.x * document_size.width}px; transition: top 1s in`}
+	style={`top: ${inbounds_position.y * document_size.height + offset_height}px; left: ${inbounds_position.x * document_size.width}px; transition: top 1s in`}
 >
 	{@render children()}
 </div>
