@@ -18,6 +18,6 @@
 </script>
 
 <FileUpload.Provider value={fileUpload} class="w-fit">
-	<FileUpload.Trigger class="btn preset-filled-primary-500 text-white">Load</FileUpload.Trigger>
+	<FileUpload.Trigger class="btn preset-filled-primary-400-600">Load</FileUpload.Trigger>
 	<FileUpload.HiddenInput />
 </FileUpload.Provider>

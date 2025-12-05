@@ -27,7 +27,7 @@
 </script>
 
 <Dialog.Provider value={dialog}>
-	<Dialog.Trigger class="btn bg-primary-500">Save</Dialog.Trigger>
+	<Dialog.Trigger class="btn preset-filled-primary-400-600">Save</Dialog.Trigger>
 	<Portal>
 		<Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950" />
 		<Dialog.Positioner class="fixed inset-0 z-50 flex items-center justify-center">

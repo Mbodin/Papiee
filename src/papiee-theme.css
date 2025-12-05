@@ -49,8 +49,8 @@
 	--color-primary-800: oklch(49.3% 0.16 31.66deg);
 	--color-primary-900: oklch(43.42% 0.15 26.48deg);
 	--color-primary-950: oklch(37.64% 0.13 17.99deg);
-	--color-primary-contrast-dark: var(--color-primary-950);
-	--color-primary-contrast-light: var(--color-primary-50);
+	--color-primary-contrast-dark: var(--color-white);
+	--color-primary-contrast-light: var(--color-black);
 	--color-primary-contrast-50: var(--color-primary-contrast-dark);
 	--color-primary-contrast-100: var(--color-primary-contrast-dark);
 	--color-primary-contrast-200: var(--color-primary-contrast-dark);

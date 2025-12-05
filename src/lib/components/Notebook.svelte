@@ -39,10 +39,10 @@
 			class="relative z-10 preset-filled-surface-400-600 before:pointer-events-none before:absolute before:-inset-4 before:rounded-lg before:border-16 before:border-surface-400-600"
 		>
 			<div class="flex flex-row gap-5 p-2 text-nowrap">
-				<h5 class="text-white">Title :</h5>
+				<h5 class="">Title :</h5>
 				<input
 					type="text"
-					class="m-0 input border-none text-white ring-2 outline-none"
+					class="m-0 input border-none ring-2 outline-none"
 					bind:value={notebook_state.title}
 				/>
 			</div>

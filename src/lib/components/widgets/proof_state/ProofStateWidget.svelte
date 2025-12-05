@@ -38,9 +38,9 @@
 </script>
 
 {#if hide !== true}
-	<section class="w-md rounded-md shadow-2xl" aria-live="polite">
-		<header class="rounded-t-md preset-filled-primary-500 text-center">
-			<h3 class="h3 text-white">State</h3>
+	<section class="w-md rounded-md shadow-md shadow-surface-500" aria-live="polite">
+		<header class="rounded-t-md preset-filled-primary-300-700 text-center">
+			<h3 class="text-3xl">State</h3>
 		</header>
 
 		<div class="text-md flex min-h-10 flex-col gap-5 preset-filled-surface-50-950 p-2">
@@ -80,7 +80,7 @@
 			{/if}
 		</div>
 
-		<footer class="rounded-b-md bg-secondary-50 p-2 text-sm">
+		<footer class="rounded-b-md preset-filled-surface-300-700 p-2 text-sm">
 			{#if loading === true}
 				<div>
 					<Loader class="mx-auto animate-spin" />

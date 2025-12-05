@@ -14,7 +14,8 @@
 
 <div class="mx-auto h-full w-9/12">
 	<Notebook bind:notebook_state mode={teacher_viewing ? 'teacher' : 'student'} />
-	<button class="btn bg-primary-500" onclick={() => (teacher_viewing = !teacher_viewing)}
-		>Change mode</button
+	<button
+		class="btn preset-filled-primary-400-600"
+		onclick={() => (teacher_viewing = !teacher_viewing)}>Change mode</button
 	>
 </div>

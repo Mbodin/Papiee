@@ -71,9 +71,7 @@
 </script>
 
 <Draggable>
-	<div
-		class="b-1 flex h-full w-full flex-col rounded-lg text-nowrap text-black scheme-light shadow-lg"
-	>
+	<div class="b-1 flex h-full w-full flex-col rounded-lg text-nowrap shadow-lg">
 		<ProofStateWidget
 			error={value?.error}
 			hide={value?.hide}

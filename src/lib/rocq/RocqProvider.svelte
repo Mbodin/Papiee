@@ -28,7 +28,7 @@
 	setContext(WORKER_CONTEXT, worker);
 </script>
 
-{#if worker.connection != null || true}
+{#if worker.connection != null}
 	{@render children?.()}
 {:else}
 	<div class="bg-surface-0 my-5 mt-5 flex h-full flex-col rounded-lg bg-surface-50-950 p-20">

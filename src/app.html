@@ -1,11 +1,19 @@
 <!doctype html>
-<html lang="en" data-theme="papiee" class="min-h-dvh" style="display: flex; flex-direction: column">
+<html
+	lang="en"
+	data-theme="papiee"
+	class="min-h-dvh overscroll-y-none"
+	style="display: flex; flex-direction: column"
+>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		%sveltekit.head%
 	</head>
-	<body data-sveltekit-preload-data="hover" class="h-full flex-1 bg-surface-100-900">
-		<div style="display: contents">%sveltekit.body%</div>
+	<body
+		data-sveltekit-preload-data="hover"
+		class="h-dvh flex-1 overscroll-y-none bg-surface-100-900"
+	>
+		<div class="contents overflow-auto">%sveltekit.body%</div>
 	</body>
 </html>
