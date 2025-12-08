@@ -10,13 +10,13 @@
 	import NotebookDownload from './NotebookDownload.svelte';
 	import WidgetWindow from './widgets/WidgetWindow.svelte';
 	import { m } from '$lib/paraglide/messages';
+	import NotebookHandle from './NotebookHandle.svelte';
 
 	let {
 		notebook_state = $bindable({ title: '', children: [] }),
 		mode
 	}: { notebook_state?: NotebookState; mode: 'teacher' | 'student' } = $props();
 
-	let anchor: HTMLElement | undefined = $state();
 	let anchored_i: number = $state(-1);
 
 	let container: HTMLDivElement | undefined = $state();
@@ -28,10 +28,11 @@
 		)
 	);
 
-	function setAnchorNode(node: HTMLElement | undefined, i?: number) {
-		anchor = node;
+	function setAnchorNode(_node: HTMLElement | undefined, i?: number) {
 		anchored_i = i == null ? -1 : i;
 	}
+
+	let article_nodes: HTMLElement[] = $state([]);
 </script>
 
 <RocqProvider>
@@ -50,12 +51,13 @@
 		</div>
 		<div class="flex h-full w-full flex-row" bind:this={container}>
 			<div class="relative h-full w-40 py-10">
-				{#if anchor && mode === 'teacher'}
+				{#if anchored_i !== -1 && mode === 'teacher'}
 					<div
-						class="absolute flex w-full flex-row-reverse px-5"
-						style={`top: ${anchor.offsetTop - (container?.offsetTop || 0)}px`}
+						class="absolute flex w-full flex-row-reverse gap-1 px-5"
+						style={`top: ${article_nodes[anchored_i].offsetTop - (container?.offsetTop || 0)}px`}
 					>
 						<NotebookAddMenu bind:notebook_state {anchored_i} />
+						<NotebookHandle bind:notebook_state bind:anchored_i />
 					</div>
 				{/if}
 			</div>
@@ -64,17 +66,19 @@
 					{@const Component = getNotebookNode_unsafe(node.type).component}
 					{@const thisAnchoredNode = (node: HTMLElement | undefined) => setAnchorNode(node, i)}
 					{@const position = global_position.value?.index === i ? node.position : undefined}
-					<Component
-						value={{ ...node, position }}
-						setAnchorNode={thisAnchoredNode}
-						onNodeValueUpdate={(_, new_v) => {
-							notebook_state.children[i] = new_v;
-						}}
-						isAnchored={() => anchored_i === i}
-						{mode}
-						position={[i]}
-						root={notebook_state}
-					/>
+					<article bind:this={article_nodes[i]}>
+						<Component
+							value={{ ...node, position }}
+							setAnchorNode={thisAnchoredNode}
+							onNodeValueUpdate={(_, new_v) => {
+								notebook_state.children[i] = new_v;
+							}}
+							isAnchored={() => anchored_i === i}
+							{mode}
+							position={[i]}
+							root={notebook_state}
+						/>
+					</article>
 				{/each}
 			</div>
 			<div class="h-full w-40"></div>
