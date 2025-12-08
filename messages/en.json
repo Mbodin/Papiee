@@ -27,5 +27,15 @@
 	"download": "Download",
 	"save": "Save",
 	"import": "Import",
-	"switch_mode": "Swicth mode"
+	"switch_mode": "Swicth mode",
+	"rocq_provider": {
+		"loading": {
+			"steps": {
+				"start": "Starting the loading",
+				"create": "Creation of the worker",
+				"library": "Loading librairies"
+			},
+			"_": "Program Loading"
+		}
+	}
 }

@@ -28,5 +28,16 @@
 	"download": "Télécharger",
 	"save": "Sauvegarder",
 	"import": "Importer",
-	"switch_mode": "Changer de mode"
+	"switch_mode": "Changer de mode",
+	"rocq_provider": {
+		"loading": {
+			"steps": {
+				"start": "Démarrage du chargement",
+				"create": "Création du worker",
+				"library": "Chargement des bibliothèques",
+				"running": ""
+			},
+			"_": "Chargement du programme"
+		}
+	}
 }
