@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { Switch } from '@skeletonlabs/skeleton-svelte';
+	import { Moon, Sun } from '@lucide/svelte';
 
-	let checked = $state(false);
+	let dark = $state(false);
 
 	$effect(() => {
 		const mode = localStorage.getItem('mode') || 'light';
-		checked = mode === 'dark';
+		dark = mode === 'dark';
 	});
 
 	const onCheckedChange = (event: { checked: boolean }) => {
 		const mode = event.checked ? 'dark' : 'light';
 		document.documentElement.setAttribute('data-mode', mode);
 		localStorage.setItem('mode', mode);
-		checked = event.checked;
+		dark = event.checked;
 	};
 </script>
 
@@ -23,9 +23,15 @@
 	</script>
 </svelte:head>
 
-<Switch {checked} {onCheckedChange}>
-	<Switch.Control>
-		<Switch.Thumb />
-	</Switch.Control>
-	<Switch.HiddenInput />
-</Switch>
+<button
+	role="switch"
+	aria-checked={dark}
+	class="mx-5"
+	onclick={() => onCheckedChange({ checked: !dark })}
+>
+	{#if dark}
+		<Moon />
+	{:else}
+		<Sun />
+	{/if}
+</button>
