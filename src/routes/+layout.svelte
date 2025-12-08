@@ -1,4 +1,5 @@
 <script lang="ts">
+	import LangSwitch from '$lib/components/LangSwitch.svelte';
 	import LightSwitch from '$lib/components/LightSwitch.svelte';
 	import '../app.css';
 
@@ -16,6 +17,7 @@
 		<h1 class="h1">Papiée</h1>
 	</div>
 	<div class="flex-1"></div>
+	<LangSwitch />
 	<LightSwitch />
 </header>
 {@render children?.()}
