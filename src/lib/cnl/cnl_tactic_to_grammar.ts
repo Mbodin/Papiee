@@ -35,16 +35,6 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 	const reference_value_type: Map<string, 'unique' | 'list'> = new Map();
 	const regitered_tokens: ({ literal: string } | { token: string })[] = [];
 
-	const _space_0_id = generate() + '#SPACE_0';
-	const _space_1_id = generate() + '#SPACE_1';
-	const SPACE_0: ParserRule[] = [
-		{ name: _space_0_id, symbols: [_space_1_id, _space_0_id] },
-		{ name: _space_0_id, symbols: [] }
-	];
-	const SPACE_1: ParserRule[] = [
-		{ name: _space_1_id, symbols: [{ literal: ' ' }], postprocess: (d) => d[0].text }
-	];
-
 	const _everything = generate() + '#EVERYTHING';
 	const EVERYTHING: ParserRule[] = [
 		{
@@ -148,7 +138,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 	const main_rule: ParserRule[] = [
 		{
 			name: filterToName(spec.header.states),
-			symbols: [_space_0_id, ...compiled_content.map((v) => v[0]), _space_0_id],
+			symbols: [...compiled_content.map((v) => v[0])],
 			postprocess(v) {
 				const references = v
 					.flat(Infinity)
@@ -178,7 +168,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 		ParserRules: compiled_content
 			.map((v) => v[1])
 			.flat()
-			.concat(...SPACE_0, ...SPACE_1, ...EVERYTHING)
+			.concat(EVERYTHING)
 			.concat(main_rule),
 		ParserStart: filterToName(spec.header.states)
 	};

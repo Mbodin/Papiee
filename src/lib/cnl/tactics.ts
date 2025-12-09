@@ -1,10 +1,12 @@
 import { createTacticFromTextual } from './cnl_tactic';
 
-// const COMMENT = createTacticFromTextual<{ comment: string }>(
-// 	'Comment',
-// 	'{*|(|comment|)|}',
-// 	({ value }) => `(*${value.comment}.*)`
-// );
+const COMMENT = createTacticFromTextual<{ comment: string }>(
+	'Comment',
+	'{*|(|comment|)|}',
+	({ value }) => `(*${value.comment}.*)`
+);
+
+const SPACES = createTacticFromTextual<{ comment: string }>('Spaces', '{*| |}', ({ value }) => ``);
 
 /**
  * For testing purpose we define crude tactics the looks like rocq tactics
