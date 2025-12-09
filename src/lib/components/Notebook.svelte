@@ -33,6 +33,14 @@
 	}
 
 	let article_nodes: HTMLElement[] = $state([]);
+
+	// svelte-ignore non_reactive_update
+	let version = 0; // Used to detect if update is called from a previously known version
+
+	$effect(() => {
+		notebook_state;
+		version++;
+	});
 </script>
 
 <RocqProvider>
@@ -66,11 +74,15 @@
 					{@const Component = getNotebookNode_unsafe(node.type).component}
 					{@const thisAnchoredNode = (node: HTMLElement | undefined) => setAnchorNode(node, i)}
 					{@const position = global_position.value?.index === i ? node.position : undefined}
+					{@const local_version = version}
 					<article bind:this={article_nodes[i]}>
 						<Component
 							value={{ ...node, position }}
 							setAnchorNode={thisAnchoredNode}
 							onNodeValueUpdate={(_, new_v) => {
+								// If the notebook was updated and a update is called on the older version
+								// Ignore the update
+								if (local_version !== version) return;
 								notebook_state.children[i] = new_v;
 							}}
 							isAnchored={() => anchored_i === i}
