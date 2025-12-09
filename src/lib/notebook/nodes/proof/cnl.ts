@@ -14,6 +14,11 @@ import type { ProofNodeValue } from './structure';
 import { newCnlParser } from '$lib/cnl/chunks/parser';
 import { getTactics } from '$lib/cnl/cnl_tactic';
 import type { EditorState } from 'prosemirror-state';
+import { isRangeCollapsed } from '$lib/cnl/chunks/range';
+
+export function getMainChunk(chunks: CnlChunk[]): CnlChunk | undefined {
+	return chunks.find((v) => !isRangeCollapsed(v.range));
+}
 
 export function fromSchemaToCnl(node: Node): { root: CnlRoot; chunks: CnlChunk[] } {
 	if (node.type.name !== 'doc') {
@@ -119,18 +124,40 @@ export function fromCnlToSchema(root: CnlRoot, chunks: CnlChunk[]) {
 		let index = 0;
 		line_chunks.sort((a, b) => a.range.startOffset - b.range.startOffset);
 
+		let line_chunks_grouped_by_main = line_chunks.reduce(
+			(a, b) => {
+				if (a.length === 0) return [[b]];
+
+				let last = a[a.length - 1];
+
+				if (isRangeCollapsed(b.range) || !getMainChunk(last)) {
+					return [...a.slice(0, a.length - 1), [...last, b]];
+				}
+				return [...a, [b]];
+			},
+			[[]] as CnlChunk[][]
+		);
+
 		return schema.nodes.line.create(
 			undefined,
-			line_chunks.map((chunk) => {
-				if (chunk.range.startOffset !== index) {
+			line_chunks_grouped_by_main.map((chunks) => {
+				let main = getMainChunk(chunks);
+
+				if (!main && line_chunks_grouped_by_main.length !== 1) {
+					throw new Error('Chunk group does not contains a main chunk');
+				}
+
+				if (!main) main = chunks[0];
+
+				if (main.range.startOffset !== index) {
 					throw new Error('Chunk is not started at the end of the previous one');
 				}
 
-				index = chunk.range.endOffset;
+				index = main.range.endOffset;
 
 				return schema.nodes.chunk.create(
-					{ value: [chunk] },
-					fromCnlLineTextToSchema(text.substring(chunk.range.startOffset, chunk.range.endOffset))
+					{ value: chunks },
+					fromCnlLineTextToSchema(text.substring(main.range.startOffset, main.range.endOffset))
 				);
 			})
 		);

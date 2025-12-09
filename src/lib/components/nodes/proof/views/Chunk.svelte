@@ -51,6 +51,7 @@
 	import type { CnlChunk } from '$lib/cnl/chunks/types';
 	import { schema } from '$lib/notebook/nodes/proof/schema';
 	import { proof_complete_value } from '$lib/notebook/widgets/proof_complete/state.svelte';
+	import { getMainChunk } from '$lib/notebook/nodes/proof/cnl';
 
 	const contentRef = useNodeViewContext('contentRef');
 	const node = useNodeViewContext('node');
@@ -60,7 +61,7 @@
 	node.subscribe((value) => (node_value = value));
 
 	const chunks = $derived((node_value?.attrs.value || []) as CnlChunk[]);
-	const chunk = $derived(chunks?.find((v) => v.range.startOffset !== v.range.endOffset));
+	const chunk = $derived(getMainChunk(chunks));
 
 	const selected = $derived((node_value?.attrs.selected as boolean) || false);
 
