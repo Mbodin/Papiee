@@ -23,7 +23,6 @@
 			proof_complete_value.value = {
 				hide: proof_complete_value?.value?.hide == null ? true : proof_complete_value?.value?.hide,
 				state: {
-					selector: proof_complete_value.value?.state.selector || '.line',
 					selected: proof_complete_value.value?.state.selected || 0,
 					view: view,
 					from: chunk?.range?.startOffset || 0,
@@ -39,7 +38,13 @@
 				return {
 					update(view, prevState) {
 						update_proofcomplete_command(view);
-						if (proof_complete_value.value) proof_complete_value.value.hide = false;
+						if (
+							proof_complete_value.value &&
+							fromTreeToTextual(fromSchemaToCnl(view.state.doc).root) !==
+								fromTreeToTextual(fromSchemaToCnl(prevState.doc).root)
+						) {
+							proof_complete_value.value.hide = false;
+						}
 					}
 				};
 			}
@@ -116,21 +121,25 @@
 
 <script lang="ts">
 	import Popup from '$lib/components/Popup.svelte';
-	import { proof_complete_value } from '$lib/notebook/widgets/proof_complete/state.svelte';
+	import {
+		proof_complete_value,
+		proof_complete_value_selector
+	} from '$lib/notebook/widgets/proof_complete/state.svelte';
 	import { keymap } from 'prosemirror-keymap';
 	import ProofComplete from './ProofComplete.svelte';
 	import { Plugin, Selection } from 'prosemirror-state';
 	import { schema } from '$lib/notebook/nodes/proof/schema';
 	import { predict } from '$lib/cnl/prediction';
 	import type { CnlChunk } from '$lib/cnl/chunks/types';
-	import { fromChunkToString, getMainChunk } from '$lib/notebook/nodes/proof/cnl';
+	import { fromChunkToString, fromSchemaToCnl, getMainChunk } from '$lib/notebook/nodes/proof/cnl';
 	import type { EditorView } from 'prosemirror-view';
+	import { fromTreeToTextual } from '$lib/cnl/tree';
 
 	let value = $derived(proof_complete_value.value);
 </script>
 
-{#if value && value.hide !== true && value.state.value.length > 0}
-	<Popup parent_anchor="bottom-left" selector={value.state.selector}>
+{#if value && value.hide !== true && proof_complete_value_selector.value && value.state.value.length > 0}
+	<Popup parent_anchor="bottom-left" selector={proof_complete_value_selector.value}>
 		<ProofComplete {...value.state} />
 	</Popup>
 {/if}

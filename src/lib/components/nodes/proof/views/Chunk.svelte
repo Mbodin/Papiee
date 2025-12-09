@@ -50,7 +50,10 @@
 	import { type Node } from 'prosemirror-model';
 	import type { CnlChunk } from '$lib/cnl/chunks/types';
 	import { schema } from '$lib/notebook/nodes/proof/schema';
-	import { proof_complete_value } from '$lib/notebook/widgets/proof_complete/state.svelte';
+	import {
+		proof_complete_value,
+		proof_complete_value_selector
+	} from '$lib/notebook/widgets/proof_complete/state.svelte';
 	import { getMainChunk } from '$lib/notebook/nodes/proof/cnl';
 	import { update_proofcomplete_command } from '$lib/components/widgets/proof_complete/ProofComplete_interface.svelte';
 
@@ -73,18 +76,8 @@
 
 		// We need to wait for hydration because if the element does not exist the popup will not be able to render
 		setTimeout(() => {
-			if (proof_complete_value.value?.state.selector === '#' + id) return;
-			proof_complete_value.value = {
-				state: {
-					from: chunk.range.startOffset,
-					to: chunk.range.endOffset,
-					selector: '#' + id,
-					value: [],
-					view: view,
-					selected: 0
-				},
-				hide: false
-			};
+			if (proof_complete_value_selector.value === '#' + id) return;
+			proof_complete_value_selector.value = '#' + id;
 			update_proofcomplete_command(view);
 		}, 10);
 	});
