@@ -1,5 +1,11 @@
-import { createGlobalGrammarFromTactics, type CnlParsingState } from './cnl_tactic';
+import {
+	createGlobalGrammarFromTactics,
+	getTactics,
+	resolve_state_actions,
+	type CnlParsingState
+} from './cnl_tactic';
 import nearley from 'nearley';
+import { parse_cnl_chained } from './tactic_parser';
 
 const { Grammar, Parser } = nearley;
 
@@ -13,18 +19,86 @@ export type Prediction = {
 
 type ParserSnapshot = unknown;
 
+type _Prediction = Prediction & {
+	parser_state: ParserSnapshot;
+};
+
+function remove_duplicates_prediction<T extends Prediction>(predictions: T[]): T[] {
+	return predictions.reduce((predictions: T[], new_prediction) => {
+		if (
+			predictions.find((prediction) => {
+				const p_inputs = prediction.inputs;
+				const np_inputs = new_prediction.inputs;
+
+				return (
+					p_inputs.length === np_inputs.length &&
+					!p_inputs.find(
+						(v, i) => !(np_inputs[i].type === v.type && np_inputs[i].value === v.value)
+					)
+				);
+			})
+		)
+			return predictions;
+		return [...predictions, new_prediction];
+	}, []);
+}
+
+function remove_duplicate_inputprediction(inputs: InputPrediction[]): InputPrediction[] {
+	return inputs.reduce((a: InputPrediction[], b) => {
+		if (
+			a.find((v) => {
+				const p_inputs = v;
+				const np_inputs = b;
+
+				return (
+					p_inputs.length === np_inputs.length &&
+					!p_inputs.find(
+						(v, i) => !(np_inputs[i].type === v.type && np_inputs[i].value === v.value)
+					)
+				);
+			})
+		)
+			return a;
+		return [...a, b];
+	}, []);
+}
+
 export function predict(
 	value: string,
 	state: CnlParsingState,
 	max_iter = 32
 ): InputPrediction[] | undefined {
+	const tactics = getTactics();
+	const empty_before = parse_cnl_chained(tactics, '', state, undefined, false);
+	let possible_initials = [state].concat(
+		empty_before.result.map(
+			(_v, i) =>
+				resolve_state_actions(
+					state,
+					empty_before.result
+						.slice(0, i + 1)
+						.map((v) => v.tactic.spec.footer.actions)
+						.flat()
+				) as CnlParsingState
+		)
+	);
+
+	const predictions = possible_initials
+		.map((v) => predict_with_state(value, v, max_iter))
+		.filter(Boolean)
+		.map((v) => v!);
+	if (predictions.length === 0) return undefined;
+	return remove_duplicate_inputprediction(predictions.flat());
+}
+
+function predict_with_state(
+	value: string,
+	state: CnlParsingState,
+	max_iter = 1
+): InputPrediction[] | undefined {
 	const compiled_rules = createGlobalGrammarFromTactics(undefined, state);
 	const grammar = Grammar.fromCompiled(compiled_rules);
 	const parser = new Parser(grammar);
-
-	type _Prediction = Prediction & {
-		parser_state: ParserSnapshot;
-	};
 
 	try {
 		parser.feed(value);
@@ -57,9 +131,8 @@ export function predict(
 
 	for (let iter = 0; iter < max_iter; iter++) {
 		predictions = predictions.flatMap((prediction) => {
-			if (prediction.completed) return [prediction];
+			if (prediction.completed && prediction.inputs.length > 0) return [prediction];
 			parser.restore(prediction.parser_state);
-
 			return parser.table[parser.current].states
 				.filter((state) => !state.isComplete)
 				.flatMap((state) => {
@@ -121,30 +194,14 @@ export function predict(
 				if (a[a.length - 1].type === 'string' && b.type == 'string')
 					return [
 						...a.slice(0, a.length - 1),
-						{ type: 'string', value: a[a.length - 1].value + b.value }
+						{ type: 'string', value: (a[a.length - 1].value + b.value).replaceAll(/[ \t]+/g, ' ') }
 					];
 				return [...a, b];
 			}, [])
 		}));
 
 		// Filter for duplicates
-		predictions = predictions.reduce((predictions: _Prediction[], new_prediction) => {
-			if (
-				predictions.find((prediction) => {
-					const p_inputs = prediction.inputs;
-					const np_inputs = new_prediction.inputs;
-
-					return (
-						p_inputs.length === np_inputs.length &&
-						!p_inputs.find(
-							(v, i) => !(np_inputs[i].type === v.type && np_inputs[i].value === v.value)
-						)
-					);
-				})
-			)
-				return predictions;
-			return [...predictions, new_prediction];
-		}, []);
+		predictions = remove_duplicates_prediction(predictions);
 	}
 
 	if (predictions.length === 0) {
@@ -152,5 +209,7 @@ export function predict(
 		return parser.results.length === 0 ? undefined : [];
 	}
 
-	return predictions.map((v) => v.inputs);
+	return predictions
+		.map((v) => v.inputs)
+		.filter((v) => !(v.length === 1 && v[0].type === 'string' && v[0].value === ' '));
 }

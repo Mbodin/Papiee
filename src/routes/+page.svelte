@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { predict } from '$lib/cnl/prediction';
 	import { fromTextualToTree } from '$lib/cnl/tree';
 	import { onMount } from 'svelte';
 
+	import '$lib/cnl/tactics';
+
 	onMount(() => {
-		let document = `ligne1\n\tligne2\n\tligne3\n\t\tligne4\n\tligne5\nligne6`;
-		console.log(JSON.stringify(fromTextualToTree(document), undefined, 1));
+		console.log(predict('', ['START']));
 	});
 </script>
 
