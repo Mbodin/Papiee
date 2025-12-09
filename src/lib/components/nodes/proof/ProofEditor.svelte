@@ -19,7 +19,7 @@
 		getCodeBeforePosition
 	} from '$lib/rocq/utils';
 	import type { RocqEndProofState } from '$lib/notebook/nodes/rocq/structure';
-	import { getContext } from 'svelte';
+	import { getContext, untrack } from 'svelte';
 	import { type RocqWorker, WORKER_CONTEXT } from '$lib/rocq/connection';
 	import { FileWarning } from '@lucide/svelte';
 	import type { CnlChunk } from '$lib/cnl/chunks/types';
@@ -157,7 +157,7 @@
 					debounced_updateproofstate();
 				},
 				focusout(view, event) {
-					// proof_complete_value.value = undefined;
+					proof_complete_value.value = undefined;
 				}
 			}
 		});
@@ -216,6 +216,23 @@
 	$effect(() => {
 		code_before;
 		debounced_updateproofendstate();
+	});
+
+	$effect(() => {
+		if (!view || !node) return;
+
+		const current_value = untrack(() => view!.state.doc);
+
+		if (
+			fromTreeToTextual(fromSchemaToCnl(current_value).root) !==
+			fromTreeToTextual(fromSchemaToCnl(node).root)
+		) {
+			let tr = view.state.tr;
+			const head = tr.selection.$head;
+			tr = tr.replaceRangeWith(0, tr.doc.content.size - 1, node);
+			tr = tr.setSelection(Selection.near(getNewSelectionPosition(view!.state, head, tr.doc)));
+			view.dispatch(tr);
+		}
 	});
 </script>
 
