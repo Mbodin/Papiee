@@ -43,7 +43,7 @@
 					document_size.width,
 			y:
 				window.scrollY +
-				(parent.y + (parent_relative.y + 1) * parent_dy - child_relative.y * child_dy) /
+				(parent.y + parent_relative.y * parent_dy - (child_relative.y - 1) * child_dy) /
 					document_size.height
 		};
 	});
@@ -100,8 +100,8 @@
 		x = Math.max(x, 0);
 		x = Math.min(x, 1 - element_size.width / document_size.width);
 
-		y = Math.max(y, 0);
-		y = Math.min(y, 1 - element_size.height / document_size.height);
+		// y = Math.max(y, 0);
+		// y = Math.min(y, 1 - element_size.height / document_size.height);
 		return { x, y };
 	});
 </script>
