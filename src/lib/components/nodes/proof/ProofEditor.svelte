@@ -38,7 +38,10 @@
 	import { value_derived_trivial } from '$lib/svelte/derived.svelte';
 	import { plugins as math_plugins, MathLiveNodeView } from './views/Math';
 	import { proof_complete_value } from '$lib/notebook/widgets/proof_complete/state.svelte';
-	import { plugins as complete_plugins } from '$lib/components/widgets/proof_complete/ProofComplete_interface.svelte';
+	import {
+		plugins as complete_plugins,
+		update_proofcomplete_command
+	} from '$lib/components/widgets/proof_complete/ProofComplete_interface.svelte';
 
 	let {
 		node = $bindable(),
@@ -181,6 +184,7 @@
 
 	const debounced_updateproofstate = debounced_task(() => {
 		if (!isAnchored()) return;
+		if (view) update_proofcomplete_command(view!);
 		const selected_chunk = chunks[selected];
 		if (!view || (proof_end_state != 'accessible' && proof_end_state != 'open')) {
 			proof_state_value.value = undefined;

@@ -1,40 +1,45 @@
 <script lang="ts" module>
+	export function update_proofcomplete_command(view: EditorView) {
+		const head = view.state.selection.$head;
+		let chunk_begin = head;
+		if (chunk_begin.node().type.name === schema.nodes.math.name)
+			chunk_begin = chunk_begin.$before();
+		chunk_begin = chunk_begin.$start();
+		const node = chunk_begin.node();
+
+		const chunks = (node?.attrs.value || []) as CnlChunk[];
+		const chunk = getMainChunk(chunks) || chunks[0];
+
+		const state = chunk?.state_before || ['START'];
+		const content = fromChunkToString(node);
+		const text = content.slice(0, head.pos - chunk_begin.pos);
+
+		const predictions = predict(text, state) || [];
+		const values = predictions.map(
+			(v) => text + v.map((v) => (v.type === 'string' ? v.value : '[' + v.value + ']')).join('')
+		);
+		if (!view.hasFocus()) proof_complete_value.value = undefined;
+		else
+			proof_complete_value.value = {
+				hide: proof_complete_value?.value?.hide == null ? true : proof_complete_value?.value?.hide,
+				state: {
+					selector: proof_complete_value.value?.state.selector || '.line',
+					selected: proof_complete_value.value?.state.selected || 0,
+					view: view,
+					from: chunk?.range?.startOffset || 0,
+					to: text.length,
+					value: values
+				}
+			};
+	}
+
 	export const plugins: Plugin[] = [
 		new Plugin({
 			view(view) {
 				return {
 					update(view, prevState) {
-						if (!proof_complete_value.value) return;
-
-						const head = view.state.selection.$head;
-						let chunk_begin = head;
-						if (chunk_begin.node().type.name === schema.nodes.math.name)
-							chunk_begin = chunk_begin.$before();
-						chunk_begin = chunk_begin.$start();
-						const node = chunk_begin.node();
-
-						const chunks = (node?.attrs.value || []) as CnlChunk[];
-						const chunk = chunks?.find((v) => v.range.startOffset !== v.range.endOffset);
-
-						if (!chunk) return;
-
-						const state = chunk.state_before;
-						const content = fromChunkToString(node);
-						const text = content.slice(0, head.pos - chunk_begin.pos);
-
-						const predictions = predict(text, state) || [];
-						const values = predictions.map(
-							(v) =>
-								text + v.map((v) => (v.type === 'string' ? v.value : '[' + v.value + ']')).join('')
-						);
-						if (values.length === 0 && proof_complete_value.value.state.value.length === 0) return;
-						proof_complete_value.value = {
-							hide: proof_complete_value.value.hide,
-							state: {
-								...proof_complete_value.value.state,
-								value: values
-							}
-						};
+						update_proofcomplete_command(view);
+						if (proof_complete_value.value) proof_complete_value.value.hide = false;
 					}
 				};
 			}
@@ -118,12 +123,13 @@
 	import { schema } from '$lib/notebook/nodes/proof/schema';
 	import { predict } from '$lib/cnl/prediction';
 	import type { CnlChunk } from '$lib/cnl/chunks/types';
-	import { fromChunkToString } from '$lib/notebook/nodes/proof/cnl';
+	import { fromChunkToString, getMainChunk } from '$lib/notebook/nodes/proof/cnl';
+	import type { EditorView } from 'prosemirror-view';
 
 	let value = $derived(proof_complete_value.value);
 </script>
 
-{#if value && !value.hide && value.state.value.length > 0}
+{#if value && value.hide !== true && value.state.value.length > 0}
 	<Popup parent_anchor="bottom-left" selector={value.state.selector}>
 		<ProofComplete {...value.state} />
 	</Popup>

@@ -52,6 +52,7 @@
 	import { schema } from '$lib/notebook/nodes/proof/schema';
 	import { proof_complete_value } from '$lib/notebook/widgets/proof_complete/state.svelte';
 	import { getMainChunk } from '$lib/notebook/nodes/proof/cnl';
+	import { update_proofcomplete_command } from '$lib/components/widgets/proof_complete/ProofComplete_interface.svelte';
 
 	const contentRef = useNodeViewContext('contentRef');
 	const node = useNodeViewContext('node');
@@ -78,12 +79,13 @@
 					from: chunk.range.startOffset,
 					to: chunk.range.endOffset,
 					selector: '#' + id,
-					value: ['intros d.', 'simpl.'],
+					value: [],
 					view: view,
 					selected: 0
 				},
 				hide: false
 			};
+			update_proofcomplete_command(view);
 		}, 10);
 	});
 </script>
