@@ -33,7 +33,22 @@ export function generate(): string {
 
 export function attach_grammar(tactic: CnlTactic): CompiledRules {
 	const reference_value_type: Map<string, 'unique' | 'list'> = new Map();
-	const regitered_tokens: ({ literal: string } | { token: string })[] = [];
+
+	const _space_0_id = generate() + '#SPACE_0';
+	const _space_1_id = generate() + '#SPACE_1';
+	const SPACE_0: ParserRule[] = [
+		{ name: _space_0_id, symbols: [_space_1_id, _space_0_id] },
+		{ name: _space_0_id, symbols: [] }
+	];
+	const SPACE_1: ParserRule[] = [
+		{
+			name: _space_1_id,
+			symbols: [{ literal: ' ' }],
+			postprocess: (d) => {
+				return d[0].value;
+			}
+		}
+	];
 
 	const _everything = generate() + '#EVERYTHING';
 	const EVERYTHING: ParserRule[] = [
@@ -91,17 +106,14 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 	function text(v: Text): [string, ParserRule[]] {
 		const id = generate();
 
-		[...v.value]
-			.filter((c) => !regitered_tokens.find((o) => 'literal' in o && o.literal === c))
-			.map((c) => ({ literal: c }))
-			.map((c) => regitered_tokens.push(c));
-
 		return [
 			id,
 			[
 				{
 					name: id,
-					symbols: [...v.value].map((v) => ({ literal: v })),
+					symbols: [...v.value]
+						.map((v) => (v === ' ' ? [_space_1_id, _space_0_id] : [{ literal: v }]))
+						.flat(),
 					postprocess(v) {
 						return v.map((v) => v.text).join('');
 					}
@@ -168,7 +180,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 		ParserRules: compiled_content
 			.map((v) => v[1])
 			.flat()
-			.concat(EVERYTHING)
+			.concat(...SPACE_0, ...SPACE_1, ...EVERYTHING)
 			.concat(main_rule),
 		ParserStart: filterToName(spec.header.states)
 	};
