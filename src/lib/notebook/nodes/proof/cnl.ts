@@ -217,8 +217,10 @@ function getInlinePosition($p: ResolvedPos): number {
 	} else if (type === schema.nodes.math.name) {
 		const size = $p.parentOffset + 1;
 		return size + getInlinePosition($p.$before());
+	} else if (type === schema.nodes.paragraph.name) {
+		return 0;
 	}
-	throw new Error('Should not happen (generic)');
+	throw new Error('Should not happen (generic) _' + type);
 }
 
 function getSchemaPosition($p: ResolvedPos, value: number): ResolvedPos {
