@@ -61,7 +61,7 @@
 						selected: Math.min(selected + 1, proof_complete_value.value.state.value.length - 1)
 					}
 				};
-				return true;
+				return !proof_complete_value.value.hide;
 			},
 			ArrowUp: (state, dispath, view) => {
 				if (!proof_complete_value.value || proof_complete_value.value.state.value.length === 0)
@@ -74,7 +74,7 @@
 						selected: Math.max(selected - 1, 0)
 					}
 				};
-				return true;
+				return !proof_complete_value.value.hide;
 			},
 			Enter: (state, dispath, view) => {
 				if (!proof_complete_value.value || proof_complete_value.value.state.value.length === 0)
