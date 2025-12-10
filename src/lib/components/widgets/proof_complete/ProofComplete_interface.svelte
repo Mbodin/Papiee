@@ -113,6 +113,12 @@
 					hide: false,
 					state: proof_complete_value.value.state
 				};
+				if (
+					!proof_complete_value_selector.value ||
+					document.querySelector(proof_complete_value_selector.value) == null
+				) {
+					proof_complete_value_selector.value = '.line';
+				}
 				return true;
 			}
 		})
@@ -138,8 +144,8 @@
 	let value = $derived(proof_complete_value.value);
 </script>
 
-{#if value && value.hide !== true && proof_complete_value_selector.value && value.state.value.length > 0}
-	<Popup parent_anchor="bottom-left" selector={proof_complete_value_selector.value}>
+{#if value && value.hide !== true && value.state.value.length > 0}
+	<Popup parent_anchor="bottom-left" selector={proof_complete_value_selector.value || '.line'}>
 		<ProofComplete {...value.state} />
 	</Popup>
 {/if}
