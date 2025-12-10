@@ -10,7 +10,7 @@
 
 {#if value !== 'none'}
 	<div
-		class="proofnode-state absolute right-0 bottom-0 flex flex-row flex-nowrap items-center justify-center gap-1 rounded-lg p-2 text-sm select-none"
+		class="proofnode-state flex w-fit flex-row flex-nowrap items-center justify-center gap-1 self-end rounded-lg p-2 text-sm select-none"
 		data-state={value || 'loading'}
 	>
 		{#if value === 'admit'}

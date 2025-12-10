@@ -84,7 +84,7 @@
 		{isAnchored}
 	/>
 
-	<div class="relative w-full">
+	<div class="relative flex w-full flex-row-reverse">
 		<ProofNodeStateDisplayChip state={value.state} />
 	</div>
 </div>
