@@ -312,19 +312,19 @@
 					e.preventDefault();
 				}}
 			>
-				<div class="flex h-10 w-10 flex-col items-center justify-center">
+				<div class="flex h-10 w-10 flex-col items-center justify-center fill-primary-500">
 					{#if collapsed}
-						<svg viewBox="0 0 16 16" class="h-4 w-4" fill="none" xmlns="http://www.w3.org/2000/svg"
+						<svg viewBox="0 0 16 16" class="h-4 w-4" xmlns="http://www.w3.org/2000/svg"
 							><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g
 								id="SVGRepo_tracerCarrier"
 								stroke-linecap="round"
 								stroke-linejoin="round"
 							></g><g id="SVGRepo_iconCarrier">
-								<path d="M0 10L8 2L16 10V12H0V10Z" fill="#000000"></path>
+								<path d="M0 10L8 2L16 10V12H0V10Z"></path>
 							</g></svg
 						>
 					{:else}
-						<svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" xmlns="http://www.w3.org/2000/svg"
+						<svg viewBox="0 0 24 24" class="h-8 w-8" xmlns="http://www.w3.org/2000/svg"
 							><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g
 								id="SVGRepo_tracerCarrier"
 								stroke-linecap="round"
@@ -334,7 +334,6 @@
 									fill-rule="evenodd"
 									clip-rule="evenodd"
 									d="M7.00003 8.5C6.59557 8.5 6.23093 8.74364 6.07615 9.11732C5.92137 9.49099 6.00692 9.92111 6.29292 10.2071L11.2929 15.2071C11.6834 15.5976 12.3166 15.5976 12.7071 15.2071L17.7071 10.2071C17.9931 9.92111 18.0787 9.49099 17.9239 9.11732C17.7691 8.74364 17.4045 8.5 17 8.5H7.00003Z"
-									fill="#000000"
 								></path>
 							</g></svg
 						>
