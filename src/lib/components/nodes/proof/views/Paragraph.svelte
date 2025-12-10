@@ -15,75 +15,75 @@
 	}
 
 	const keymap_definition: { [key in string]: Command } = {
-		// Backspace: (state, dispatch) => {
-		// 	const head = state.selection.$head;
-		// 	if (head.start() !== head.pos) {
-		// 		return false;
-		// 	}
-		// 	const paragraph_pos = head.$start(direct_parent_depth(head, 'paragraph'));
-		// 	let preceding_line_pos = paragraph_pos.$decrement();
-		// 	while (preceding_line_pos.pos > 0 && preceding_line_pos.node().type.name !== 'line')
-		// 		preceding_line_pos = preceding_line_pos.$decrement();
-		// 	if (preceding_line_pos.pos === 0) return false;
-		// 	const preceding_paragraph_pos = preceding_line_pos.$start(
-		// 		direct_parent_depth(preceding_line_pos, 'paragraph')
-		// 	);
-		// 	const parent_paragraph_pos = preceding_line_pos.$start(
-		// 		direct_parent_depth(preceding_line_pos, 'paragraph', 1)
-		// 	);
-		// 	if (preceding_paragraph_pos.pos === parent_paragraph_pos.pos) {
-		// 		if (dispatch) {
-		// 			let tr = state.tr;
-		// 			let preserve_content_node =
-		// 				paragraph_pos.node().childCount === 2 ||
-		// 				(parent_paragraph_pos.node().maybeChild(1)?.childCount || 0) > 1;
-		// 			tr = tr.delete(
-		// 				paragraph_pos.before() - (preserve_content_node ? 0 : 1),
-		// 				paragraph_pos.after() + (preserve_content_node ? 0 : 1)
-		// 			);
-		// 			tr = tr.insert(preceding_line_pos.end(), paragraph_pos.node().child(0).children);
-		// 			const after_pos = tr.doc.resolve(
-		// 				preceding_line_pos.end() + paragraph_pos.node().child(0).nodeSize
-		// 			);
-		// 			if (paragraph_pos.node().maybeChild(1)) {
-		// 				if ((parent_paragraph_pos.node().maybeChild(1)?.childCount || 0) > 1) {
-		// 					tr = tr.insert(after_pos.pos, paragraph_pos.node().child(1).children);
-		// 				} else {
-		// 					// We need to remove the empty line that was created when content node was preserved but empty
-		// 					tr = tr.replaceWith(
-		// 						after_pos.start(),
-		// 						after_pos.end(),
-		// 						paragraph_pos.node().child(1).children
-		// 					);
-		// 				}
-		// 			}
-		// 			tr.doc.check();
-		// 			tr = tr.setSelection(Selection.near(tr.doc.resolve(preceding_line_pos.pos)));
-		// 			dispatch(tr);
-		// 			return true;
-		// 		}
-		// 	} else {
-		// 		if (dispatch) {
-		// 			let tr = state.tr;
-		// 			tr = tr.delete(paragraph_pos.before(), paragraph_pos.after());
-		// 			tr = tr.insert(preceding_line_pos.end(), paragraph_pos.node().child(0).children);
-		// 			const after_pos = tr.doc.resolve(
-		// 				preceding_line_pos.end() + paragraph_pos.node().child(0).nodeSize
-		// 			);
-		// 			if (paragraph_pos.node().childCount === 2) {
-		// 				tr = tr.insert(after_pos.pos, paragraph_pos.node().child(1).children);
-		// 			}
-		// 			tr = tr.setSelection(Selection.near(tr.doc.resolve(preceding_line_pos.pos)));
-		// 			tr.doc.check();
-		// 			dispatch(tr);
-		// 			return true;
-		// 		}
-		// 	}
-		// 	return false;
-		// },
-		// 'Ctrl-Backspace': (state, dispatch) => keymap_definition.Backspace(state, dispatch),
-		// 'Shift-Backspace': (state, dispatch) => keymap_definition.Backspace(state, dispatch),
-		// 'Ctrl-Shift-Backspace': (state, dispatch) => keymap_definition.Backspace(state, dispatch),
+		Backspace: (state, dispatch) => {
+			const head = state.selection.$head;
+			if (head.start() !== head.pos) {
+				return false;
+			}
+			const paragraph_pos = head.$start(direct_parent_depth(head, 'paragraph'));
+			let preceding_line_pos = paragraph_pos.$decrement();
+			while (preceding_line_pos.pos > 0 && preceding_line_pos.node().type.name !== 'line')
+				preceding_line_pos = preceding_line_pos.$decrement();
+			if (preceding_line_pos.pos === 0) return false;
+			const preceding_paragraph_pos = preceding_line_pos.$start(
+				direct_parent_depth(preceding_line_pos, 'paragraph')
+			);
+			const parent_paragraph_pos = preceding_line_pos.$start(
+				direct_parent_depth(preceding_line_pos, 'paragraph', 1)
+			);
+			if (preceding_paragraph_pos.pos === parent_paragraph_pos.pos) {
+				if (dispatch) {
+					let tr = state.tr;
+					let preserve_content_node =
+						paragraph_pos.node().childCount === 2 ||
+						(parent_paragraph_pos.node().maybeChild(1)?.childCount || 0) > 1;
+					tr = tr.delete(
+						paragraph_pos.before() - (preserve_content_node ? 0 : 1),
+						paragraph_pos.after() + (preserve_content_node ? 0 : 1)
+					);
+					tr = tr.insert(preceding_line_pos.end(), paragraph_pos.node().child(0).children);
+					const after_pos = tr.doc.resolve(
+						preceding_line_pos.end() + paragraph_pos.node().child(0).nodeSize
+					);
+					if (paragraph_pos.node().maybeChild(1)) {
+						if ((parent_paragraph_pos.node().maybeChild(1)?.childCount || 0) > 1) {
+							tr = tr.insert(after_pos.pos, paragraph_pos.node().child(1).children);
+						} else {
+							// We need to remove the empty line that was created when content node was preserved but empty
+							tr = tr.replaceWith(
+								after_pos.start(),
+								after_pos.end(),
+								paragraph_pos.node().child(1).children
+							);
+						}
+					}
+					tr.doc.check();
+					tr = tr.setSelection(Selection.near(tr.doc.resolve(preceding_line_pos.pos)));
+					dispatch(tr);
+					return true;
+				}
+			} else {
+				if (dispatch) {
+					let tr = state.tr;
+					tr = tr.delete(paragraph_pos.before(), paragraph_pos.after());
+					tr = tr.insert(preceding_line_pos.end(), paragraph_pos.node().child(0).children);
+					const after_pos = tr.doc.resolve(
+						preceding_line_pos.end() + paragraph_pos.node().child(0).nodeSize
+					);
+					if (paragraph_pos.node().childCount === 2) {
+						tr = tr.insert(after_pos.pos, paragraph_pos.node().child(1).children);
+					}
+					tr = tr.setSelection(Selection.near(tr.doc.resolve(preceding_line_pos.pos)));
+					tr.doc.check();
+					dispatch(tr);
+					return true;
+				}
+			}
+			return false;
+		},
+		'Ctrl-Backspace': (state, dispatch) => keymap_definition.Backspace(state, dispatch),
+		'Shift-Backspace': (state, dispatch) => keymap_definition.Backspace(state, dispatch),
+		'Ctrl-Shift-Backspace': (state, dispatch) => keymap_definition.Backspace(state, dispatch),
 		// Delete: (state, dispatch) => {
 		// 	const head = state.selection.$head;
 		// 	if (head.end() !== head.pos)
@@ -109,9 +109,9 @@
 		// 		dispatch
 		// 	);
 		// },
-		// 'Ctrl-Delete': (state, dispatch) => keymap_definition.Delete(state, dispatch),
-		// 'Shift-Delete': (state, dispatch) => keymap_definition.Delete(state, dispatch),
-		// 'Ctrl-Shift-Delete': (state, dispatch) => keymap_definition.Delete(state, dispatch),
+		'Ctrl-Delete': (state, dispatch) => keymap_definition.Delete(state, dispatch),
+		'Shift-Delete': (state, dispatch) => keymap_definition.Delete(state, dispatch),
+		'Ctrl-Shift-Delete': (state, dispatch) => keymap_definition.Delete(state, dispatch),
 		Enter: (state, dispatch) => {
 			const head = state.selection.$head;
 			// If at first level we can't reduce the indent
