@@ -6,6 +6,7 @@
 	} from '$lib/components/LoaderDisplay.svelte';
 	import { m } from '$lib/paraglide/messages';
 	import { close, create, initialize, WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
+	import { absolute } from '$lib/route.svelte';
 	import { Loader } from '@lucide/svelte';
 	import { onMount, setContext, type Snippet } from 'svelte';
 
@@ -26,9 +27,7 @@
 	onMount(() => {
 		setTimeout(async () => {
 			loader_state = { point: 0, step_i: 1 };
-			let route = origin + resolve('/');
-			route = route.endsWith('/') ? route.substring(0, route.length - 1) : route;
-			const connection = await create(route);
+			const connection = await create(absolute(origin, ''));
 			loader_state = { point: 0, step_i: 2 };
 			await initialize(connection, initialization_params);
 			loader_state = { point: 1, step_i: 2 };
