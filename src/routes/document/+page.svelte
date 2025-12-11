@@ -13,7 +13,7 @@
 	let teacher_viewing = $state(true);
 </script>
 
-<div class="mx-auto h-full w-9/12">
+<div class="mx-auto h-fit w-9/12">
 	<Notebook bind:notebook_state mode={teacher_viewing ? 'teacher' : 'student'} />
 	<button
 		class="btn preset-filled-primary-600-400"

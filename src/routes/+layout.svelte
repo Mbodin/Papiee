@@ -21,4 +21,6 @@
 	<LangSwitch />
 	<LightSwitch />
 </header>
-{@render children?.()}
+<div class="relative flex h-fit flex-1 overflow-scroll">
+	{@render children?.()}
+</div>
