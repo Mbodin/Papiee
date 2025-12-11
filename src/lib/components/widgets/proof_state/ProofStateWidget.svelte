@@ -11,10 +11,8 @@
 	let goals = $derived(rocq_state?.goals);
 	let goal = $derived(goals?.goals[0]);
 
-	let hyps = $derived(goal?.hyps);
-
 	let internals = $derived(
-		hyps?.filter((v) => v.names[0].startsWith('__internal_name_')).map((v) => v.ty) || []
+		goal?.hyps?.filter((v) => v.names[0].startsWith('__internal_name_')).map((v) => v.ty) || []
 	);
 
 	let sets = $derived([
@@ -24,6 +22,10 @@
 				.filter((v) => v.includes('\\in'))
 				.map((v) => v.split('\\in')[1].trim())
 		)
+	]);
+
+	let hyps = $derived([
+		...new Set(internals.map(fromPpToString).filter((v) => !v.includes('\\in')))
 	]);
 
 	let values_by_sets = $derived(
@@ -55,6 +57,20 @@
 						{#each values_by_sets as [set, values]}
 							<li class="li m-0 p-0 text-nowrap">
 								<Latex value={values.join(',') + '\\in' + set} />
+							</li>
+						{/each}
+					</ul>
+				</section>
+
+				<section>
+					<header>
+						<h5 class="">{m['notebook.widgets.proof_state.hypothesis']()}</h5>
+					</header>
+
+					<ul class="ml-10">
+						{#each hyps as value}
+							<li class="li m-0 p-0 text-nowrap">
+								<Latex {value} />
 							</li>
 						{/each}
 					</ul>

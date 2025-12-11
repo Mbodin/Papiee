@@ -15,7 +15,8 @@
 			"proof_state": {
 				"state": "State",
 				"definitions": "Definitions :",
-				"error_nogoal": "No goal currently found ..."
+				"error_nogoal": "No goal currently found ...",
+				"hypothesis": "Hypothesis :"
 			}
 		},
 		"save": "Saving Notebook"

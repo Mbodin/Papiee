@@ -15,7 +15,8 @@
 			"proof_state": {
 				"state": "Etat",
 				"definitions": "Definitions :",
-				"error_nogoal": "Aucun but n'a été trouvé ..."
+				"error_nogoal": "Aucun but n'a été trouvé ...",
+				"hypothesis": "Hypothèses :"
 			}
 		},
 		"save": "Sauvegarde du Notebook"
