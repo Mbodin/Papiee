@@ -13,7 +13,7 @@ import {
 } from 'vscode-languageserver-protocol';
 import { getRocqFileHeaderContent } from './connection';
 import type { LspProofState, LspVariable, MessageConnection } from './type';
-import type { GoalAnswer } from './pp';
+import type { GoalAnswer, Pp } from './pp';
 
 export function positionAfterString(value: string): Position {
 	const line_number = value.includes('\n') ? value.split('\n').length - 1 : 0;
@@ -103,38 +103,22 @@ export async function lsp_getProofEndState(
 	connection: MessageConnection,
 	code: string
 ): Promise<RocqEndProofState> {
+	let last_line = ('\n' + code).substring(('\n' + code).indexOf('\n'));
+	if (last_line.trim().includes('Proof.')) return 'open';
+
 	return connection.transient_file(
 		async ({ document }) => {
-			let ast_spans: [string, [string, ...any]][] = await connection
-				.sendRequest('coq/getDocument', {
-					textDocument: document,
-					goals: 'Str',
-					ast: true
-				})
-				.then((v: any) => v.spans.filter((v: any) => 'ast' in v).map((v: any) => v.ast.v.expr));
+			const goal_message = (await connection.sendRequest('proof/goals', {
+				textDocument: { uri: document.uri, version: document.version },
+				position: { ...positionAfterString(code) },
+				pp_format: 'Pp',
+				mode: 'After'
+			})) as GoalAnswer<Pp, Pp>;
 
-			let last_endproof_i = ast_spans.findIndex(
-				(v: any) => v[0] === 'VernacSynPure' && v[1][0] === 'VernacEndProof'
-			);
-
-			let after_last = ast_spans.slice(last_endproof_i + 1);
-
-			let begin_i = ast_spans.findIndex((v: [string, [string, ...any]]) => {
-				if (v[0] === 'VernacSynPure') {
-					if (v[1][0] === 'VernacDefinition') return true;
-					if (v[1][0] === 'VernacStartTheoremProof') return true;
-				}
-
-				return false;
-			});
-
-			let begin = ast_spans[begin_i];
-
-			if (begin == null) return 'nothing';
-
-			let opened = after_last.find((v) => v[0] === 'VernacSynPure' && v[1][0] === 'VernacProof');
-
-			return opened ? 'open' : 'accessible';
+			if (!goal_message.goals) return 'nothing';
+			if (goal_message.goals.goals.length > 0 && goal_message.goals.goals[0].hyps.length > 0)
+				return 'open';
+			return 'accessible';
 		},
 		{ text: code.replaceAll(/\u00A0/g, ' ') }
 	);
