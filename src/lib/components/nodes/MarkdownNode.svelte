@@ -3,6 +3,7 @@
 	import { markdown } from '@codemirror/lang-markdown';
 
 	import MarkdownIt from 'markdown-it';
+	import { katex } from '@mdit/plugin-katex';
 	import type { NotebookNodeProps } from '$lib/notebook/nodes/types';
 	import type { MarkdownNodeValue } from '$lib/notebook/nodes/markdown/structure';
 	import { BrickWallIcon, PickaxeIcon } from '@lucide/svelte';
@@ -17,6 +18,7 @@
 			linkify: true,
 			typographer: true
 		});
+		md.use(katex);
 		return md.render(value.value.trim());
 	});
 

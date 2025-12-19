@@ -51,6 +51,7 @@
 		"@codemirror/view": "^6.38.8",
 		"@fsegurai/codemirror-theme-basic-dark": "^6.2.2",
 		"@lucide/svelte": "^0.546.0",
+		"@mdit/plugin-katex": "^0.24.1",
 		"@prosemirror-adapter/svelte": "^0.4.6",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@types/markdown-it": "^14.1.2",
