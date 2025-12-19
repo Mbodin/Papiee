@@ -72,7 +72,7 @@ const APPLY = createTacticFromTextual<{ apply: string }>(
 const INTROS = createTacticFromTextual<{ identifier: string }>(
 	'intros',
 	'{reasoning|intros |identifier|.|}',
-	({ value }) => `intros ${value.identifier}.`
+	({ value }) => `\\letIn{${value.identifier}}{\\mathbb{N}}.`
 );
 
 const SIMPL = createTacticFromTextual<{}>('simpl', '{reasoning|simpl.|}', () => `simpl.`);
