@@ -11,7 +11,7 @@
 		fromSchemaToCnl
 	} from '$lib/notebook/nodes/proof/cnl';
 	import { fromTextualToTree, fromTreeToTextual } from '$lib/cnl/tree';
-	import { lsp_getProofBeginState, getCodeBeforePosition } from '$lib/rocq/utils';
+	import { lsp_getProofEndState, getCodeBeforePosition } from '$lib/rocq/utils';
 	import { getContext, onMount } from 'svelte';
 	import { WORKER_CONTEXT, type RocqWorker } from '$lib/rocq/connection';
 	import ProofNodeStateDisplayChip from './proof/ProofNodeStateDisplayChip.svelte';
@@ -38,7 +38,7 @@
 	const debounced_updatestate = debounced_task(async (current_value: ProofNodeValue = value) => {
 		if (!connection) return;
 		const code = code_before + fromProofNodeToRocq(current_value);
-		const result = await lsp_getProofBeginState(connection, code);
+		const result = await lsp_getProofEndState(connection, code);
 
 		onNodeValueUpdate(current_value, { ...current_value, state: result });
 	}, 1000);

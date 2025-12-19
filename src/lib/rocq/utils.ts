@@ -14,6 +14,8 @@ import {
 import { getRocqFileHeaderContent } from './connection';
 import type { LspProofState, LspVariable, MessageConnection } from './type';
 import type { GoalAnswer, Pp } from './pp';
+import * as proto from 'vscode-languageserver-protocol';
+import * as types from 'vscode-languageserver-types';
 
 export function positionAfterString(value: string): Position {
 	const line_number = value.includes('\n') ? value.split('\n').length - 1 : 0;
@@ -99,7 +101,7 @@ export function assembleCodeFromChunks(
 	return text;
 }
 
-export async function lsp_getProofEndState(
+export async function lsp_getProofBeginState(
 	connection: MessageConnection,
 	code: string
 ): Promise<RocqEndProofState> {
@@ -126,39 +128,29 @@ export async function lsp_getProofEndState(
 
 const CACHE_extractRocqEndProofNodeState = new Cache<string, ProofNodeState>(128);
 
-export async function lsp_getProofBeginState(
+export async function lsp_getProofEndState(
 	connection: MessageConnection,
 	code: string
 ): Promise<ProofNodeState> {
-	code = code.replaceAll(/\u00A0/g, ' ') + 'Qed.';
+	code = code.replaceAll(/\u00A0/g, ' ');
+	console.log(code);
 
-	const cached = CACHE_extractRocqEndProofNodeState.get(code);
-	if (cached) return cached.value;
+	// const cached = CACHE_extractRocqEndProofNodeState.get(code);
+	// if (cached) return cached.value;
 
 	return connection.transient_file(
 		async ({ document }) => {
-			const return_value: any = await connection.sendRequest('coq/getDocument', {
-				textDocument: document,
-				goals: 'Str',
-				ast: true
-			});
+			const return_value = (await connection.sendRequest('proof/goals', {
+				textDocument: { uri: document.uri, version: document.version },
+				position: { ...positionAfterString(code) },
+				pp_format: 'Pp',
+				mode: 'After'
+			})) as GoalAnswer<Pp, Pp>;
+			console.log('h', return_value);
 
-			const errors = return_value.spans.filter((v: any) => 'error' in v.goals);
-			if (errors.length > 1) {
-				CACHE_extractRocqEndProofNodeState.set(code, 'error');
-				return 'error';
-			} else {
-				try {
-					let o = return_value?.spans?.[return_value.spans.length - 2]?.goals?.error;
-					if (o[1][0][1].includes('Attempt to save an incomplete proof')) {
-						CACHE_extractRocqEndProofNodeState.set(code, 'admit');
-						return 'admit';
-					}
-				} catch (_e) {}
+			if (return_value.goals?.given_up.length !== 0) return 'admit';
 
-				CACHE_extractRocqEndProofNodeState.set(code, 'done');
-				return 'done';
-			}
+			return 'done';
 		},
 		{ text: code }
 	);
