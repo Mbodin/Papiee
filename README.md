@@ -1,5 +1,9 @@
 # Papiée
 
+## Installation
+
+When using `npm install` be aware that you need to follow the downloading steps written in the console (a file has to be retrieved from the rocq lsp github document). The link and location of the needed file is provided as error in the console.
+
 ## Developing
 
 Once you've imported Papiée and installed dependencies with `npm install`, start a development server:
