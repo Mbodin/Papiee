@@ -118,7 +118,7 @@ var vernacular = [
 	'Show',
 	'Strict',
 	'Structure',
-	'Tactic',
+	'parsed',
 	'Time',
 	'Theorem',
 	'Types',
@@ -273,7 +273,7 @@ vernacular.map(function (word) {
 });
 
 tactics.map(function (word) {
-	words[word] = 'tactic';
+	words[word] = 'parsed';
 });
 terminators.map(function (word) {
 	words[word] = 'terminator';
@@ -281,7 +281,7 @@ terminators.map(function (word) {
 
 // Tags not handled yet: statementend, variable, coq-bullet, coq-focus; note that in
 const vernacTag = Tag.define('vernac');
-const tacticTag = Tag.define('tactic');
+const tacticTag = Tag.define('parsed');
 const terminatorTag = Tag.define('terminator');
 
 /*
@@ -374,10 +374,10 @@ function tokenBase(stream: StringStream, state: RocqCMState) {
 	if (/\d/.test(ch)) {
 		stream.eatWhile(/[\d]/);
 		/*
-      if (stream.eat('.')) {
-      stream.eatWhile(/[\d]/);
-      }
-    */
+	  if (stream.eat('.')) {
+	  stream.eatWhile(/[\d]/);
+	  }
+	*/
 		return 'number';
 	}
 
@@ -398,7 +398,7 @@ function tokenBase(stream: StringStream, state: RocqCMState) {
 	if (at_sentence_start) {
 		state.sentence_kind = kind;
 		state.is_head = true;
-	} else if (kind === 'tactic' && state.sentence_kind === 'vernac') {
+	} else if (kind === 'parsed' && state.sentence_kind === 'vernac') {
 		/* tactics should not occur in vernac (unless "ltac:" is used?) */
 		kind = 'variable';
 	}

@@ -27,6 +27,13 @@ export type CNLParseResultChained = {
 	action?: StructureSpecification['specification'];
 };
 
+/**
+ * 
+ * @param tactics the tactics available for the parsing
+ * @param value the string input
+ * @param state the current state
+ * @returns the result and the new {@link CnlParsingState}
+ */
 export function parse_cnl(
 	tactics: CnlTactic[],
 	value: string,
@@ -69,11 +76,20 @@ export function parse_cnl(
 	return max;
 }
 
+/**
+ * 
+ * @param tactics the tactics available for the parsing
+ * @param value the string input
+ * @param state the current state
+ * @param ignore_structure if line end should stop the parsing (false make it stop, true make it continues)
+ * @param trim_empty_end if parsing should be stripped at the end of all epsilons parse
+ * @returns A list of parsings and the new {@link CnlParsingState}
+ */
 export function parse_cnl_chained(
 	tactics: CnlTactic[],
 	value: string,
 	state: CnlParsingState,
-	ignore_structre: boolean = false,
+	ignore_structure: boolean = false,
 	trim_empty_end: boolean = true
 ): CNLParseResultChained {
 	let _state = [...state];
@@ -89,7 +105,7 @@ export function parse_cnl_chained(
 		ends.push(_offset);
 		_state = result.state;
 		parsed.push(result.result);
-	} while (result && (ignore_structre || !result.result.tactic.spec.footer.structure));
+	} while (result && (ignore_structure || !result.result.tactic.spec.footer.structure));
 
 	let trim_end_index = ends.findIndex((v) => v === ends[ends.length - 1]);
 	if (trim_empty_end && trim_end_index !== ends.length - 1) {

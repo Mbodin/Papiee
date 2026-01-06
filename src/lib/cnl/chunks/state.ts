@@ -1,11 +1,19 @@
 import { resolve_state_actions, type CnlParsingState } from '../cnl_tactic';
-import type { CnlChunk, TacticChunk } from './types';
+import type { CnlChunk, ParsedChunk } from './types';
 
-export function getStateAfterChunks(state: CnlParsingState, chunk: CnlChunk[]): CnlParsingState {
+/**
+ * Resolve all state actions inside the chunks
+ * Comment and error chunks are ignored
+ * 
+ * @param state initial {@link CnlParsingState}
+ * @param chunks chunks to be considered
+ * @returns the resolved {@link CnlParsingState} after the chunks
+ */
+export function getStateAfterChunks(state: CnlParsingState, chunks: CnlChunk[]): CnlParsingState {
 	return resolve_state_actions(
 		state,
-		chunk
-			.filter((v) => v.type === 'tactic')
-			.flatMap((v) => (v as TacticChunk).tactic.spec.footer.actions)
+		chunks
+			.filter((v) => v.type === 'parsed')
+			.flatMap((v) => (v as ParsedChunk).tactic.spec.footer.actions)
 	);
 }

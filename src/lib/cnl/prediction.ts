@@ -23,6 +23,11 @@ type _Prediction = Prediction & {
 	parser_state: ParserSnapshot;
 };
 
+/**
+ * Strip a list of predictions from redundat parsings
+ * @param predictions 
+ * @returns 
+ */
 function remove_duplicates_prediction<T extends Prediction>(predictions: T[]): T[] {
 	return predictions.reduce((predictions: T[], new_prediction) => {
 		if (
@@ -63,6 +68,13 @@ function remove_duplicate_inputprediction(inputs: InputPrediction[]): InputPredi
 	}, []);
 }
 
+/**
+ * Tries to predict possible continuations of an input
+ * @param value the input
+ * @param state the {@link CnlParsingState} at the time of the input
+ * @param max_iter the maximum number of predictions iterations allowed
+ * @returns a list of predictions
+ */
 export function predict(
 	value: string,
 	state: CnlParsingState,
@@ -127,7 +139,7 @@ function predict_with_state(
 			inputs: [],
 			completed: parser.results.length !== 0
 		});
-	} catch (_e) {}
+	} catch (_e) { }
 
 	for (let iter = 0; iter < max_iter; iter++) {
 		predictions = predictions.flatMap((prediction) => {

@@ -97,7 +97,7 @@
 		display: inline-block;
 	}
 
-	:global(.paragraph-line-chunk[data-type='tactic']) {
+	:global(.paragraph-line-chunk[data-type='parsed']) {
 		--selected-border: black;
 		--selected-background: rgba(0, 0, 0, 0.05);
 		--unselected-border: black;

@@ -92,7 +92,7 @@ export function assembleCodeFromChunks(
 ): string {
 	const code = chunks
 		.slice(0, position + 1)
-		.filter((v) => v.type === 'tactic')
+		.filter((v) => v.type === 'parsed')
 		.map((v) => v.code)
 		.join('');
 

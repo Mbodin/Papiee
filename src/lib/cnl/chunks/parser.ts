@@ -9,24 +9,24 @@ import type { CnlContent, CnlLine, CnlParagraph, CnlPosition, CnlRoot } from '..
 import {
 	CHILD_WITHOUT_PARAGRAPH_BEGIN,
 	FATAL_ERROR,
-	TACTIC_AFTER_LINE_END,
-	TACTIC_NOT_RECOGNISED,
+	PROOF_ELEMENT_AFTER_LINE_END,
+	PROOF_ELEMENT_NOT_RECOGNISED,
 	type ErrorGenerator
 } from './errors';
 import { collapsedRange, isRangeCollapsed, linePosition } from './range';
 import { getStateAfterChunks } from './state';
-import { COMMENT, TACTIC, type CnlChunk, type TacticChunk } from './types';
+import { COMMENT, PARSED, type CnlChunk, type ParsedChunk } from './types';
 
 export type CnlParser = (root: CnlRoot) => CnlChunk[];
 
 function getLineEndStructure_chunkIndex(chunk: CnlChunk[]): number | -1 {
 	return chunk.findIndex(
-		(v) => v.type === 'tactic' && v.tactic.spec.footer.structure && !isFallbackTactic(v.tactic)
+		(v) => v.type === 'parsed' && v.tactic.spec.footer.structure && !isFallbackTactic(v.tactic)
 	);
 }
 
 function getStructureSpecification(chunks: CnlChunk[]): CnlTactic | undefined {
-	return chunks.findLast((v) => v.type === 'tactic')?.tactic;
+	return chunks.findLast((v) => v.type === 'parsed')?.tactic;
 }
 
 function turnToErroChunks(
@@ -45,7 +45,7 @@ function turnToErroChunks(
 function resolve_state_actions_chunks(state: CnlParsingState, chunks: CnlChunk[]): CnlParsingState {
 	return resolve_state_actions(
 		state,
-		chunks.map((v) => (v.type === 'tactic' ? v.tactic.spec.footer.actions : [])).flat()
+		chunks.map((v) => (v.type === 'parsed' ? v.tactic.spec.footer.actions : [])).flat()
 	);
 }
 
@@ -95,7 +95,7 @@ export function newCnlParser(tactics: CnlTactic[], initial_state: CnlParsingStat
 		const { ends, result } = parse_cnl_chained(tactics, '', state, false);
 
 		let chunks: CnlChunk[] = result.map((v, i) =>
-			TACTIC(
+			PARSED(
 				v,
 				resolve_state_actions(
 					state,
@@ -269,7 +269,7 @@ export function newCnlParser(tactics: CnlTactic[], initial_state: CnlParsingStat
 		const { ends, result } = parse_cnl_chained(tactics, line.value, state, true);
 
 		let chunks: CnlChunk[] = result.map((v, i) =>
-			TACTIC(
+			PARSED(
 				v,
 				resolve_state_actions(
 					state,
@@ -292,11 +292,11 @@ export function newCnlParser(tactics: CnlTactic[], initial_state: CnlParsingStat
 
 		// If there is text which was not parsed, then the text represents a syntax error
 		if (!isRangeCollapsed(error_range)) {
-			chunks.push(TACTIC_NOT_RECOGNISED(after_chunks, error_range));
+			chunks.push(PROOF_ELEMENT_NOT_RECOGNISED(after_chunks, error_range));
 		}
 
 		chunks = chunks.map((v) =>
-			v.type === 'tactic' && v.tactic.name?.toLocaleLowerCase() === 'comment'
+			v.type === 'parsed' && v.tactic.name?.toLocaleLowerCase() === 'comment'
 				? COMMENT(v, after_chunks, v.range)
 				: v
 		);
@@ -306,7 +306,7 @@ export function newCnlParser(tactics: CnlTactic[], initial_state: CnlParsingStat
 
 		// If there are tactics after a tactic which was marked as line end, then those tactics are error
 		if (line_stop !== -1 && tactic_after_stop) {
-			chunks = turnToErroChunks(chunks, line_stop + 1, TACTIC_AFTER_LINE_END);
+			chunks = turnToErroChunks(chunks, line_stop + 1, PROOF_ELEMENT_AFTER_LINE_END);
 		}
 
 		return {

@@ -1,4 +1,4 @@
-import type { CnlChunk, TacticChunk } from '$lib/cnl/chunks/types';
+import type { CnlChunk, ParsedChunk } from '$lib/cnl/chunks/types';
 import {
 	comparePosition,
 	fromTextualToTree,
@@ -119,7 +119,7 @@ export function fromCnlToSchema(root: CnlRoot, chunks: CnlChunk[]) {
 				type: 'comment',
 				range: { parent: position, startOffset: 0, endOffset: text.length },
 				comment_code: ''
-			} as unknown as TacticChunk);
+			} as unknown as ParsedChunk);
 		}
 		let index = 0;
 		line_chunks.sort((a, b) => a.range.startOffset - b.range.startOffset);
@@ -196,7 +196,7 @@ export function fromProofNodeToRocq(value: ProofNodeValue) {
 					return '';
 				case 'comment':
 					return v.comment_code;
-				case 'tactic':
+				case 'parsed':
 					return v.code;
 			}
 		})

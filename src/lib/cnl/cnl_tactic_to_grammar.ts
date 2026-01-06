@@ -8,29 +8,29 @@ import type {
 	Text
 } from './cnl_tactic_specifier';
 
+/**
+ * A state filter is by definition
+ * - '*' if accessible from all states
+ * - [] if accessible from no states
+ * - [v1, v2, ..., vn] if {@link CnlParsingState} starts with [v1, v2, ..., vn]
+ * @param filter 
+ * @returns a valid name to be used in the grammar
+ */
 export function filterToName(filter?: StateFilter): string {
 	if (filter === '*') return 'ANYTHING';
 	if (!filter || filter.length == 0) return `FILTER_DEFAULT`;
 	return `FILTER_${filter.map((v) => v.toUpperCase()).join('$')}`;
 }
 
-export function create_token(t: { type: string }, values?: string[]): Symbol {
-	return {
-		test: (v: any) => {
-			if ('value' in v && values?.includes(v.value)) return true;
-			return (
-				(typeof v === 'object' && 'token' in v && v.token === t.type) ||
-				('type' in v && v.type === t.type)
-			);
-		},
-		token: t.type
-	} as Symbol;
-}
-
 export function generate(): string {
 	return crypto.randomUUID().replace('-', '_');
 }
 
+/**
+ * Build and set the grammar in the {@link CnlTactic} from the rules stored in the object
+ * @param tactic 
+ * @returns the linked grammar
+ */
 export function attach_grammar(tactic: CnlTactic): CompiledRules {
 	const reference_value_type: Map<string, 'unique' | 'list'> = new Map();
 

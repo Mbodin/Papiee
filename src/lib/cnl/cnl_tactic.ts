@@ -39,6 +39,12 @@ export function isFallbackTactic(tactic: CnlTactic<unknown>): boolean {
 	return tactic.spec.content.length === 0;
 }
 
+/**
+ * Compute the final {@link CnlParsingState} from an initial state and a list of actions
+ * @param state the initial state
+ * @param actions the list of actions
+ * @returns the resolved {@link CnlParsingState}
+ */
 export function resolve_state_actions(state: CnlParsingState, actions: StateAction[]) {
 	const _state = [...state];
 
@@ -70,6 +76,13 @@ export type TransformerContext<T = any> = {
 
 export type Transformer<T> = (value: TransformerContext<T>) => string;
 
+/**
+ * Parse {@link CnlTactic} from the string representation
+ * @param name the optional name of the tactic, usefull for debugging purpose
+ * @param textual the textual representation
+ * @param transformer the function to convert parsed object into rocq code
+ * @returns a {@link CnlTactic}
+ */
 export function createTacticFromTextual<T = any>(
 	name: string | undefined,
 	textual: string,
@@ -110,6 +123,12 @@ export function createTacticFromTextual<T = any>(
 
 export type ParseResult<T = unknown> = { tactic: CnlTactic<T>; value: T };
 
+/**
+ * Define a global grammar from a list of {@link CnlTactic}
+ * @param tactics 
+ * @param state 
+ * @returns a grammar which should parse proof elements
+ */
 export function createGlobalGrammarFromTactics(
 	tactics?: CnlTactic[],
 	state?: CnlParsingState

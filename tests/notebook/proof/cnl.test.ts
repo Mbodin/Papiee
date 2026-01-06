@@ -8,7 +8,7 @@ function newCnlParser(tactics: CnlTactic[], initial_state: CnlParsingState): Cnl
 	const parser = _newCnlParser(tactics, initial_state);
 	return (root) =>
 		parser(root).map((v: any) => {
-			if (v.type === 'tactic' && v.tactic && v.tactic.textual) {
+			if (v.type === 'parsed' && v.tactic && v.tactic.textual) {
 				const textual = v.tactic.textual;
 				delete v.tactic;
 				v['textual'] = textual;
@@ -54,7 +54,7 @@ test('Line - One text tactic', () => {
 														endOffset: 13
 													},
 													code: '',
-													type: 'tactic',
+													type: 'parsed',
 													textual: '{|Hello World !|}'
 												}
 											]
@@ -112,7 +112,7 @@ test('Line - Multiple text tactics', () => {
 														endOffset: 13
 													},
 													code: '',
-													type: 'tactic',
+													type: 'parsed',
 													textual: '{|Hello World !|}'
 												}
 											]
@@ -136,7 +136,7 @@ test('Line - Multiple text tactics', () => {
 														endOffset: 26
 													},
 													code: '',
-													type: 'tactic',
+													type: 'parsed',
 													textual: '{|Hello World !|}'
 												}
 											]
@@ -160,7 +160,7 @@ test('Line - Multiple text tactics', () => {
 														endOffset: 39
 													},
 													code: '',
-													type: 'tactic',
+													type: 'parsed',
 													textual: '{|Hello World !|}'
 												}
 											]
