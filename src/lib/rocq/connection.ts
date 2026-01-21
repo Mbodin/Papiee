@@ -24,7 +24,7 @@ export function getRocqFileHeaderContent(): string {
 export async function create(origin: string): Promise<MessageConnection> {
 	let wuri = '/wasm-bin/wacoq_worker.js';
 
-	let worker = new Worker(wuri);
+	let worker = new Worker(origin+wuri);
 	worker.postMessage(origin);
 
 	let reader = new BrowserMessageReader(worker);
