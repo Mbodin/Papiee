@@ -9,7 +9,7 @@
 
 	const text = `Soit $(u_{n}) \\in \\mathbb{R}^{\\mathbb{N}}$, $q \\in \\mathbb{R}$.
 Supposons que : $\\forall n \\in \\mathbb{N}, u_{n+1} = q \\times u_{n}$
-On procèdre par récurrence.
+On procède par récurrence.
 \t$q^{0} \\times u_{0} = 1 \\times u_{0} =u_{0}$
 \tOn suppose par récurrence : $\\exists n_{0} \\in \\mathbb{N}$, $u_{n_{0}} = q^{n_{0}} \\times u_{0}$.\n\tMontrons que $u_{n_{0} +1} = q^{n_{0} +1} \\times u_{0}$. On a que : $u_{n_{0} +1} = q \\times u_{n_{0}} = q\\times \\left( q^{n_{0}} \\times u_{0}\\right) = q^{n_{0} +1} \\times u_{0}$. Par récurrence on a bien que $\\forall n\\in \\mathbb{N}, u_{n} =q^{n} \\times u_{0}$. `;
 

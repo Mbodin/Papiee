@@ -49,10 +49,21 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
-## Project organisation
+## Project entry points
 
-When opening the webbrowser, the webpage is generated from a [Svelte document](src/routes/document/+page.svelte).
+When opening the webbrowser, the webpage is generated from [a Svelte document](src/routes/document/+page.svelte).
 Within this webpage, several Svelte elements are used, in particular the `QUESTION_NODE`, composed of a question in Markdown and a proof.
-The behaviour of this node is defined in a [Typescript file](src/lib/notebook/nodes/question/structure.ts) imported at the beginning of the Svelte document.
+The behaviour of this node is defined in [a Typescript file](src/lib/notebook/nodes/question/structure.ts) imported at the beginning of the Svelte document.
 
+The tactics available to students are defined in [`tactics.ts`](src/lib/cnl/tactics.ts).
+Here is an example of a declaration:
+```typescript
+const INTROS = createTacticFromTextual<{ identifier: string, inset: string }>(
+	'intros',
+	'{reasoning|Let |identifier| \\in |inset|.|-+reasoning}',
+	({ value }) => `\\letIn{${value.identifier}}{${value.inset}}.`
+);
+```
+This declares a new tactic `intros`, invoked (for instance) by `Let x \in \mathbb{N}`, that triggers the `\letIn{x}{\mathbb{N}}` Rocq tactic (defined in [`Tactics.v`](rocq/Tactics.v).
+Annotation like `reasoning` restrict where this tactic can be invoked, and the annotation `-+reasoning` at the end of the same line defines the state after the invocation of the tactic.
 

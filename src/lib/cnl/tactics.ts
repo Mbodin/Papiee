@@ -23,7 +23,7 @@ const ADMITTED = createTacticFromTextual<{}>('admitted', '{reasoning||-+end}', (
 
 const DESTRUCTION = createTacticFromTextual<{ identifier: string }>(
 	'destruction',
-	'{reasoning|destruct |identifier|.|>+destruction}',
+	'{reasoning|Analyse de cas sur |identifier|.|>+destruction}',
 	({ value }) => `destruct ${value.identifier}.\n`
 );
 
@@ -59,7 +59,7 @@ const REWRITE_RIGHT = createTacticFromTextual<{ rewrite: string }>(
 
 const REFLEXIVITY = createTacticFromTextual<{}>(
 	'rewrite_right',
-	'{reasoning|reflexivity.|-+end}',
+	'{reasoning|L\'égalité est triviale.|-+end}',
 	({ value }) => `reflexivity.`
 );
 
@@ -69,14 +69,14 @@ const APPLY = createTacticFromTextual<{ apply: string }>(
 	({ value }) => `apply ${value.apply}.`
 );
 
-const INTROS = createTacticFromTextual<{ identifier: string }>(
+const INTROS = createTacticFromTextual<{ identifier: string, inset: string }>(
 	'intros',
-	'{reasoning|intros |identifier|.|}',
-	({ value }) => `\\letIn{${value.identifier}}{\\mathbb{N}}.`
+	'{reasoning|Soit |identifier| \\in |inset|.|}',
+	({ value }) => `\\letIn{${value.identifier}}{${value.inset}}.`
 );
 
-const SIMPL = createTacticFromTextual<{}>('simpl', '{reasoning|simpl.|}', () => `simpl.`);
+const SIMPL = createTacticFromTextual<{}>('simpl', '{reasoning|Simplifions.|}', () => `simpl.`);
 
-const LEFT = createTacticFromTextual<{}>('left', '{reasoning|left.|}', () => `left.`);
+const LEFT = createTacticFromTextual<{}>('left', '{reasoning|Montrons la propriété de gauche.|}', () => `left.`);
 
-const RIGHT = createTacticFromTextual<{}>('right', '{reasoning|right.|}', () => `right.`);
+const RIGHT = createTacticFromTextual<{}>('right', '{reasoning|Montrons la propriété de droite.|}', () => `right.`);
