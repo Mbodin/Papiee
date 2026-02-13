@@ -3,7 +3,7 @@
 	"hello_world": "Hello, {name} from fr!",
 	"notebook": {
 		"proof": {
-			"error_norocqproof": "Aucune preuve rocq n'a été trouvée précédemment dans le fichier.",
+			"error_norocqproof": "Aucune preuve Rocq n'a été trouvée précédemment dans le fichier.",
 			"begin_state": {
 				"error": "Erreur",
 				"success": "Succès",
