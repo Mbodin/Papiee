@@ -10,7 +10,7 @@
 	import '$lib/resolvedpos';
 	import { schema } from '$lib/notebook/nodes/proof/schema';
 
-	import '$lib/cnl/tactics';
+	import '$lib/cnl/tactics_fr';
 	import { proof_state_value } from '$lib/notebook/widgets/proof_state/state.svelte';
 	import type { NotebookState } from '$lib/notebook/structure';
 	import {

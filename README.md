@@ -55,7 +55,7 @@ When opening the webbrowser, the webpage is generated from [a Svelte document](s
 Within this webpage, several Svelte elements are used, in particular the `QUESTION_NODE`, composed of a question in Markdown and a proof.
 The behaviour of this node is defined in [a Typescript file](src/lib/notebook/nodes/question/structure.ts) imported at the beginning of the Svelte document.
 
-The tactics available to students are defined in [`tactics.ts`](src/lib/cnl/tactics.ts).
+The tactics available to students are defined in the [`tactics_*.ts`](src/lib/cnl/) files.
 Here is an example of a declaration:
 ```typescript
 const INTROS = createTacticFromTextual<{ identifier: string, inset: string }>(

@@ -13,8 +13,10 @@ const SPACES = createTacticFromTextual<{ comment: string }>('Spaces', '{*| |}', 
  */
 
 /**
- * r : reasoning
- * end : the goal is supposedly empty
+ * States:
+ * - reasoning: main reasonning state.
+ * - end: the goal is supposedly empty.
+ * - destruction: we are in the middle of a case analysis.
  */
 
 const START = createTacticFromTextual<{}>('start', '{START||-+reasoning}', ({}) => '');
@@ -23,7 +25,7 @@ const ADMITTED = createTacticFromTextual<{}>('admitted', '{reasoning||-+end}', (
 
 const DESTRUCTION = createTacticFromTextual<{ identifier: string }>(
 	'destruction',
-	'{reasoning|Analyse de cas sur |identifier|.|>+destruction}',
+	'{reasoning|destruct |identifier|.|>+destruction}',
 	({ value }) => `destruct ${value.identifier}.\n`
 );
 
@@ -59,7 +61,7 @@ const REWRITE_RIGHT = createTacticFromTextual<{ rewrite: string }>(
 
 const REFLEXIVITY = createTacticFromTextual<{}>(
 	'rewrite_right',
-	'{reasoning|L\'égalité est triviale.|-+end}',
+	'{reasoning|reflexivity.|-+end}',
 	({ value }) => `reflexivity.`
 );
 
@@ -69,14 +71,14 @@ const APPLY = createTacticFromTextual<{ apply: string }>(
 	({ value }) => `apply ${value.apply}.`
 );
 
-const INTROS = createTacticFromTextual<{ identifier: string, inset: string }>(
+const INTROS = createTacticFromTextual<{ identifier: string }>(
 	'intros',
-	'{reasoning|Soit |identifier| \\in |inset|.|}',
-	({ value }) => `\\letIn{${value.identifier}}{${value.inset}}.`
+	'{reasoning|intros |identifier|.|}',
+	({ value }) => `\\letIn{${value.identifier}}{\\mathbb{N}}.`
 );
 
-const SIMPL = createTacticFromTextual<{}>('simpl', '{reasoning|Simplifions.|}', () => `simpl.`);
+const SIMPL = createTacticFromTextual<{}>('simpl', '{reasoning|simpl.|}', () => `simpl.`);
 
-const LEFT = createTacticFromTextual<{}>('left', '{reasoning|Montrons la propriété de gauche.|}', () => `left.`);
+const LEFT = createTacticFromTextual<{}>('left', '{reasoning|left.|}', () => `left.`);
 
-const RIGHT = createTacticFromTextual<{}>('right', '{reasoning|Montrons la propriété de droite.|}', () => `right.`);
+const RIGHT = createTacticFromTextual<{}>('right', '{reasoning|right.|}', () => `right.`);

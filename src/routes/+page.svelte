@@ -3,7 +3,7 @@
 	import { fromTextualToTree } from '$lib/cnl/tree';
 	import { onMount } from 'svelte';
 
-	import '$lib/cnl/tactics';
+	import '$lib/cnl/tactics_test';
 
 	onMount(() => {
 		console.log(predict('', ['START']));

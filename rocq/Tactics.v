@@ -584,10 +584,25 @@ Check ltac:(goal_test_solve ltac:(trivial_to_prove) (forall x : nat, x + 1 = 1 +
 (* All the tactics defined below in the shape of a LaTeX command
   (like \letIn{…}{…}) are meant to be use by the GUI as basic blocks
   for student reasonning.
+  The rationnale is that the same script could be used to format TeX documents
+  into a readable proof.
   When these tactics fail, they always return a string of the form
   [fail "Error_code"{args}{…}] to simplify the parsing of their response. *)
 
 (* ** Linear Tactics (don't add or remove goals) *)
+
+(* *** Assertive tactics *)
+
+(* These tactics don't change anything in the goal, but help to structure the proof. *)
+
+(* **** \alreadyProven{P}: check that something has already been proven. *)
+
+(* TODO *)
+
+(* **** \toBeProven{P}: check that the goal is of the form. *)
+
+(* TODO *)
+
 
 (* *** \letIn{variable}{set}: Introduce a variable. *)
 
@@ -898,6 +913,10 @@ Check ltac:(goal_test_step_fail ltac:(\letIn{x}{\mathbb{N}} ; \letIn{y}{\mathbb{
 
 
 (* ** Structural Tactics (add and/or remove goals) *)
+
+(* *** \letsProve{P}: Prove an intermediary lemma. *)
+
+(* TODO *)
 
 (* *** \closeGoal{}: Closes the goal (possibly admitting its result). *)
 
