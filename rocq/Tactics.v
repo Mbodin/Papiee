@@ -591,19 +591,6 @@ Check ltac:(goal_test_solve ltac:(trivial_to_prove) (forall x : nat, x + 1 = 1 +
 
 (* ** Linear Tactics (don't add or remove goals) *)
 
-(* *** Assertive tactics *)
-
-(* These tactics don't change anything in the goal, but help to structure the proof. *)
-
-(* **** \alreadyProven{P}: check that something has already been proven. *)
-
-(* TODO *)
-
-(* **** \toBeProven{P}: check that the goal is of the form. *)
-
-(* TODO *)
-
-
 (* *** \letIn{variable}{set}: Introduce a variable. *)
 
 (* Ensure that the provided variable is fresh within the environment. *)
@@ -881,6 +868,41 @@ Check ltac:(goal_test_step ltac:(\letIn{x}{\mathbb{N}} ; \letIn{y}{\mathbb{N}} ;
 Check ltac:(goal_test_step_fail ltac:(\letIn{x}{\mathbb{N}} ; \letIn{y}{\mathbb{N}} ; \introduce{(x = x)})
               (\forall x y \in \mathbb{N}, x = y -> False)).
 
+(* *** Assertive tactics (don't change much in the context) *)
+
+(* These tactics don't change anything in the goal, but help to structure the proof. *)
+
+(* **** \alreadyProven{P}: check that something has already been proven. *)
+
+Tactic Notation "\alreadyProven" "{" constr(P) "}" :=
+  assume_proof_mode ltac:(fun _ =>
+    let H := new_private in
+    assert (H : P) ; [ trivial_to_prove || add_warning "not_yet_proven"%string |] ;
+    clear H).
+
+Check ltac:(goal_test_step ltac:(\letIn{n}{\mathbb{N}} ; \introduce{(n > 2)} ; \alreadyProven{(n > 2)})
+              (\forall n \in \mathbb{N}, n > 2 -> n > 1)
+              (\forall n \in \mathbb{N}, n > 2 -> n > 1)).
+
+Check ltac:(goal_test_step_fail ltac:(\letIn{n}{\mathbb{N}} ; \alreadyProven{(n > 2)})
+              (\forall n \in \mathbb{N}, n > 1)).
+
+(* **** \toBeProven{P}: check that the goal is of the form. *)
+
+Tactic Notation "\toBeProven" "{" constr(P) "}" :=
+  assume_proof_mode ltac:(fun _ =>
+    lazymatch goal with
+    | |- ?G =>
+      let E := new_private in
+      assert (E : G <-> P) ; [ trivial_to_prove |] ;
+      rewrite E;
+      clear E
+    end).
+
+Check ltac:(goal_test_step ltac:(\letIn{n}{\mathbb{N}} ; \introduce{(n > 2)} ; \toBeProven{(1 < n)})
+              (\forall n \in \mathbb{N}, n > 2 -> n > 1)
+              (\forall n \in \mathbb{N}, n > 2 -> 1 < n)).
+
 
 (* ** (Linears) Tactics with Databases *)
 
@@ -916,7 +938,11 @@ Check ltac:(goal_test_step_fail ltac:(\letIn{x}{\mathbb{N}} ; \letIn{y}{\mathbb{
 
 (* *** \letsProve{P}: Prove an intermediary lemma. *)
 
-(* TODO *)
+Tactic Notation "\toBeProven" "{" constr(P) "}" :=
+  assume_proof_mode ltac:(fun _ =>
+    let E := new_name in
+    assert (E : P)).
+
 
 (* *** \closeGoal{}: Closes the goal (possibly admitting its result). *)
 
@@ -1121,6 +1147,7 @@ Ltac suggest_hint :=
 
 Ltac suggest_goal :=
   try lazymatch goal with
+  | |- solved_goal => idtac
   | |- ?g =>
     let H := new_private in
     (assert (H : g) ; [ trivial_to_prove |]) ;
@@ -1160,8 +1187,13 @@ Goal \forall x \in \mathbb{N}^\star, x * x * x >= 1.
   \help{}. (* \suggest{\caseItem{_}} \suggest{\caseEnd{}} *)
   \caseItem{(x = 0)}.
     \help{}. (* No hint. *)
+    conclude lia.
+    \help{}. (* \suggest{\closeGoal{}}. *)
     \caseItemEnd{}.
   \help{}. (* \suggest{\caseItem{_}} \suggest{\caseEnd{}} *)
-  \closeGoal{}.
-Admitted.
+  \caseItem{(x > 0)}.
+    conclude lia.
+    \caseItemEnd{}.
+  \caseEnd{}.
+Qed.
 
