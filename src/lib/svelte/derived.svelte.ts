@@ -9,7 +9,7 @@ export function value_derived<T>(getter: () => T, equal: (a: T, b: T) => boolean
 
 	return {
 		get value() {
-			return cached_value;
+			return (() => cached_value)();
 		}
 	};
 }

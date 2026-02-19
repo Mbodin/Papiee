@@ -7,15 +7,17 @@
 	import { QUESTION_NODE } from '$lib/notebook/nodes/question/structure';
 	import { onMount } from 'svelte';
 
-	const text = `Soit $(u_{n}) \\in \\mathbb{R}^{\\mathbb{N}}$, $q \\in \\mathbb{R}$.
-Supposons que : $\\forall n \\in \\mathbb{N}, u_{n+1} = q \\times u_{n}$
-On procède par récurrence.
-\t$q^{0} \\times u_{0} = 1 \\times u_{0} =u_{0}$
-\tOn suppose par récurrence : $\\exists n_{0} \\in \\mathbb{N}$, $u_{n_{0}} = q^{n_{0}} \\times u_{0}$.\n\tMontrons que $u_{n_{0} +1} = q^{n_{0} +1} \\times u_{0}$. On a que : $u_{n_{0} +1} = q \\times u_{n_{0}} = q\\times \\left( q^{n_{0}} \\times u_{0}\\right) = q^{n_{0} +1} \\times u_{0}$. Par récurrence on a bien que $\\forall n\\in \\mathbb{N}, u_{n} =q^{n} \\times u_{0}$. `;
-
 	let node = QUESTION_NODE.initial();
 
 	onMount(() => {
+		let text = "Soit $(u_{n}) \\in \\mathbb{R}^{\\mathbb{N}}$, $q \\in \\mathbb{R}$.\n" ;
+		text += "Supposons que $\\forall n \\in \\mathbb{N}, u_{n+1} = q \\times u_{n}$.\n" ;
+		text += "On procède par récurrence.\n" ;
+		text += "\t$On a q^{0} \\times u_{0} = 1 \\times u_{0} = u_{0}$.\n"
+		text += "\tOn suppose par récurrence $\\exists n_{0} \\in \\mathbb{N}$, $u_{n_{0}} = q^{n_{0}} \\times u_{0}$.\n" ;
+		text += "\tMontrons que $u_{n_{0} +1} = q^{n_{0} +1} \\times u_{0}$. "
+		text += "On a $u_{n_{0} +1} = q \\times u_{n_{0}} = q\\times \\left( q^{n_{0}} \\times u_{0}\\right) = q^{n_{0} +1} \\times u_{0}$.\n" ;
+		text += "Par récurrence on a bien $\\forall n\\in \\mathbb{N}, u_{n} =q^{n} \\times u_{0}$.";
 		node.children.cnl_proof.value = text;
 	});
 

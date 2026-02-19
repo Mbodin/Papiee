@@ -88,7 +88,7 @@ const LETS_PROVE = createTacticFromTextual<{ property: string }>(
 
 const QED = createTacticFromTextual<{}>(
 	'qed',
-	'{reasoning|Ce qu\'il fallait démontrer.|end}',
+	'{reasoning|Ce qu\'il fallait démontrer.|-+end}',
 	({ value }) => `\\closeGoal{}`
 );
 
