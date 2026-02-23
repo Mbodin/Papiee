@@ -3,10 +3,14 @@ import type { CnlTactic } from './cnl_tactic';
 import { Lexer } from './lexer';
 import type {
 	Reference,
+	Iteration,
+	Either,
+	SpecificationContent,
 	SpecificationContentNode,
 	StateFilter,
 	Text
 } from './cnl_tactic_specifier';
+import { get_references } from './cnl_tactic_specifier';
 
 /**
  * A state filter is by definition
@@ -92,22 +96,31 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 
 	const spec = tactic.spec;
 
-	function specification_node(v: SpecificationContentNode): [string, ParserRule[]] {
+	// Return a triple:
+	// - A symbol corresponding to the non-terminal recognizing the current node.
+	// - Symbols that have been defined for subnodes,
+	// - The associated rules.
+	function specification_node(v: SpecificationContentNode): [string, [string], ParserRule[]] {
 		switch (v.type) {
 			case 'text':
 				return text(v);
 			case 'reference':
 				return reference(v);
+			case 'iteration':
+				return iteration(v);
+			case 'either':
+				return either(v);
 			default:
 				throw new Error(`${v as any} is unknown`);
 		}
 	}
 
-	function text(v: Text): [string, ParserRule[]] {
+	function text(v: Text): [string, [string], ParserRule[]] {
 		const id = generate();
 
 		return [
 			id,
+			[id],
 			[
 				{
 					name: id,
@@ -117,18 +130,19 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 					postprocess(v) {
 						return v.map((v) => v.text).join('');
 					}
-				}
+				} as ParserRule
 			]
 		];
 	}
 
-	function reference(v: Reference): [string, ParserRule[]] {
+	function reference(v: Reference): [string, [string], ParserRule[]] {
 		const id = generate() + '_' + v.value + '#REF' + v.value;
 		if (reference_value_type.has(v.value)) reference_value_type.set(v.value, 'list');
 		else reference_value_type.set(v.value, 'unique');
 
 		return [
 			id,
+			[id],
 			[
 				{
 					name: id,
@@ -145,12 +159,67 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 		];
 	}
 
+	function either(e: Either): [string, [string], ParserRule[]] {
+		const id_global = generate() ;
+
+		const sub =
+			e.contents.map ((c, i) => {
+					const id = generate() + '_' + i + '#CASE' + i;
+					const [inner_node, states, rules] = specification_node(c);
+
+					return [
+						id,
+						[id, ...states],
+						[
+							{
+								name: id,
+								symbols: [inner_node],
+								postprocess = d => d.join ("")
+							} as ParserRule,
+							...rules
+						]
+					]
+				}) ;
+
+		return [
+			id_global,
+			[id_global, ...sub.flatmap(([inner_node, states, rules) => states)],
+			sub.flatmap(([inner_node, states, rules) => rules)
+		]
+	}
+
+	function iteration(i: Iteration): [string, [string], ParserRule[]] {
+		const id = generate() ;
+		const [inner_node, states, rules] = specification_node(i.content) ;
+
+		get_references(i.content).forEach(v => reference_value_type.set(v.value, 'list')) ;
+
+
+		return [
+			id,
+			[id, ...states],
+			[
+				{
+					name: id + "_empty",
+					symbols: [],
+					postprocess: () => null
+				} as ParserRule,
+				{
+					name: id + "_cons",
+					symbols: [id, inner_node],
+					postprocess: d => d[0].concat([d[1]])
+				} as ParserRule,
+				...rules
+			]
+		] ;
+	}
+
 	const compiled_content = spec.content.map((v) => specification_node(v));
 
 	const main_rule: ParserRule[] = [
 		{
 			name: filterToName(spec.header.states),
-			symbols: [...compiled_content.map((v) => v[0])],
+			symbols: [...compiled_content.flatmap(([id, states, rules]) => states)],
 			postprocess(v) {
 				const references = v
 					.flat(Infinity)
@@ -178,10 +247,8 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 	const grammar = {
 		Lexer: new Lexer(),
 		ParserRules: compiled_content
-			.map((v) => v[1])
-			.flat()
-			.concat(...SPACE_0, ...SPACE_1, ...EVERYTHING)
-			.concat(main_rule),
+			.flatmap(([id, states, rules]) => rules)
+			.concat([...SPACE_0, ...SPACE_1, ...EVERYTHING, main_rule]),
 		ParserStart: filterToName(spec.header.states)
 	};
 	tactic.grammar = grammar;
