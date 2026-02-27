@@ -1,3 +1,6 @@
+
+// Avoid reloading all dependencies if an object technically changed, but not meaningfully.
+// The value field of the returned object only change when the getter was updated to a different value.
 export function value_derived<T>(getter: () => T, equal: (a: T, b: T) => boolean) {
 	let derived_state = $derived.by(getter);
 
@@ -9,7 +12,7 @@ export function value_derived<T>(getter: () => T, equal: (a: T, b: T) => boolean
 
 	return {
 		get value() {
-			return (() => cached_value)();
+			return cached_value;
 		}
 	};
 }

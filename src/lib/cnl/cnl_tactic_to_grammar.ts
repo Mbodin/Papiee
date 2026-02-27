@@ -48,9 +48,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 		{
 			name: _space_1_id,
 			symbols: [{ literal: ' ' }],
-			postprocess: (d) => {
-				return d[0].value;
-			}
+			postprocess: (d) => d[0].value
 		}
 	];
 
@@ -67,12 +65,11 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 				} as Symbol,
 				_everything
 			],
-			postprocess(d, loc, reject) {
-				return d
+			postprocess: (d, loc, reject) =>
+					d
 					.flat()
 					.map((v) => (typeof v === 'string' ? v : v?.value || ''))
-					.join('');
-			}
+					.join('')
 		},
 		{
 			name: _everything,
@@ -127,9 +124,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 					symbols: [...v.value]
 						.map((v) => (v === ' ' ? [_space_1_id, _space_0_id] : [{ literal: v }]))
 						.flat(),
-					postprocess(v) {
-						return v.map((v) => v.text).join('');
-					}
+					postprocess: (v) => v.map((v) => v.text).join('')
 				} as ParserRule
 			]
 		];
@@ -147,12 +142,10 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 				{
 					name: id,
 					symbols: [_everything],
-					postprocess(d, loc, reject) {
-						return {
+					postprocess: (d, loc, reject) => ({
 							type: v.value,
 							value: d[0]
-						};
-					},
+						}),
 					test: 1
 				} as ParserRule
 			]
@@ -174,7 +167,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 							{
 								name: id,
 								symbols: [inner_node],
-								postprocess = d => d.join ("")
+								postprocess: d => d.join ("")
 							} as ParserRule,
 							...rules
 						]
@@ -183,8 +176,8 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 
 		return [
 			id_global,
-			[id_global, ...sub.flatmap(([inner_node, states, rules) => states)],
-			sub.flatmap(([inner_node, states, rules) => rules)
+			[id_global, ...sub.flatMap(([inner_node, states, rules]) => states)],
+			sub.flatMap(([inner_node, states, rules]) => rules)
 		]
 	}
 
@@ -200,12 +193,12 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 			[id, ...states],
 			[
 				{
-					name: id + "_empty",
+					name: id,
 					symbols: [],
 					postprocess: () => null
 				} as ParserRule,
 				{
-					name: id + "_cons",
+					name: id,
 					symbols: [id, inner_node],
 					postprocess: d => d[0].concat([d[1]])
 				} as ParserRule,
@@ -219,7 +212,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 	const main_rule: ParserRule[] = [
 		{
 			name: filterToName(spec.header.states),
-			symbols: [...compiled_content.flatmap(([id, states, rules]) => states)],
+			symbols: [...compiled_content.flatMap(([id, states, rules]) => states)],
 			postprocess(v) {
 				const references = v
 					.flat(Infinity)
@@ -247,7 +240,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 	const grammar = {
 		Lexer: new Lexer(),
 		ParserRules: compiled_content
-			.flatmap(([id, states, rules]) => rules)
+			.flatMap(([id, states, rules]) => rules)
 			.concat([...SPACE_0, ...SPACE_1, ...EVERYTHING, main_rule]),
 		ParserStart: filterToName(spec.header.states)
 	};

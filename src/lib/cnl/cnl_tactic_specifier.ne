@@ -46,8 +46,8 @@ export type StructureSpecificationBeginOfParagraph = {
 	specification: 'begin_of_paragraph';
 };
 
-function get_references(c: SpecificationContent): Reference[] {
-	return c.flatmap(v => {
+export function get_references(c: SpecificationContent): Reference[] {
+	return c.flatMap(v => {
 		switch (v.type) {
 			case 'text':
 				return [] ;
@@ -80,7 +80,7 @@ function reference(value: string): Reference {
 }
 
 function iteration(content: SpecificationContent): Iteration {
-	return { type: 'iteration'; content };
+	return { type: 'iteration', content };
 }
 
 function either(contents: SpecificationContent[]): Either {
@@ -93,9 +93,9 @@ function either(contents: SpecificationContent[]): Either {
       if (r0[i] !== r2[i]) return false ;
     }
 		return true ;
-	}) throw new Error(`Mismatch references`);
+	})) throw new Error(`Mismatch references`);
 
-	return { type: 'either'; contents };
+	return { type: 'either', contents };
 }
 
 function header(states: StateFilter): SpecificationHeader {
