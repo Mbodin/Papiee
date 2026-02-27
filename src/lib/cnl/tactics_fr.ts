@@ -35,25 +35,23 @@ const LET_IN = createTacticFromTextual<{ identifier: string, inset: string }>(
 	({ value }) => `\\letIn{${value.identifier}}{${value.inset}}.`
 );
 
-/* TODO: Soient x, y \in R, i \in N. → Implique d'ajouter des étoiles dans la grammaire cnl_tactic_specifier.ne
 const INTRODUCTIONS1 = createTacticFromTextual<{ identifier: string, inset: string }>(
 	'introductions1',
-	'{reasoning|Soient |identifier| \\in |inset|,|-+intros}',
-	({ value }) => `\\letIn{${value.identifier}}{${value.inset}}.`
+	'{reasoning|Soient |identifier|\\(, |identifier|\\)* \\in |inset||+intros}',
+	({ value }) => value.identifier.map(v => `\\letIn{${v}}{${value.inset}}.`).join(' ')
 );
 
 const INTRODUCTIONS2 = createTacticFromTextual<{ identifier: string, inset: string }>(
 	'introductions2',
-	'{intros||identifier| \\in |inset|,|-+intros}',
-	({ value }) => `\\letIn{${value.identifier}}{${value.inset}}.`
+	'{intros|\\(,\\| et\\|, et\\) |identifier|\\(, |identifier|\\)* \\in |inset||}',
+	({ value }) => value.identifier.map(v => `\\letIn{${v}}{${value.inset}}.`).join(' ')
 );
 
 const INTRODUCTIONS3 = createTacticFromTextual<{}>(
 	'introductions3',
-	'{intros|.|-+reasoning}',
+	'{intros|.|-}',
 	({ value }) => `\\letIn{${value.identifier}}{${value.inset}}.`
 );
-*/
 
 const LET_IN_PAIR = createTacticFromTextual<{ identifier1: string, identifier2: string,
 																						  inset1: string, inset2: string }>(

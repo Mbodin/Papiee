@@ -181,7 +181,7 @@ reference -> "|" word "|"
 word -> [a-zA-Z0-9_]:+
 {% d => d[0].join("") %}
 
-iteration -> "|(|" content ("||" content):* "|)" (null | "*" | "+") "|"
+iteration -> "\\(" content ("\\|" content):* "\\)" (null | "*" | "+")
 {% d => {
 	const c = d[2] ? either([d[1], ...d[2]]) : d[1] ;
 	switch (d[4]){

@@ -10,7 +10,7 @@
 	let node = QUESTION_NODE.initial();
 
 	onMount(() => {
-		let text = "Soit $(u_{n}) \\in \\mathbb{R}^{\\mathbb{N}}$, $q \\in \\mathbb{R}$.\n" ;
+		let text = "Soient $(u_{n}) \\in \\mathbb{R}^{\\mathbb{N}}$ et $q \\in \\mathbb{R}$.\n" ;
 		text += "Supposons que $\\forall n \\in \\mathbb{N}, u_{n+1} = q \\times u_{n}$.\n" ;
 		text += "On procède par récurrence.\n" ;
 		text += "\t$On a q^{0} \\times u_{0} = 1 \\times u_{0} = u_{0}$.\n"
