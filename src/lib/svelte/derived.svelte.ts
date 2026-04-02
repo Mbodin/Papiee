@@ -4,10 +4,13 @@
 export function value_derived<T>(getter: () => T, equal: (a: T, b: T) => boolean) {
 	let derived_state = $derived.by(getter);
 
-	let cached_value = $state(derived_state);
+	// svelte-ignore state_referenced_locally
+	let cached_value = (() => $state.snapshot(derived_state))();
 
 	$effect(() => {
-		if (!equal(derived_state, cached_value)) cached_value = derived_state;
+		let state = $state.snapshot(derived_state);
+		if (!equal(state, cached_value))
+			cached_value = state;
 	});
 
 	return {

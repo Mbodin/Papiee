@@ -53,3 +53,4 @@ const object = Object.fromEntries(
 	files.map((path) => [path.substring('rocq/'.length), String(fs.readFileSync(path))])
 );
 fs.writeFileSync('rocq/rocq.json', JSON.stringify({ files: object }, undefined, 1));
+
