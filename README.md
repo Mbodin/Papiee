@@ -39,6 +39,8 @@ npm run dev -- --open
 
 One can then open a webbrowser at `http://localhost:5173/document` to open a Papiée document.
 
+When developping, some files must be regenerated (for instance .ne files): consider rerunning `node scripts/installation.js` when you change these files.
+
 ## Building
 
 To create a production version of Papiée:

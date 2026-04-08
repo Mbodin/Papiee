@@ -43,7 +43,7 @@ const INTRODUCTIONS1 = createTacticFromTextual<{ identifier: string, inset: stri
 
 const INTRODUCTIONS2 = createTacticFromTextual<{ identifier: string, inset: string }>(
 	'introductions2',
-	'{intros|\\(,\\| et\\|, et\\) |identifier|\\(, |identifier|\\)* \\in |inset||}',
+	'{intros|\\(,| et|, et\\) |identifier|\\(, |identifier|\\)* \\in |inset||}',
 	({ value }) => value.identifier.map(v => `\\letIn{${v}}{${value.inset}}.`).join(' ')
 );
 

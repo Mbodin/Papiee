@@ -84,7 +84,8 @@ function iteration(content: SpecificationContent): Iteration {
 }
 
 function either(contents: SpecificationContent[]): Either {
-	if(contents.length <= 1) throw new Error(`At least two branches are expected`);
+	if(contents.length <= 1)
+		throw new Error(`At least two branches are expected (object: ${JSON.stringify(contents)})`);
 	const r0 = get_references(contents[0]).sort() ;
 	if(!contents.every(c => {
 		const r2 = get_references(c).sort() ;
@@ -169,11 +170,11 @@ header_states -> (word " "):* word
 content -> text:? (interactive text):* interactive:?
 {% d => d.flat(Infinity).filter(Boolean) %}
 
-text -> ([^|] | "\\|"):+
-{% d => text(d[0].map((v: string) => v[0] === "\\|" ? "|" : v[0]).join("")) %}
+text -> ([^|\\] | "\\\\|" | "\\" [a-zA-Z]):+
+{% d => text(d[0].map(v => v[0] === "\\\\|" ? "|" : v.join("")).join("")) %}
 
-interactive -> reference | iteration
-{% d => d %}
+interactive -> (reference | iteration):*
+{% d => d.flat(Infinity) %}
 
 reference -> "|" word "|"
 {% d => reference(d[1]) %}
@@ -183,12 +184,12 @@ word -> [a-zA-Z0-9_]:+
 
 iteration -> "\\(" content ("\\|" content):* "\\)" (null | "*" | "+")
 {% d => {
-	const c = d[2] ? either([d[1], ...d[2]]) : d[1] ;
-	switch (d[4]){
-		case null: return c ;
+	const c = (d[2].length > 0) ? either([d[1], ...d[2]]) : d[1] ;
+	switch (d[4][0]){
+		case undefined: return c ;
 		case "*": return iteration(c) ;
 		case "+": return [c, iteration(c)] ;
-		default: assert(false) ;
+		default: throw new Error(`Unexpected value`);
 	}
 } %}
 

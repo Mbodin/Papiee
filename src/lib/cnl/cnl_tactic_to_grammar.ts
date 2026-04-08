@@ -108,7 +108,7 @@ export function attach_grammar(tactic: CnlTactic): CompiledRules {
 			case 'either':
 				return either(v);
 			default:
-				throw new Error(`${v as any} is unknown`);
+				throw new Error(`${v.type ? v.type : JSON.stringify(v)} is unknown`);
 		}
 	}
 
