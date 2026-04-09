@@ -3,7 +3,7 @@ import { createTacticFromTextual } from './cnl_tactic';
 const COMMENT = createTacticFromTextual<{ comment: string }>(
 	'Comment',
 	'{*|(|comment|)|}',
-	({ value }) => `(*${value.comment}.*)`
+	({ value }) => `(* ${value.comment} *)`
 );
 
 const SPACES = createTacticFromTextual<{ comment: string }>('Spaces', '{*| |}', ({ value }) => ``);

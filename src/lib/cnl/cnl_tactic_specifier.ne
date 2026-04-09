@@ -64,11 +64,11 @@ export function get_references(c: SpecificationContent): Reference[] {
 }
 
 function specification(
-	_header: SpecificationHeader,
+	header: SpecificationHeader,
 	content: SpecificationContent,
-	_footer: SpecificationFooter
+	footer: SpecificationFooter
 ): Specification {
-	return { type: 'specification', header: _header, content, footer: _footer };
+	return { type: 'specification', header, content, footer };
 }
 
 function text(value: string): Text {
@@ -174,7 +174,7 @@ text -> ([^|\\] | "\\\\|" | "\\" [a-zA-Z]):+
 {% d => text(d[0].map(v => v[0] === "\\\\|" ? "|" : v.join("")).join("")) %}
 
 interactive -> (reference | iteration):*
-{% d => d.flat(Infinity) %}
+{% id %}
 
 reference -> "|" word "|"
 {% d => reference(d[1]) %}
