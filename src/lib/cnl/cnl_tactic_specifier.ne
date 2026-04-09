@@ -171,10 +171,10 @@ content -> text:? (interactive text):* interactive:?
 {% d => d.flat(Infinity).filter(Boolean) %}
 
 text -> ([^|\\] | "\\\\|" | "\\" [a-zA-Z]):+
-{% d => text(d[0].map(v => v[0] === "\\\\|" ? "|" : v.join("")).join("")) %}
+{% d => text(d[0].map((v : string[]) => v[0] === "\\\\|" ? "|" : v.join("")).join("")) %}
 
 interactive -> (reference | iteration):*
-{% id %}
+{% d => d.flat() %}
 
 reference -> "|" word "|"
 {% d => reference(d[1]) %}

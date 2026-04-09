@@ -22,13 +22,9 @@ if (!fs.existsSync('static/worker_artifact.zip')) {
 if (!fs.existsSync('static/worker_artifact/')) {
 	console.log('Trying to unzip worker_artifact.zip ...');
 
-	await new Promise((resolve, rejects) =>
-		fs
-			.createReadStream('static/worker_artifact.zip')
-			.pipe(unzipper.Extract({ path: 'static/worker_artifact' }))
-			.on('close', () => resolve())
-			.on('error', () => rejects())
-	);
+	fs
+		.createReadStream('static/worker_artifact.zip')
+		.pipe(unzipper.Extract({ path: 'static/worker_artifact' })) ;
 	console.log('Zip file was extracted !');
 } else {
 	console.log('Zip file is already extracted');
@@ -45,10 +41,11 @@ console.log('Installation done, it should work now !');
 
 console.log('Creating a dump file containing rocq/**.v files.');
 
-const files = fs
-	.readdirSync('rocq')
-	.filter((v) => v.endsWith('.v'))
-	.map((name) => 'rocq/' + name);
+const files =
+	fs
+		.readdirSync('rocq')
+		.filter((v) => v.endsWith('.v'))
+		.map((name) => 'rocq/' + name) ;
 const object = Object.fromEntries(
 	files.map((path) => [path.substring('rocq/'.length), String(fs.readFileSync(path))])
 );
