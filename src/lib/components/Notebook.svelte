@@ -46,7 +46,7 @@
 <RocqProvider>
 	<div class="my-5 mt-5 flex h-full flex-col rounded-lg bg-surface-50-950">
 		<div
-			class="relative z-10 preset-filled-surface-400-600 before:pointer-events-none before:absolute before:-inset-4 before:rounded-lg before:border-16 before:border-surface-400-600"
+			class="relative z-10 preset-filled-surface-300-700 before:pointer-events-none before:absolute before:-inset-4 before:rounded-lg before:border-16 before:border-surface-300-700"
 		>
 			<div class="flex flex-row gap-5 p-2 text-nowrap">
 				<h5 class="">{m.title()}:</h5>

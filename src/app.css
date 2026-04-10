@@ -8,3 +8,14 @@
 @import './papiee-theme.css';
 
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
+
+/* We need to choose between the katex-mathml and katex-html display (otherwise both appear!).
+ The former displays nicer. */
+.katex-html {
+	display: none ;
+}
+
+.pa_goal {
+	font-size: 2.5ex ;
+}
+

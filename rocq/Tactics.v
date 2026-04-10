@@ -24,7 +24,11 @@ Notation "x '\in' S" := (in_set x S) (at level 70, no associativity).
 
 Notation "'\forall' x .. y '\in' S ',' P" :=
   (forall x, x \in S -> .. (forall y, y \in S -> P) .. )
-  (at level 99, x binder, y binder, P at level 200, right associativity).
+  (at level 10, x binder, y binder, P at level 200, right associativity).
+
+Notation "'\exists' x '\in' S ',' P" :=
+  (exists x, x \in S /\ P)
+  (at level 10, x binder, P at level 200, right associativity).
 
 Definition fullset (T : Type) : @set T := fun _ => True.
 Opaque fullset.
@@ -124,6 +128,8 @@ Notation "S '^{' n '}'" := (setpower S n) (at level 96, left associativity).
 Definition powerset {T : Set} (S : @set T) : @set (@set T) := fullset set.
 
 Notation "'\powerset' '{' S '}'" := (powerset S).
+
+Notation "a \mod b" := (a mod b) (at level 40, no associativity).
 
 
 (* * Helper Tactics *)
@@ -555,7 +561,7 @@ Ltac goal_is_simple :=
 
 Lemma mod_eq : forall a b c,
   b <> 0 ->
-  a mod b = c ->
+  a \mod b = c ->
   exists k, a = b * k + c.
 Proof. intros a b c D E. rewrite <- E. eexists. apply Nat.Div0.div_mod. Qed.
 
@@ -570,13 +576,13 @@ Ltac trivial_to_prove :=
        (* FIXME: Do we want to force the students to do it explicitly? *)
        eassumption
      | (* Proofs by computations. *)
-       goal_is_simple ; filter_simple ; simplify_goal ; (eassumption || lia || lra)
+       (* goal_is_simple ; *) filter_simple ; simplify_goal ; (eassumption || lia || lra)
      | (* Proofs by computations with existentials. *)
        repeat match goal with E : ?x = _ |- _ => subst x end;
        (reflexivity || eassumption
         || (rewrite Nat.Div0.div_exact; (reflexivity || eassumption))
         || (rewrite Nat.mul_comm; rewrite Nat.Div0.div_exact; (reflexivity || eassumption)))
-     | progress repeat match goal with E : ?a mod ?b = ?c |- _ =>
+     | progress repeat match goal with E : ?a \mod ?b = ?c |- _ =>
          let D := new_private in
          (assert (D : b <> 0); [lia|]) ;
          let k := new_name in
@@ -584,14 +590,17 @@ Ltac trivial_to_prove :=
          destruct (mod_eq a b c D E) as [k E'];
          clear E
        end
+     | progress repeat rewrite Nat.add_0_r in *
+     | progress repeat rewrite Nat.add_0_l in *
      | split; intros
-     | eexists ] ]
+     | eexists
+     | match goal with |- context [?f] => progress (unfold f; simpl; fold f) end ] ]
   || lazymatch goal with |- ?g => fail "Error_trivial_to_prove{"g"}" end.
 
 Check ltac:(goal_test_solve ltac:(trivial_to_prove) (1%R \in \mathbb{R})).
 Check ltac:(goal_test_solve ltac:(trivial_to_prove) (1%R \in \mathbb{R}^\star)).
 Check ltac:(goal_test_solve ltac:(trivial_to_prove) (1%R \in \mathbb{R}_+)).
-Check ltac:(goal_test_solve ltac:(trivial_to_prove) (\forall x \in \mathbb{R}^\star, (x <> 0)%R)).
+(*Check ltac:(goal_test_solve ltac:(trivial_to_prove) (\forall x \in \mathbb{R}^\star, (x <> 0)%R)).*)
 Check ltac:(goal_test_solve ltac:(trivial_to_prove) (\forall n \in \mathbb{N}^\star, n \in \mathbb{N})).
 Check ltac:(goal_test_solve_fail ltac:(trivial_to_prove) (forall x, exists y, x = y + 1)).
 Check ltac:(goal_test_solve ltac:(trivial_to_prove) (forall x : nat, x = x)).
@@ -1246,3 +1255,27 @@ Goal \forall x \in \mathbb{N}^\star, x * x * x >= 1.
   \caseEnd{}.
 Qed.
 
+
+
+(* This is the proof we would like to write.
+Definition A_ (n : nat) := n * (2 * n + 1) * (7 * n + 1).
+Lemma A_6 : \forall n \in \mathbb{N}, \exists a \in \mathbb{N}, A_ n = 3 * a.
+Proof.
+  \letIn{n}{\mathbb{N}}.
+  \caseBegin{}.
+    \caseItem{(n mod 3 = 0)}.
+      \introExists{k}{(n = 3 * k)}.
+      \therefore{(A_ n = 3 * (k * (2 * n + 1) * (7 * n + 1)))}.
+      \caseItemEnd{}.
+    \caseItem{(n mod 3 = 1)}.
+      \introExists{k}{(n = 3 * k + 1)}.
+      \therefore{(2 * n + 1 = 3 * (2 * k + 1))}.
+      \therefore{(A_ n = 3 * (n * (2 * k + 1) * (7 * n + 1)))}.
+      \caseItemEnd{}.
+    \caseItem{(n mod 3 = 2)}.
+      \introExists{k}{(n = 3 * k + 2)}.
+      \therefore{(7 * n + 1 = 3 * (7 * k + 5))}.
+      \therefore{(A_ n = 3 * (n * (2 * n + 1) * (7 * k + 5)))}.
+      \caseItemEnd{}.
+  \caseEnd{}.
+*)

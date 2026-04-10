@@ -16,7 +16,7 @@
 				"state": "State",
 				"definitions": "Definitions :",
 				"error_nogoal": "No goal currently found ...",
-				"hypothesis": "Hypothesis :"
+				"hypotheses": "Hypotheses :"
 			}
 		},
 		"save": "Saving Notebook"
@@ -28,7 +28,7 @@
 	"download": "Download",
 	"save": "Save",
 	"import": "Import",
-	"switch_mode": "Swicth mode",
+	"switch_mode": "Switch mode",
 	"rocq_provider": {
 		"loading": {
 			"steps": {

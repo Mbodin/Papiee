@@ -13,10 +13,10 @@
 		},
 		"widgets": {
 			"proof_state": {
-				"state": "Etat",
+				"state": "État",
 				"definitions": "Definitions :",
 				"error_nogoal": "Aucun but n'a été trouvé ...",
-				"hypothesis": "Hypothèses :"
+				"hypotheses": "Hypothèses :"
 			}
 		},
 		"save": "Sauvegarde du Notebook"
@@ -25,7 +25,6 @@
 	"fatal_error": "Erreur Fatale",
 	"title": "Titre",
 	"cancel": "Annuler",
-	"Télécharger": "download",
 	"download": "Télécharger",
 	"save": "Sauvegarder",
 	"import": "Importer",

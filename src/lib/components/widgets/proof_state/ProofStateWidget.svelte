@@ -64,7 +64,7 @@
 
 				<section>
 					<header>
-						<h5 class="">{m['notebook.widgets.proof_state.hypothesis']()}</h5>
+						<h5 class="">{m['notebook.widgets.proof_state.hypotheses']()}</h5>
 					</header>
 
 					<ul class="ml-10">
@@ -97,13 +97,13 @@
 			{/if}
 		</div>
 
-		<footer class="rounded-b-md preset-filled-surface-300-700 p-2 text-sm">
+		<footer class="rounded-b-md preset-filled-surface-200-800 p-2 text-sm">
 			{#if loading === true}
 				<div>
 					<Loader class="mx-auto animate-spin" />
 				</div>
 			{:else if goal?.ty != null}
-				<h4 class="text-nowrap">
+				<h4 class="text-nowrap pa_goal">
 					<Latex value={fromPpToString(goal?.ty || ['Pp_empty'])} />
 				</h4>
 			{:else}
