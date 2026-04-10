@@ -6,7 +6,6 @@ From Stdlib Require Import Logic.Classical_Prop.
 
 Import List.ListNotations.
 
-
 (* Hopefully, this function will never be called, but if it is, it should provide enough
   information for debugging. *)
 Ltac internal_error fct msg :=
@@ -554,19 +553,39 @@ Ltac goal_is_simple :=
     end
   end.
 
+Lemma mod_eq : forall a b c,
+  b <> 0 ->
+  a mod b = c ->
+  exists k, a = b * k + c.
+Proof. intros a b c D E. rewrite <- E. eexists. apply Nat.Div0.div_mod. Qed.
+
 (* This tactic should correspond to a “trivial” step in the proof for the students's level. *)
 Ltac trivial_to_prove :=
   solve [
    intros ;
    repeat first
      [ (* Really, really simple proofs. *)
-       solve [ trivial ]
+       solve [ trivial | reflexivity ]
      | (* Proofs of the form [exists x, P x] when there is an object [P x] in the context. *)
        (* FIXME: Do we want to force the students to do it explicitly? *)
        eassumption
      | (* Proofs by computations. *)
-       goal_is_simple ; filter_simple ; simplify_goal ; (assumption || lia || lra)
-     | split; intros ] ]
+       goal_is_simple ; filter_simple ; simplify_goal ; (eassumption || lia || lra)
+     | (* Proofs by computations with existentials. *)
+       repeat match goal with E : ?x = _ |- _ => subst x end;
+       (reflexivity || eassumption
+        || (rewrite Nat.Div0.div_exact; (reflexivity || eassumption))
+        || (rewrite Nat.mul_comm; rewrite Nat.Div0.div_exact; (reflexivity || eassumption)))
+     | progress repeat match goal with E : ?a mod ?b = ?c |- _ =>
+         let D := new_private in
+         (assert (D : b <> 0); [lia|]) ;
+         let k := new_name in
+         let E' := new_name in
+         destruct (mod_eq a b c D E) as [k E'];
+         clear E
+       end
+     | split; intros
+     | eexists ] ]
   || lazymatch goal with |- ?g => fail "Error_trivial_to_prove{"g"}" end.
 
 Check ltac:(goal_test_solve ltac:(trivial_to_prove) (1%R \in \mathbb{R})).
@@ -824,7 +843,7 @@ Check ltac:(goal_test_step_fail ltac:(\introduceNamed{H}{nat}) (forall x : nat, 
 Check ltac:(goal_test_step_fail ltac:(\letIn{x}{\mathbb{N}} ; \introduceNamed{x}{True})
               (\forall x \in \mathbb{N}, True -> x = x)).
 
-(* ** \introduce{property}: Introduce a property. *)
+(* *** \introduce{property}: Introduce a property. *)
 
 Tactic Notation "\introduce" "{" constr(P) "}" :=
   assume_proof_mode ltac:(fun _ =>
@@ -867,6 +886,36 @@ Check ltac:(goal_test_step ltac:(\letIn{x}{\mathbb{N}} ; \letIn{y}{\mathbb{N}} ;
    fail *)
 Check ltac:(goal_test_step_fail ltac:(\letIn{x}{\mathbb{N}} ; \letIn{y}{\mathbb{N}} ; \introduce{(x = x)})
               (\forall x y \in \mathbb{N}, x = y -> False)).
+
+
+(* *** \introExists{name}{property}: Introduce a variable satisfying a property, whose existence follows from the current context. *)
+
+Tactic Notation "\introExists" "{" ident(x) "}" "{" uconstr(P) "}" :=
+  assume_proof_mode ltac:(fun _ =>
+    first [ ensure_variable_fresh x | fail 1 "Error_exists_alreadyTaken{"x"}" ] ;
+    first [
+        (let t := new_private in pose proof (t := fun x => P); clear t)
+      | fail 1 "Error_exists_typeError{"x"}{"P"}" ] ;
+    let E := new_private in
+    (assert (E : exists x, P); [ trivial_to_prove |]) ;
+    let H := new_name in
+    destruct E as [x H]).
+
+(* x \in \mathbb{N}
+   x = 10
+   ===========================================
+   False
+\introExists{y}{x = 2 * y}
+   x \in \mathbb{N}
+   x = 10
+   y
+   x = 2 * y
+   ================
+   False *)
+Check ltac:(goal_test_step ltac:(\letIn{x}{\mathbb{N}} ; \introduce{(x = 10)} ; \introExists{y}{(x = 2 * y)})
+              (\forall x \in \mathbb{N}, x = 10 -> False)
+              (\forall x \in \mathbb{N}, x = 10 -> forall y, x = 2 * y -> False)).
+
 
 (* *** Assertive tactics (don't change much in the context) *)
 

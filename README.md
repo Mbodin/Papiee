@@ -12,7 +12,7 @@ pip install nodeenv
 nodeenv -p
 ```
 
-The first time `npm install` will be run, an error will be thrown about a file to be retrived from the Rocq-lsp github document.
+The first time `npm install` will be run, an error will be thrown about a file to be retrieved from the Rocq-lsp github document.
 The link and location of the needed file is provided as error in the console.
 ```sh
 npm install

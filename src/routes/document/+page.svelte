@@ -10,20 +10,27 @@
 	let node = QUESTION_NODE.initial();
 
 	onMount(() => {
-		let text = "Soit $(u_{n}) \\in \\mathbb{R}^{\\mathbb{N}}$, $q \\in \\mathbb{R}$.\n" ;
-		text += "Supposons que $\\forall n \\in \\mathbb{N}, u_{n+1} = q \\times u_{n}$.\n" ;
-		text += "On procède par récurrence.\n" ;
-		text += "\t$On a q^{0} \\times u_{0} = 1 \\times u_{0} = u_{0}$.\n"
-		text += "\tOn suppose par récurrence $\\exists n_{0} \\in \\mathbb{N}$, $u_{n_{0}} = q^{n_{0}} \\times u_{0}$.\n" ;
-		text += "\tMontrons que $u_{n_{0} +1} = q^{n_{0} +1} \\times u_{0}$. "
-		text += "On a $u_{n_{0} +1} = q \\times u_{n_{0}} = q\\times \\left( q^{n_{0}} \\times u_{0}\\right) = q^{n_{0} +1} \\times u_{0}$.\n" ;
-		text += "Par récurrence on a bien $\\forall n\\in \\mathbb{N}, u_{n} =q^{n} \\times u_{0}$.";
-		node.children.cnl_proof.value = text;
+		let markdown = "On pose $A_n = n × (2n + 1) × (7n + 1)$.\n" ;
+		markdown += "Montrer que pour tout $n$, $A_n$ est divisible par $3$." ;
+		node.children.markdown_header.value = markdown ;
+
+		let rocq = "Definition A (n : nat) := n * (2 * n + 1) * (7 * n + 1).\n" ;
+		rocq += "Lemma A_6 : forall n, exists a, A n = 3 * a.\n" ;
+		rocq += "Proof.\n"
+		node.children.rocq_header.value = rocq ;
+
+		let proof = "Soit $n \\in \\mathbb{N}$.\n" ;
+		proof += "On distingue les cas suivants.\n" ;
+		proof += "\t- Si $n mod 3 = 0$. Il existe alors $k$ tel que $n = 3 * k$. On a donc $A n = 3 * (k * (2 * n + 1) * (7 * n + 1))$.\n" ;
+		proof += "\t- Si $n mod 3 = 1$. Il existe alors $k$ tel que $n = 3 * k + 1$. On a donc $2 * n + 1 = 3 * (2 * k + 1)$. On a donc $A n = 3 * (n * (2 * k + 1) * (7 * n + 1)).$\n" ;
+		proof += "\t- Si $n mod 3 = 2$. Il existe alors $k$ tel que $n = 3 * k + 2$. On a donc $7 * n + 1 = 3 * (7 * k + 5)$. On a donc $A n = 3 * (n * (2 * n + 1) * (7 * k + 5)).$\n" ;
+		proof += "Ce qu'il fallait démontrer.\n" ;
+		node.children.cnl_proof.value = proof ;
 	});
 
 	let notebook_state: NotebookState = $state({
 		children: [node],
-		title: ''
+		title: "Exemple d'analyse de cas"
 	});
 
 	let teacher_viewing = $state(true);

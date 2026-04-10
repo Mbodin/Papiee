@@ -80,6 +80,12 @@ const INTRODUCE = createTacticFromTextual<{ property: string }>(
 	({ value }) => `\\introduce{${value.property}}.`
 );
 
+const INTRO_EXISTS = createTacticFromTextual<{ property: string }>(
+	'intro_exists',
+	'{reasoning|Il existe alors |x| tel que |property|.|}',
+	({ value }) => `\\introExists{${value.x}}{${value.property}}.`
+);
+
 const LETS_PROVE = createTacticFromTextual<{ property: string }>(
 	'lets_prove',
 	'{reasoning|Montrons que |property|.|}',
@@ -94,7 +100,7 @@ const QED = createTacticFromTextual<{}>(
 
 const CASE_ANALYSIS = createTacticFromTextual<{}>(
 	'case_analysis',
-	'{reasoning|Procédons par analyse de cas.|>+case}',
+	'{reasoning|On distingue les cas suivants.|>+case}',
 	({ value }) => `\\caseBegin{}`
 );
 

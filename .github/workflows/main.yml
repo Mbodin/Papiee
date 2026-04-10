@@ -30,7 +30,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '24.x'
+          node-version: '25.x'
       - name: Query worker url
         run: 'cd static && curl -H "Accept: application/vnd.github+json" -H "Authorization: token ${{ secrets.TOKEN }}" -L -o worker_artifact.zip "https://api.github.com/repos/ejgallego/rocq-lsp/actions/artifacts/4518852242/zip"'
       - name: Install dependencies
