@@ -129,7 +129,7 @@ Definition powerset {T : Set} (S : @set T) : @set (@set T) := fullset set.
 
 Notation "'\powerset' '{' S '}'" := (powerset S).
 
-Notation "a \mod b" := (a mod b) (at level 40, no associativity).
+Notation "a \bmod b" := (a mod b) (at level 40, no associativity).
 
 
 (* * Helper Tactics *)
@@ -561,7 +561,7 @@ Ltac goal_is_simple :=
 
 Lemma mod_eq : forall a b c,
   b <> 0 ->
-  a \mod b = c ->
+  a \bmod b = c ->
   exists k, a = b * k + c.
 Proof. intros a b c D E. rewrite <- E. eexists. apply Nat.Div0.div_mod. Qed.
 
@@ -582,7 +582,7 @@ Ltac trivial_to_prove :=
        (reflexivity || eassumption
         || (rewrite Nat.Div0.div_exact; (reflexivity || eassumption))
         || (rewrite Nat.mul_comm; rewrite Nat.Div0.div_exact; (reflexivity || eassumption)))
-     | progress repeat match goal with E : ?a \mod ?b = ?c |- _ =>
+     | progress repeat match goal with E : ?a \bmod ?b = ?c |- _ =>
          let D := new_private in
          (assert (D : b <> 0); [lia|]) ;
          let k := new_name in

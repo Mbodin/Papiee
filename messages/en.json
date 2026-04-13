@@ -3,7 +3,7 @@
 	"hello_world": "Hello, {name} from en!",
 	"notebook": {
 		"proof": {
-			"error_norocqproof": "No Rocq proof was found in Rocq file before this.",
+			"error_norocqproof": "No Rocq proof was found in the Rocq file before this.",
 			"begin_state": {
 				"error": "Error",
 				"success": "Success",
@@ -14,9 +14,9 @@
 		"widgets": {
 			"proof_state": {
 				"state": "State",
-				"definitions": "Definitions :",
+				"definitions": "Variables:",
 				"error_nogoal": "No goal currently found ...",
-				"hypotheses": "Hypotheses :"
+				"hypotheses": "Hypotheses:"
 			}
 		},
 		"save": "Saving Notebook"

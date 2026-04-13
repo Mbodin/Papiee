@@ -19,11 +19,12 @@
 		rocq += "Proof.\n"
 		node.children.rocq_header.value = rocq ;
 
-		let proof = "Soit $n \\in \\mathbb{N}$.\n" ;
+		let proof = "Montrons que $\\forall n \\in \\mathbb{N}, \\exists k \\in \\mathbb{N}, A_ n = 3 * k$.\n" ;
+		proof += "Soit $n \\in \\mathbb{N}$.\n" ;
 		proof += "On distingue les cas suivants.\n" ;
-		proof += "\t- Si $n \\mod 3 = 0$. Il existe alors $k$ tel que $n = 3 * k$. On a donc $A_ n = 3 * (k * (2 * n + 1) * (7 * n + 1))$.\n" ;
-		proof += "\t- Si $n \\mod 3 = 1$. Il existe alors $k$ tel que $n = 3 * k + 1$. On a donc $2 * n + 1 = 3 * (2 * k + 1)$. On a donc $A_ n = 3 * (n * (2 * k + 1) * (7 * n + 1)).$\n" ;
-		proof += "\t- Si $n \\mod 3 = 2$. Il existe alors $k$ tel que $n = 3 * k + 2$. On a donc $7 * n + 1 = 3 * (7 * k + 5)$. On a donc $A_ n = 3 * (n * (2 * n + 1) * (7 * k + 5)).$\n" ;
+		proof += "\t- Si $n \\bmod 3 = 0$. Il existe alors $k$ tel que $n = 3 * k$. Alors $A_ n = 3 * (k * (2 * n + 1) * (7 * n + 1))$.\n" ;
+		proof += "\t- Si $n \\bmod 3 = 1$. Il existe alors $k$ tel que $n = 3 * k + 1$. Alors $2 * n + 1 = 3 * (2 * k + 1)$. Alors $A_ n = 3 * (n * (2 * k + 1) * (7 * n + 1)).$\n" ;
+		proof += "\t- Si $n \\bmod 3 = 2$. Il existe alors $k$ tel que $n = 3 * k + 2$. Alors $7 * n + 1 = 3 * (7 * k + 5)$. Alors $A_ n = 3 * (n * (2 * n + 1) * (7 * k + 5)).$\n" ;
 		proof += "Ce qu'il fallait démontrer.\n" ;
 		node.children.cnl_proof.value = proof ;
 	});

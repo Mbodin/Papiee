@@ -65,7 +65,7 @@ const LET_IN_PAIR = createTacticFromTextual<{ identifier1: string, identifier2: 
 
 const THEREFORE = createTacticFromTextual<{ property: string }>(
 	'therefore',
-	'{reasoning|On a donc $|property|$.|}',
+	'{reasoning|Alors $|property|$.|}',
 	({ value }) => `\\therefore{(${value.property})}.`
 );
 
@@ -93,12 +93,6 @@ const LETS_PROVE = createTacticFromTextual<{ property: string }>(
 	({ value }) => `\\letsProve{(${value.property})}.`
 );
 
-const QED = createTacticFromTextual<{}>(
-	'qed',
-	'{reasoning|Ce qu\'il fallait démontrer.|-+end}',
-	({ value }) => `\\closeGoal{}.`
-);
-
 const CASE_ANALYSIS = createTacticFromTextual<{}>(
 	'case_analysis',
 	'{reasoning|On distingue les cas suivants.|>+case}',
@@ -121,5 +115,11 @@ const DESTRUCTION_END = createTacticFromTextual<{}>(
 	'case_end',
 	'{case||--+end}',
 	({ value }) => '\\caseEnd{}.'
+);
+
+const QED = createTacticFromTextual<{}>(
+	'qed',
+	'{reasoning|Ce qu\'il fallait démontrer.|-+end}',
+	({ value }) => `\\closeGoal{}.`
 );
 
