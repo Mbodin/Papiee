@@ -131,6 +131,8 @@ Notation "'\powerset' '{' S '}'" := (powerset S).
 
 Notation "a \bmod b" := (a mod b) (at level 40, no associativity).
 
+Notation "a \times b" := (a * b) (at level 39, left associativity).
+
 
 (* * Helper Tactics *)
 
@@ -1259,24 +1261,24 @@ Qed.
 
 
 (* This is the proof we would like to write.
-Definition A_ (n : nat) := n * (2 * n + 1) * (7 * n + 1).
-Lemma A_6 : \forall n \in \mathbb{N}, \exists a \in \mathbb{N}, A_ n = 3 * a.
+Definition A_ (n : nat) := n \times (2 \times n + 1) \times (7 \times n + 1).
+Lemma A_6 : \forall n \in \mathbb{N}, \exists a \in \mathbb{N}, A_ n = 3 \times a.
 Proof.
   \letIn{n}{\mathbb{N}}.
   \caseBegin{}.
     \caseItem{(n mod 3 = 0)}.
-      \introExists{k}{\mathbb{N}}{(n = 3 * k)}.
-      \therefore{(A_ n = 3 * (k * (2 * n + 1) * (7 * n + 1)))}.
+      \introExists{k}{\mathbb{N}}{(n = 3 \times k)}.
+      \therefore{(A_ n = 3 \times (k \times (2 \times n + 1) \times (7 \times n + 1)))}.
       \caseItemEnd{}.
     \caseItem{(n mod 3 = 1)}.
-      \introExists{k}{\mathbb{N}}{(n = 3 * k + 1)}.
-      \therefore{(2 * n + 1 = 3 * (2 * k + 1))}.
-      \therefore{(A_ n = 3 * (n * (2 * k + 1) * (7 * n + 1)))}.
+      \introExists{k}{\mathbb{N}}{(n = 3 \times k + 1)}.
+      \therefore{(2 \times n + 1 = 3 \times (2 \times k + 1))}.
+      \therefore{(A_ n = 3 \times (n \times (2 \times k + 1) \times (7 \times n + 1)))}.
       \caseItemEnd{}.
     \caseItem{(n mod 3 = 2)}.
-      \introExists{k}{\mathbb{N}}{(n = 3 * k + 2)}.
-      \therefore{(7 * n + 1 = 3 * (7 * k + 5))}.
-      \therefore{(A_ n = 3 * (n * (2 * n + 1) * (7 * k + 5)))}.
+      \introExists{k}{\mathbb{N}}{(n = 3 \times k + 2)}.
+      \therefore{(7 \times n + 1 = 3 \times (7 \times k + 5))}.
+      \therefore{(A_ n = 3 \times (n \times (2 \times n + 1) \times (7 \times k + 5)))}.
       \caseItemEnd{}.
   \caseEnd{}.
 *)
