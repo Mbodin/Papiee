@@ -897,33 +897,34 @@ Check ltac:(goal_test_step_fail ltac:(\letIn{x}{\mathbb{N}} ; \letIn{y}{\mathbb{
               (\forall x y \in \mathbb{N}, x = y -> False)).
 
 
-(* *** \introExists{name}{property}: Introduce a variable satisfying a property, whose existence follows from the current context. *)
+(* *** \introExists{name}{set}{property}: Introduce a variable satisfying a property, whose existence follows from the current context. *)
 
-Tactic Notation "\introExists" "{" ident(x) "}" "{" uconstr(P) "}" :=
+Tactic Notation "\introExists" "{" ident(x) "}" "{" constr(S) "}" "{" uconstr(P) "}" :=
   assume_proof_mode ltac:(fun _ =>
     first [ ensure_variable_fresh x | fail 1 "Error_exists_alreadyTaken{"x"}" ] ;
     first [
         (let t := new_private in pose proof (t := fun x => P); clear t)
       | fail 1 "Error_exists_typeError{"x"}{"P"}" ] ;
     let E := new_private in
-    (assert (E : exists x, P); [ trivial_to_prove |]) ;
+    (assert (E : exists x, x \in S /\ P); [ trivial_to_prove |]) ;
+    let I := new_name in
     let H := new_name in
-    destruct E as [x H]).
+    destruct E as [x [I H]]).
 
 (* x \in \mathbb{N}
    x = 10
    ===========================================
    False
-\introExists{y}{x = 2 * y}
+\introExists{y}{\mathbb{N}}{x = 2 * y}
    x \in \mathbb{N}
    x = 10
-   y
+   y \in \mathbb{N}
    x = 2 * y
    ================
    False *)
-Check ltac:(goal_test_step ltac:(\letIn{x}{\mathbb{N}} ; \introduce{(x = 10)} ; \introExists{y}{(x = 2 * y)})
+Check ltac:(goal_test_step ltac:(\letIn{x}{\mathbb{N}} ; \introduce{(x = 10)} ; \introExists{y}{\mathbb{N}}{(x = 2 * y)})
               (\forall x \in \mathbb{N}, x = 10 -> False)
-              (\forall x \in \mathbb{N}, x = 10 -> forall y, x = 2 * y -> False)).
+              (\forall x \in \mathbb{N}, x = 10 -> \forall y \in \mathbb{N}, x = 2 * y -> False)).
 
 
 (* *** Assertive tactics (don't change much in the context) *)
@@ -1264,16 +1265,16 @@ Proof.
   \letIn{n}{\mathbb{N}}.
   \caseBegin{}.
     \caseItem{(n mod 3 = 0)}.
-      \introExists{k}{(n = 3 * k)}.
+      \introExists{k}{\mathbb{N}}{(n = 3 * k)}.
       \therefore{(A_ n = 3 * (k * (2 * n + 1) * (7 * n + 1)))}.
       \caseItemEnd{}.
     \caseItem{(n mod 3 = 1)}.
-      \introExists{k}{(n = 3 * k + 1)}.
+      \introExists{k}{\mathbb{N}}{(n = 3 * k + 1)}.
       \therefore{(2 * n + 1 = 3 * (2 * k + 1))}.
       \therefore{(A_ n = 3 * (n * (2 * k + 1) * (7 * n + 1)))}.
       \caseItemEnd{}.
     \caseItem{(n mod 3 = 2)}.
-      \introExists{k}{(n = 3 * k + 2)}.
+      \introExists{k}{\mathbb{N}}{(n = 3 * k + 2)}.
       \therefore{(7 * n + 1 = 3 * (7 * k + 5))}.
       \therefore{(A_ n = 3 * (n * (2 * n + 1) * (7 * k + 5)))}.
       \caseItemEnd{}.

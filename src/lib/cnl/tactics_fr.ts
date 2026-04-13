@@ -83,8 +83,8 @@ const INTRODUCE = createTacticFromTextual<{ property: string }>(
 
 const INTRO_EXISTS = createTacticFromTextual<{ property: string }>(
 	'intro_exists',
-	'{reasoning|Il existe alors $|x|$ tel que $|property|$.|}',
-	({ value }) => `\\introExists{${value.x}}{(${value.property})}.`
+	'{reasoning|Il existe alors $|x| \\in |inset|$ tel que $|property|$.|}',
+	({ value }) => `\\introExists{${value.x}}{${value.inset}}{(${value.property})}.`
 );
 
 const LETS_PROVE = createTacticFromTextual<{ property: string }>(
