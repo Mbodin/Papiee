@@ -56,3 +56,4 @@ export const PARAGRAPH_ALREADY_ENDED = syntax('paragraph_already_ended');
  * Used to create error for proof element that was not recognized
  */
 export const PROOF_ELEMENT_NOT_RECOGNISED = syntax('tactic_not_recognized');
+

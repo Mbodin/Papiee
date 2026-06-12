@@ -26,6 +26,13 @@ Download the requested file (here `https://github.com/ejgallego/rocq-lsp/actions
 
 The second invocation of `npm install` should now work.
 
+On subsequent sessions, the following lines should be enough to set up the environment:
+```sh
+source virtualenv/bin/activate
+# Entering virtualenv
+nodeenv -p
+```
+
 ## Developing
 
 Once you've imported Papiée and installed dependencies with `npm install`, start a development server:

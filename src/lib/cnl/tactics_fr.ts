@@ -1,5 +1,7 @@
 import { createTacticFromTextual } from './cnl_tactic';
 
+// FIXME: Why not add two arguments for createTacticFromTextual to get the state of the stack before and after?
+
 const COMMENT = createTacticFromTextual<{ comment: string }>(
 	'Comment',
 	'{*|(|comment|)|}',
@@ -81,7 +83,7 @@ const INTRODUCE = createTacticFromTextual<{ property: string }>(
 	({ value }) => `\\introduce{(${value.property})}.`
 );
 
-const INTRO_EXISTS = createTacticFromTextual<{ property: string }>(
+const INTRO_EXISTS = createTacticFromTextual<{ x: string, inset: string, property: string }>(
 	'intro_exists',
 	'{reasoning|Il existe alors $|x| \\in |inset|$ tel que $|property|$.|}',
 	({ value }) => `\\introExists{${value.x}}{${value.inset}}{(${value.property})}.`
